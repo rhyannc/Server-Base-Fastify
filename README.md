@@ -252,3 +252,11 @@ src/
 
 Este projeto está sob a licença **ISC**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
+## DOCKER
+
+Para executar o Banco de dados deve se usar o Docker e rodar o camando 
+docker compose up -d
+
+## PRISMA
+Executar o comando abaixo para criar as tablas
+npx prisma migrate dev
