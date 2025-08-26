@@ -1,5 +1,5 @@
 
-Uma Base para API moderna e robusta, construída com TypeScript e Fastify, oferecendo alta performance e escalabilidade.
+Uma Base para construção de API's,  moderna e robusta, construída com TypeScript e Fastify, oferecendo alta performance e escalabilidade.
 
 ## 📋 Descrição
 
@@ -55,26 +55,16 @@ api-locacao/
 
 ### Pré-requisitos
 - **Node.js** 22 ou superior
-- **npm** ou **yarn**
-- **Git**
 
 ### 🛠️ Instalação
 
-1. **Clone o repositório:**
+ **Instale as dependências:**
 ```bash
-git clone [url-do-repositorio]
-cd api-locacao
-```
-
-2. **Instale as dependências:**
-```bash
-npm install
-# ou
-yarn install
+npm i
 ```
 
 3. **Configure as variáveis de ambiente:**
-Crie um arquivo `.env` na raiz do projeto:
+Ajuste o arquivo `.env` na raiz do projeto:
 ```env
 # Ambiente de execução
 NODE_ENV=dev
@@ -84,6 +74,20 @@ PORT=3333
 ```
 
 ## 🏃‍♂️ Como Executar
+
+### DOCKER
+Com o docker já instalado execute no terminal o comando abaixo para criaçao do banco
+```bash
+docker compose up -d
+```
+
+### PRISMA
+Execute os comando para gerar as migrate e criaçao das tabelas
+```bash
+npx prisma generete
+npx prisma migrate dev
+```
+
 
 ### 🚀 Desenvolvimento
 ```bash
@@ -252,11 +256,3 @@ src/
 
 Este projeto está sob a licença **ISC**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## DOCKER
-
-Para executar o Banco de dados deve se usar o Docker e rodar o camando 
-docker compose up -d
-
-## PRISMA
-Executar o comando abaixo para criar as tablas
-npx prisma migrate dev

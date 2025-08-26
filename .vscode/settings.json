@@ -1,3 +1,5 @@
+// Faz com que o eslint cuide dos erros ao emvez do prettier
+
 {
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {

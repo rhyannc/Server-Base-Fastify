@@ -7,5 +7,5 @@ app
     port: env.PORT,
   })
   .then(() => {
-    console.log(' ✅  HTTP Server Online! 🚀 ')
+    console.log('✅ HTTP Server Online! 🚀 ')
   })
