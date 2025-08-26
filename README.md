@@ -84,7 +84,7 @@ docker compose up -d
 ### PRISMA
 Execute os comando para gerar as migrate e criaçao das tabelas
 ```bash
-npx prisma generete
+npx prisma generate
 npx prisma migrate dev
 ```
 

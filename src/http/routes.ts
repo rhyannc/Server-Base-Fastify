@@ -1,6 +1,10 @@
 import { FastifyInstance } from 'fastify'
 
-import { register } from './controllers/register'
+import {
+  register,
+  registerBodyResponse,
+  registerBodySchema,
+} from './controllers/register'
 
 export async function appRoutes(app: FastifyInstance) {
   app.post(
@@ -9,7 +13,8 @@ export async function appRoutes(app: FastifyInstance) {
       schema: {
         tags: ['Register'],
         summary: 'Cria um novo usuário',
-        description: 'Endpoint para registrar um novo usuário',
+        body: registerBodySchema,
+        response: registerBodyResponse,
       },
     },
     register,

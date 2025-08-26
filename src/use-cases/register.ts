@@ -24,10 +24,12 @@ export class RegisterUseCase {
     }
 
     // Cadastra no BD
-    await this.usersRepository.create({
+    const user = await this.usersRepository.create({
       name,
       email,
       password_hash,
     })
+
+    return user // Retorna o usuário criado
   }
 }
