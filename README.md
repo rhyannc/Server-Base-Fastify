@@ -88,6 +88,15 @@ npx prisma generate
 npx prisma migrate dev
 ```
 
+### TESTES UNITARIOS
+Implementação de testes unitarios com Vitest, modelo visual com :ui e coverage para analisar onde passa mais vezes 
+```bash
+npm run test
+npm run test:watch
+npm run test:ui
+npm run test:coverage
+```
+
 
 ### 🚀 Desenvolvimento
 ```bash
@@ -99,7 +108,7 @@ O servidor será iniciado em modo de desenvolvimento com hot-reload na porta 333
 ```bash
 # Compilar o projeto
 npm run build
-
+ 
 # Executar versão compilada
 npm start
 ```

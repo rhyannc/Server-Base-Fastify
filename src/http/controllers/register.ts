@@ -1,14 +1,16 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
-import { UserAlreadyExistsError } from '@/use-cases/errors/user-already-exists'
-import { RegisterUseCase } from '@/use-cases/register'
+import { UserAlreadyExistsError } from '@/use-cases/errors/user-already-exists-error'
+import { makeRegisterUseCase } from '@/use-cases/factories/make-register-use-case'
 
 export const registerBodySchema = z.object({
   name: z.string(),
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email('E-mail Invalido!'),
+  phone: z.string().min(10, 'Numero incompleto, pelomenos 10 caracteres!'),
+  password: z.string().min(6, 'Minimo de 6 carateres'),
+  plan: z.string(),
+  createdBy: z.string().optional().describe('Criado por)'),
 })
 
 export const registerBodyResponse = {
@@ -20,13 +22,21 @@ export const registerBodyResponse = {
 
 // Função assíncrona que lida com a requisição de registro de um novo usuário
 export async function register(request: FastifyRequest, reply: FastifyReply) {
-  const { name, email, password } = registerBodySchema.parse(request.body)
+  const { name, email, phone, password, plan, createdBy } =
+    registerBodySchema.parse(request.body)
 
   try {
-    const prismaUsersRepository = new PrismaUsersRepository()
-    const registerUseCase = new RegisterUseCase(prismaUsersRepository)
+    // Inversion Dependency Factoreis Pattern
+    const registerUseCase = makeRegisterUseCase()
 
-    const user = await registerUseCase.execute({ name, email, password })
+    const { user } = await registerUseCase.execute({
+      name,
+      email,
+      phone,
+      password,
+      plan,
+      createdBy: createdBy ?? '',
+    })
     return reply.status(201).send({ userId: user.id }) // 👉 retorna o ID
   } catch (err) {
     // Retorna um erro 409 (Conflito) caso o e-mail já esteja cadastrado

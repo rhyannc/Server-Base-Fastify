@@ -1,6 +1,12 @@
 import { FastifyInstance } from 'fastify'
 
 import {
+  autenticateBodyResponse,
+  autenticateBodySchema,
+  authenticate,
+} from './controllers/autenticate'
+import { refresh } from './controllers/refresh'
+import {
   register,
   registerBodyResponse,
   registerBodySchema,
@@ -18,5 +24,24 @@ export async function appRoutes(app: FastifyInstance) {
       },
     },
     register,
+  )
+
+  app.post(
+    '/session',
+    {
+      schema: {
+        tags: ['Register'],
+        summary: 'Authentica um usuário',
+        body: autenticateBodySchema,
+        response: autenticateBodyResponse,
+      },
+    },
+    authenticate,
+  )
+
+  app.patch(
+    '/token/refresh',
+    { schema: { tags: ['Register'], summary: 'Rota de recriar um token' } },
+    refresh,
   )
 }
