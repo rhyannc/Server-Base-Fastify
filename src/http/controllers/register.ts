@@ -9,7 +9,6 @@ export const registerBodySchema = z.object({
   email: z.string().email('E-mail Invalido!'),
   phone: z.string().min(10, 'Numero incompleto, pelomenos 10 caracteres!'),
   password: z.string().min(6, 'Minimo de 6 carateres'),
-  plan: z.string(),
   createdBy: z.string().optional().describe('Criado por)'),
 })
 
@@ -22,7 +21,7 @@ export const registerBodyResponse = {
 
 // Função assíncrona que lida com a requisição de registro de um novo usuário
 export async function register(request: FastifyRequest, reply: FastifyReply) {
-  const { name, email, phone, password, plan, createdBy } =
+  const { name, email, phone, password, createdBy } =
     registerBodySchema.parse(request.body)
 
   try {
@@ -34,7 +33,6 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
       email,
       phone,
       password,
-      plan,
       createdBy: createdBy ?? '',
     })
     return reply.status(201).send({ userId: user.id }) // 👉 retorna o ID

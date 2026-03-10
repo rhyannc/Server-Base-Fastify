@@ -17,7 +17,7 @@ interface CreateCompanyUseCaseRequest {
   complement?: string | null
   cep?: string | null
   createdBy?: string | null
-  manager: string
+  managerId: string
 }
 
 interface CreateCompanyUseCaseResponse {
@@ -39,7 +39,7 @@ export class CreateCompanyUseCase {
     complement,
     cep,
     createdBy,
-    manager,
+    managerId,
   }: CreateCompanyUseCaseRequest): Promise<CreateCompanyUseCaseResponse> {
     // Validar se CNPJ ja existe
     const companyWithsameCnpj = await this.companysRepository.findByCnpj(cnpj)
@@ -62,7 +62,7 @@ export class CreateCompanyUseCase {
       complement,
       cep,
       createdBy,
-      manager,
+      managerId,
     })
 
     return { company } // Retorna a company criada

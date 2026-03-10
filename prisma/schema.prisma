@@ -18,6 +18,46 @@ enum Role {
   MEMBER
 }
 
+enum Status {
+  ACTIVE
+  FROZEN
+  ARCHIVED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum UsageMetric {
+  COMPANIES
+  COLLABORATORS
+  INVOICES
+}
+
+model User {
+  id               String            @id @default(uuid())
+  name             String
+  email            String            @unique
+  phone            String?
+  password_hash    String
+  avatar           String?
+  active           Boolean           @default(true)
+  lastLoginAt      DateTime? // Último login
+  createdBy        String? // Usuário que criou
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userSubscription UserSubscription?
+  collaborators    Collaborator[]
+  companies        Company[]
+  usages           Usage[]
+
+  @@map("users")
+}
+
 model Company {
   id         String   @id @default(uuid())
   name       String
@@ -32,50 +72,89 @@ model Company {
   complement String?
   cep        String?
   active     Boolean  @default(true)
+  status     Status   @default(ACTIVE) // active, frozen, archived
   createdBy  String?
   createdAt  DateTime @default(now())
   updatedBy  String?
   updatedAt  DateTime @updatedAt
 
-  user    User   @relation(fields: [manager], references: [id])
-  manager String
+  manager       User           @relation(fields: [managerId], references: [id])
+  managerId     String
+  collaborators Collaborator[]
 
-  @@map("companys")
+  @@map("companies")
 }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  phone         String?
-  password_hash String
-  avatar        String?
-  plan          String    @default("free")
-  planExpiresAt DateTime? // Expiração do plano
-  active        Boolean   @default(true)
-  role          Role      @default(MEMBER)
-  lastLoginAt   DateTime? // Último login
-  createdBy     String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  company       Company[]
+model Collaborator {
+  id        String  @id @default(uuid())
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
 
-  @@map("users")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  role Role @default(MEMBER)
+
+  active Boolean @default(true)
+  status Status  @default(ACTIVE) // active, frozen, archived
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, userId]) // Um usuário só pode ser colaborador de uma empresa uma vez
+  @@map("collaborators")
 }
 
 model Plan {
-  id                Int      @id @default(autoincrement())
+  id                Int                @id @default(autoincrement())
   name              String
   description       String?
-  isActive          Boolean  @default(true) // Plano ativo/inativo
-  isPopular         Boolean  @default(false)
-  value             Decimal  @db.Decimal(10, 2)
+  isActive          Boolean            @default(true) // Plano ativo/inativo
+  isPopular         Boolean            @default(false)
+  price             Decimal            @db.Decimal(10, 2)
   max_companies     String
   max_collaborators String
   max_invoices      String
-  createdAt         DateTime @default(now())
+  createdAt         DateTime           @default(now())
+  userSubscriptions UserSubscription[]
 
-  @@map("Plans")
+  @@map("plans")
+}
+
+model UserSubscription {
+  id                Int                @id @default(autoincrement())
+  user              User               @relation(fields: [userId], references: [id])
+  userId            String             @unique
+  plan              Plan               @relation(fields: [planId], references: [id])
+  planId            Int
+  status            SubscriptionStatus // active, trialing, past_due, canceled, expired
+  startedAt         DateTime           @default(now()) // Data de início da assinatura
+  expiresAt         DateTime? // Data de expiração da assinatura
+  trialEndsAt       DateTime? // Data de expiração do período de teste
+  canceledAt        DateTime? // Data de cancelamento da assinatura
+  gracePeriodEndsAt DateTime? // Data de expiração do período de carência
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_subscriptions")
+}
+
+model Usage {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  metric UsageMetric
+  value  Int         @default(0)
+
+  period DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, metric, period])
+  @@map("usages")
 }
 
 model rental_item {

@@ -17,7 +17,7 @@ export const createCompanyBodySchema = z.object({
   complement: z.string().optional(),
   cep: z.string().optional(),
   createdBy: z.string().optional().describe('Criado por)'),
-  manager: z
+  managerId: z
     .string()
     .optional()
     .describe('Que pode criar e gerenciar novos user'),
@@ -62,7 +62,7 @@ export async function createCompany(
       state,
       address,
       createdBy: createdBy ?? request.user.sub,
-      manager: manager ?? request.user.sub,
+      managerId: manager ?? request.user.sub,
     })
 
     return reply.status(201).send({ companyId: company.id }) // 👉 retorna o ID
