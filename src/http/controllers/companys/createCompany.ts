@@ -45,7 +45,7 @@ export async function createCompany(
     state,
     address,
     createdBy,
-    manager,
+    managerId,
   } = createCompanyBodySchema.parse(request.body)
 
   try {
@@ -62,7 +62,7 @@ export async function createCompany(
       state,
       address,
       createdBy: createdBy ?? request.user.sub,
-      managerId: manager ?? request.user.sub,
+      managerId: managerId ?? request.user.sub,
     })
 
     return reply.status(201).send({ companyId: company.id }) // 👉 retorna o ID
