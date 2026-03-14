@@ -25,7 +25,7 @@ describe('Create Company Use Case', () => {
       city: 'Cel. Fabriciano',
       state: 'MG',
       country: 'BRASIL',
-      manager: '132',
+      managerId: '132',
     })
 
     expect(company.id).toEqual(expect.any(String))
@@ -42,7 +42,7 @@ describe('Create Company Use Case', () => {
       city: 'Cel. Fabriciano',
       state: 'MG',
       country: 'BRASIL',
-      manager: '132',
+      managerId: '132',
     })
 
     await expect(() =>
@@ -54,7 +54,7 @@ describe('Create Company Use Case', () => {
         city: 'Cel. Fabriciano',
         state: 'MG',
         country: 'BRASIL',
-        manager: '132',
+        managerId: '132',
       }),
     ).rejects.toBeInstanceOf(CompanyAlreadyExistsError)
   })

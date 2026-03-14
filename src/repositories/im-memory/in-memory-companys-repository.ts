@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
 
-import { Company, Prisma } from '@prisma/client'
+import { Company, Prisma, Status } from '@prisma/client'
 
-import { companysRepository } from '../companys-repository'
+import { CompanysRepository } from '../companys-repository'
 
-export class InMemoryCompanysRepository implements companysRepository {
+export class InMemoryCompanysRepository implements CompanysRepository {
   public items: Company[] = []
 
   async findById(id: string) {
@@ -27,6 +27,18 @@ export class InMemoryCompanysRepository implements companysRepository {
     return company
   }
 
+  async findManyByUserManager(userId: string, page: number) {
+    return this.items
+      .filter((item) => item.name.includes(userId))
+      .slice((page - 1) * 20, page * 20)
+  }
+
+  async searchMany(query: string, page: number) {
+    return this.items
+      .filter((item) => item.name.includes(query))
+      .slice((page - 1) * 20, page * 20)
+  }
+
   async create(data: Prisma.CompanyUncheckedCreateInput) {
     const company = {
       id: randomUUID(),
@@ -42,11 +54,12 @@ export class InMemoryCompanysRepository implements companysRepository {
       complement: data.complement ?? null,
       cep: data.cep ?? null,
       active: true,
+      status: data.status ?? Status.ACTIVE,
       createdBy: 'user-0',
       createdAt: new Date(),
       updatedBy: 'user',
       updatedAt: new Date(),
-      manager: '123',
+      managerId: '123',
     }
 
     this.items.push(company)

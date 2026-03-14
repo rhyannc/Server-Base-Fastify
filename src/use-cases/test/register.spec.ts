@@ -21,7 +21,6 @@ describe('Register Use Case', () => {
       name: 'User Test',
       email: 'user@google.com',
       password: '123456',
-      plan: 'Gold',
     })
 
     expect(user.id).toEqual(expect.any(String))
@@ -33,14 +32,10 @@ describe('Register Use Case', () => {
       email: 'user@google.com',
       phone: '31988223344',
       password: '123456',
-      plan: 'Gold',
     })
 
     // Utiliza o Bcrypt para verificar se essa senha pode se transformar no Hash
-    const isPasswordCorrectlyHashed = await compare(
-      '123456',
-      user.password_hash,
-    )
+    const isPasswordCorrectlyHashed = await compare('123456', user.passwordHash)
 
     expect(isPasswordCorrectlyHashed).toBe(true)
   })
@@ -53,7 +48,6 @@ describe('Register Use Case', () => {
       email,
       phone: '31988223344',
       password: '123456',
-      plan: 'Gold',
     })
 
     await expect(() =>
@@ -62,7 +56,6 @@ describe('Register Use Case', () => {
         email,
         phone: '31988223344',
         password: '123456',
-        plan: 'Gold',
       }),
     ).rejects.toBeInstanceOf(UserAlreadyExistsError)
   })

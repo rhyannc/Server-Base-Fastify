@@ -16,7 +16,7 @@ CREATE TABLE "public"."users" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT,
-    "password_hash" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
     "avatar" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "lastLoginAt" TIMESTAMP(3),
@@ -74,9 +74,9 @@ CREATE TABLE "public"."plans" (
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isPopular" BOOLEAN NOT NULL DEFAULT false,
     "price" DECIMAL(10,2) NOT NULL,
-    "max_companies" TEXT NOT NULL,
-    "max_collaborators" TEXT NOT NULL,
-    "max_invoices" TEXT NOT NULL,
+    "maxCompanies" TEXT NOT NULL,
+    "maxCollaborators" TEXT NOT NULL,
+    "maxInvoices" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "plans_pkey" PRIMARY KEY ("id")

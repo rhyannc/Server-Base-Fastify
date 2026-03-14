@@ -43,7 +43,7 @@ model User {
   name             String
   email            String            @unique
   phone            String?
-  password_hash    String
+  passwordHash     String
   avatar           String?
   active           Boolean           @default(true)
   lastLoginAt      DateTime? // Último login
@@ -112,9 +112,9 @@ model Plan {
   isActive          Boolean            @default(true) // Plano ativo/inativo
   isPopular         Boolean            @default(false)
   price             Decimal            @db.Decimal(10, 2)
-  max_companies     String
-  max_collaborators String
-  max_invoices      String
+  maxCompanies      String
+  maxCollaborators  String
+  maxInvoices       String
   createdAt         DateTime           @default(now())
   userSubscriptions UserSubscription[]
 

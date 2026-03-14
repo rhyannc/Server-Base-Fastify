@@ -19,7 +19,7 @@ describe('Get User Profile Use Case', () => {
     const createdUser = await usersRepository.create({
       name: 'Jaco',
       email: 'jaco@google.com.br',
-      password_hash: await hash('123456', 4),
+      passwordHash: await hash('123456', 4),
     })
 
     const { user } = await sut.execute({

@@ -21,8 +21,9 @@ export const registerBodyResponse = {
 
 // Função assíncrona que lida com a requisição de registro de um novo usuário
 export async function register(request: FastifyRequest, reply: FastifyReply) {
-  const { name, email, phone, password, createdBy } =
-    registerBodySchema.parse(request.body)
+  const { name, email, phone, password, createdBy } = registerBodySchema.parse(
+    request.body,
+  )
 
   try {
     // Inversion Dependency Factoreis Pattern

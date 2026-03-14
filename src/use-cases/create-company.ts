@@ -1,6 +1,6 @@
 import { Company } from '@prisma/client'
 
-import { companysRepository } from '@/repositories/companys-repository'
+import { CompanysRepository } from '@/repositories/companys-repository'
 
 import { CompanyAlreadyExistsError } from './errors/company-already-exists-error'
 
@@ -25,7 +25,7 @@ interface CreateCompanyUseCaseResponse {
 }
 
 export class CreateCompanyUseCase {
-  constructor(private companysRepository: companysRepository) {}
+  constructor(private companysRepository: CompanysRepository) {}
   async execute({
     name,
     cnpj,

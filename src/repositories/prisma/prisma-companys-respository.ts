@@ -31,7 +31,7 @@ export class PrismaCompanysRepository implements CompanysRepository {
   async findManyByUserManager(userId: string, page: number) {
     const companies = await prisma.company.findMany({
       where: {
-        manager: userId,
+        managerId: userId,
       },
       take: 20, // Total de resutados por pagina
       skip: (page - 1) * 20,
