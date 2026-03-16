@@ -5,7 +5,14 @@ import { prisma } from '@/lib/prisma'
 import { PlansRepository } from '../plans-repository'
 
 export class PrismaPlansRepository implements PlansRepository {
- 
+ async findById(id: number) {
+    const plans = await prisma.plan.findUnique({
+      where: {
+        id,
+      },
+    })
+    return plans
+  }
 
     async searchMany(query: string, page: number){
         const plans = await prisma.plan.findMany({

@@ -18,7 +18,7 @@ export class GetCompanyIdUseCase {
   async execute({
     companyId,
   }: GetCompanyIdUseCaseRequest): Promise<GetCompanyIdUseCaseResponse> {
-    // Confere email esta no BD
+    // Confere id esta no BD
     const company = await this.companysRepository.findById(companyId)
 
     if (!company) {

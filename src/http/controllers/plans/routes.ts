@@ -9,6 +9,7 @@ import {
   createPlanBodySchema,
 } from './createPlan'
 import { search, searchPlansQuerySchema } from './search'
+import { planId, planIdBodyResponse, planIdBodySchema } from './planId'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
@@ -27,6 +28,19 @@ export async function plansRoutes(app: FastifyInstance) {
       onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
     },
     createPlan,
+  )
+
+  app.get(
+    '/plan/:planId',
+    {
+      schema: {
+        tags: ['Plan'],
+        summary: 'Retorna dados do plano passando o id',
+        params: planIdBodySchema,
+        response: planIdBodyResponse,
+      },
+    },
+    planId,
   )
 
   app.get(
