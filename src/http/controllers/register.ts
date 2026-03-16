@@ -34,7 +34,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
       email,
       phone,
       password,
-      createdBy: createdBy ?? 'null',
+      createdBy,
     })
     return reply.status(201).send({ userId: user.id }) // 👉 retorna o ID
   } catch (err) {

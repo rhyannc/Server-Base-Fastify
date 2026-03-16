@@ -35,6 +35,13 @@ export class AuthenticateUseCase {
       throw new InvalidCredentialsError()
     }
 
-    return { user }
+    // Atualiza a data do último login
+    const updatedUser = await this.usersRepository.update({
+      id: user.id,
+      lastLoginAt: new Date(),
+      updatedAt: user.updatedAt, // Nao altera o updatedAt, deixando apenas para quando o usuario for atualizado
+    })
+
+    return { user: updatedUser }
   }
 }

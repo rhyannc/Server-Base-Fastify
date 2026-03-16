@@ -33,6 +33,7 @@ export class PrismaPlansRepository implements PlansRepository {
       where: {
         name: {
           contains: query,
+          mode: 'insensitive',
         },
       },
       take: 10,
@@ -46,7 +47,7 @@ export class PrismaPlansRepository implements PlansRepository {
     return plan
   }
 
-  async update(data: Prisma.PlanUncheckedUpdateInput){ //tem que ter promisse?
+  async update(data: Prisma.PlanUncheckedUpdateInput) {
     const plan = await prisma.plan.update({
       where: {
         id: data.id as number, // O Prisma precisa saber QUAL ID atualizar

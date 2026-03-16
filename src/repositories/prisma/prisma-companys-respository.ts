@@ -5,10 +5,6 @@ import { prisma } from '@/lib/prisma'
 import { CompanysRepository } from '../companies-repository'
 
 export class PrismaCompanysRepository implements CompanysRepository {
-  
-
-  
-
   async findById(id: string) {
     const company = await prisma.company.findUnique({
       where: {
@@ -29,25 +25,20 @@ export class PrismaCompanysRepository implements CompanysRepository {
 
   async findMany(page: number) {
     const companies = await prisma.company.findMany({
+      include: {
+        manager: {
+          select: {
+            name: true,
+          },
+        },
+      },
       take: 20, // Total de resutados por pagina
       skip: (page - 1) * 20,
     })
     return companies
   }
 
-  /* async searchMany(query: string, page: number) {
-    const company = await prisma.company.findMany({
-      where: {
-        name: {
-          contains: query,
-        },
-      },
-      take: 20,
-      skip: (page - 1) * 20,
-    })
-  } */
-
-    async findManyByUserManager(userId: string, page: number) {
+  async findManyByUserManager(userId: string, page: number) {
     const companies = await prisma.company.findMany({
       where: {
         managerId: userId,
@@ -58,7 +49,7 @@ export class PrismaCompanysRepository implements CompanysRepository {
     return companies
   }
 
-    async searchMany(query: string, page: number) {
+  async searchMany(query: string, page: number) {
     const companies = await prisma.company.findMany({
       where: {
         OR: [
@@ -75,6 +66,14 @@ export class PrismaCompanysRepository implements CompanysRepository {
           },
         ],
       },
+      include: {
+        manager: {
+          select: {
+            name: true,
+          },
+        },
+      },
+
       take: 20, // Total de resutados por pagina
       skip: (page - 1) * 20,
     })
@@ -90,13 +89,13 @@ export class PrismaCompanysRepository implements CompanysRepository {
   }
 
   async update(data: Prisma.CompanyUncheckedUpdateInput) {
-    const company = await prisma.company.update({ 
+    const company = await prisma.company.update({
       where: {
         id: data.id as string, // O Prisma precisa saber QUAL ID atualizar
       },
       data, // Os dados novos
     })
-    
+
     return company
   }
 }

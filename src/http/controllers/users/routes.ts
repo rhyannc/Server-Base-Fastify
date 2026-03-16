@@ -41,11 +41,12 @@ export async function usersRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
-        summary: 'Retorna dados do usuario passando o id',
+        summary: 'Retorna dados do usuario passando o id | somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }],
         params: userIdBodySchema,
         response: userIdBodyResponse,
       },
+      onRequest: [verifyUserRole('ADMIN')],
     },
     userId,
   )
