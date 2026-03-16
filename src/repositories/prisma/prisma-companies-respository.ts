@@ -2,9 +2,9 @@ import { Prisma } from '@prisma/client'
 
 import { prisma } from '@/lib/prisma'
 
-import { CompanysRepository } from '../companies-repository'
+import { CompaniesRepository } from '../companies-repository'
 
-export class PrismaCompanysRepository implements CompanysRepository {
+export class PrismaCompaniesRepository implements CompaniesRepository {
   async findById(id: string) {
     const company = await prisma.company.findUnique({
       where: {

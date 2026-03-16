@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { makeFindCompaniesUseCase } from '@/use-cases/factories/make-find-companys'
+import { makeFindCompaniesUseCase } from '@/use-cases/factories/make-find-companies'
 
 export const findCompaniesQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),

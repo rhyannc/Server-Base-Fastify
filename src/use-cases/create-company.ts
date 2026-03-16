@@ -1,6 +1,6 @@
 import { Company, Status } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companies-repository'
+import { CompaniesRepository } from '@/repositories/companies-repository'
 
 import { CompanyAlreadyExistsError } from './errors/company-already-exists-error'
 
@@ -27,7 +27,7 @@ interface CreateCompanyUseCaseResponse {
 }
 
 export class CreateCompanyUseCase {
-  constructor(private companysRepository: CompanysRepository) {}
+  constructor(private companiesRepository: CompaniesRepository) {}
   async execute({
     name,
     cnpj,
@@ -46,14 +46,14 @@ export class CreateCompanyUseCase {
     managerId,
   }: CreateCompanyUseCaseRequest): Promise<CreateCompanyUseCaseResponse> {
     // Validar se CNPJ ja existe
-    const companyWithsameCnpj = await this.companysRepository.findByCnpj(cnpj)
+    const companyWithsameCnpj = await this.companiesRepository.findByCnpj(cnpj)
 
     if (companyWithsameCnpj) {
       throw new CompanyAlreadyExistsError()
     }
 
     // Cadastra no BD
-    const company = await this.companysRepository.create({
+    const company = await this.companiesRepository.create({
       name,
       cnpj,
       email,

@@ -1,6 +1,6 @@
 import { Company } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companies-repository'
+import { CompaniesRepository } from '@/repositories/companies-repository'
 
 interface FetchCompanyUseCaseRequest {
   userId: string
@@ -11,14 +11,14 @@ interface FetchCompanyUseCaseResponse {
   company: Company[]
 }
 
-export class FetchCompanysUserId {
-  constructor(private companysRepository: CompanysRepository) {}
+export class FetchCompaniesUserId {
+  constructor(private companiesRepository: CompaniesRepository) {}
 
   async execute({
     userId,
     page,
   }: FetchCompanyUseCaseRequest): Promise<FetchCompanyUseCaseResponse> {
-    const company = await this.companysRepository.findManyByUserManager(
+    const company = await this.companiesRepository.findManyByUserManager(
       userId,
       page,
     )

@@ -1,6 +1,6 @@
 import { Company, Prisma } from '@prisma/client'
 
-export interface CompanysRepository {
+export interface CompaniesRepository {
   findById(id: string): Promise<Company | null>
   findByCnpj(cnpj?: string | null): Promise<Company | null>
   findMany(page: number): Promise<any[]>

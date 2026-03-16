@@ -1,6 +1,6 @@
 import { Company, Status } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companies-repository'
+import { CompaniesRepository } from '@/repositories/companies-repository'
 
 interface UpdateCompanyUseCaseRequest {
   id: string
@@ -23,7 +23,7 @@ interface UpdateCompanyUseCaseResponse {
 }
 
 export class UpdateCompanyUseCase {
-  constructor(private companysRepository: CompanysRepository) {}
+  constructor(private companiesRepository: CompaniesRepository) {}
 
   async execute({
     id,
@@ -40,7 +40,7 @@ export class UpdateCompanyUseCase {
     cep,
  
   }: UpdateCompanyUseCaseRequest): Promise<UpdateCompanyUseCaseResponse> {
-    const company = await this.companysRepository.update({
+    const company = await this.companiesRepository.update({
       id,
       name,
       cnpj,

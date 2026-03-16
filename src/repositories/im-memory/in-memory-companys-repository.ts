@@ -2,9 +2,9 @@ import { randomUUID } from 'node:crypto'
 
 import { Company, Prisma, Status } from '@prisma/client'
 
-import { CompanysRepository } from '../companies-repository'
+import { CompaniesRepository } from '../companies-repository'
 
-export class InMemoryCompanysRepository implements CompanysRepository {
+export class InMemoryCompaniesRepository implements CompaniesRepository {
   public items: Company[] = []
 
   async findById(id: string) {

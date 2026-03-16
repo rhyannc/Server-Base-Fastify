@@ -1,6 +1,6 @@
 import { Company } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companies-repository'
+import { CompaniesRepository } from '@/repositories/companies-repository'
 
 // Interface local para estender a Company
 interface CompanyWithManager extends Company {
@@ -9,23 +9,23 @@ interface CompanyWithManager extends Company {
   }
 }
 
-interface SearchCompanysUseCaseRequest {
+interface SearchCompaniesUseCaseRequest {
   query: string
   page: number
 }
 
-interface SearchCompanysUseCaseResponse {
+interface SearchCompaniesUseCaseResponse {
   company: Company[]
 }
 
-export class SearchCompanysUseCase {
-  constructor(private companysRepository: CompanysRepository) {}
+export class SearchCompaniesUseCase {
+  constructor(private companiesRepository: CompaniesRepository) {}
 
   async execute({
     query,
     page,
-  }: SearchCompanysUseCaseRequest): Promise<SearchCompanysUseCaseResponse> {
-    const company = (await this.companysRepository.searchMany(
+  }: SearchCompaniesUseCaseRequest): Promise<SearchCompaniesUseCaseResponse> {
+    const company = (await this.companiesRepository.searchMany(
       query,
       page,
     )) as CompanyWithManager[]

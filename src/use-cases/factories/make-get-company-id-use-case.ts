@@ -1,10 +1,10 @@
-import { PrismaCompanysRepository } from '@/repositories/prisma/prisma-companys-respository'
+import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
 import { GetCompanyIdUseCase } from '../get-company-id'
 
 export function makeGetCompanyidUseCase() {
-  const companysRepository = new PrismaCompanysRepository()
-  const useCase = new GetCompanyIdUseCase(companysRepository)
+  const companiesRepository = new PrismaCompaniesRepository()
+  const useCase = new GetCompanyIdUseCase(companiesRepository)
 
   return useCase
 }

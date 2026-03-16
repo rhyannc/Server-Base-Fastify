@@ -14,7 +14,7 @@ import {
   createCompanyBodySchema,
 } from './createCompany'
 import { findManager, findManagerQuerySchema } from './findManager'
-import { search, searchCompanysQuerySchema } from './search'
+import { search, searchCompaniesQuerySchema } from './search'
 import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
 import { findCompanies, findCompaniesQuerySchema } from './findCompany'
 
@@ -57,7 +57,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         tags: ['Company'],
         summary: 'Pesquisa todas as empresas mas somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
-        querystring: searchCompanysQuerySchema,
+        querystring: searchCompaniesQuerySchema,
       },
       onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
     },

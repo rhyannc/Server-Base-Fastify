@@ -15,9 +15,9 @@ export async function findManager(
   const { userId, page } = findManagerQuerySchema.parse(request.query)
 
   // Inversion Dependency Factoreis Pattern
-  const FetchCompanysUserId = makeFindUserIdCompaniesUseCase()
+  const FetchCompaniesUserId = makeFindUserIdCompaniesUseCase()
 
-  const { company } = await FetchCompanysUserId.execute({
+  const { company } = await FetchCompaniesUserId.execute({
     userId,
     page,
   })

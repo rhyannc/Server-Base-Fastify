@@ -1,10 +1,10 @@
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { UpdateCompanyUseCase } from '../update-company'
+import { FetchCompaniesUseCase } from '../fetch-companies'
 
-export function makeUpdateCompaniesUseCase() {
+export function makeFindCompaniesUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()
-  const useCase = new UpdateCompanyUseCase(companiesRepository)
+  const useCase = new FetchCompaniesUseCase(companiesRepository)
                       
   return useCase
 }

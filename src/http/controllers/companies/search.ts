@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { makeSearchCompaniesUseCase } from '@/use-cases/factories/make-search-companies'
 
-export const searchCompanysQuerySchema = z.object({
+export const searchCompaniesQuerySchema = z.object({
   q: z
     .string()
     .min(1, 'q não pode ser vazio')
@@ -12,7 +12,7 @@ export const searchCompanysQuerySchema = z.object({
 })
 
 export async function search(request: FastifyRequest, reply: FastifyReply) {
-  const { q, page } = searchCompanysQuerySchema.parse(request.query)
+  const { q, page } = searchCompaniesQuerySchema.parse(request.query)
 
   const searchCompaniesUseCase = makeSearchCompaniesUseCase()
 

@@ -1,6 +1,6 @@
 import { Company } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companies-repository'
+import { CompaniesRepository } from '@/repositories/companies-repository'
 
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
@@ -13,13 +13,13 @@ interface GetCompanyIdUseCaseResponse {
 }
 
 export class GetCompanyIdUseCase {
-  constructor(private companysRepository: CompanysRepository) {}
+  constructor(private companiesRepository: CompaniesRepository) {}
 
   async execute({
     companyId,
   }: GetCompanyIdUseCaseRequest): Promise<GetCompanyIdUseCaseResponse> {
     // Confere id esta no BD
-    const company = await this.companysRepository.findById(companyId)
+    const company = await this.companiesRepository.findById(companyId)
 
     if (!company) {
       throw new ResourceNotFoundError()
