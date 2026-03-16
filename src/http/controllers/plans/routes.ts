@@ -10,6 +10,7 @@ import {
 } from './createPlan'
 import { planId, planIdBodyResponse, planIdBodySchema } from './planId'
 import { search, searchPlansQuerySchema } from './search'
+import { findPlans, findPlansQuerySchema } from './findPlans'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
@@ -55,5 +56,17 @@ export async function plansRoutes(app: FastifyInstance) {
       onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
     },
     search,
+  )
+
+  app.get(
+    '/plans',
+    {
+      schema: {
+        tags: ['Plan'],
+        summary: 'Retorna todos os planos Ativos',
+        querystring: findPlansQuerySchema,
+      },
+    },
+    findPlans,
   )
 }

@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { PlansRepository } from '../plans-repository'
 
 export class PrismaPlansRepository implements PlansRepository {
- async findById(id: number) {
+  async findById(id: number) {
     const plans = await prisma.plan.findUnique({
       where: {
         id,
@@ -14,21 +14,35 @@ export class PrismaPlansRepository implements PlansRepository {
     return plans
   }
 
-    async searchMany(query: string, page: number){
-        const plans = await prisma.plan.findMany({
-            where: {
-                name: {
-                    contains: query,
-                },
-            },
-            take: 10,
-            skip: (page - 1) * 10,
-        })
-        return plans
-    }
+  async findMany(page: number) {
+    const plans = await prisma.plan.findMany({
+      take: 10, // limita a quantidade de resultados por página
+      skip: (page - 1) * 10, // pula os resultados anteriores
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
+    return plans
+  }
 
-    async create(data: Prisma.PlanCreateInput){
-        const plan = await prisma.plan.create({ data })
-        return plan
-    }
+  async searchMany(query: string, page: number) {
+    const plans = await prisma.plan.findMany({
+      where: {
+        name: {
+          contains: query,
+        },
+      },
+      take: 10,
+      skip: (page - 1) * 10,
+    })
+    return plans
+  }
+
+  async create(data: Prisma.PlanCreateInput) {
+    const plan = await prisma.plan.create({ data })
+    return plan
+  }
 }
