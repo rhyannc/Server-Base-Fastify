@@ -12,10 +12,10 @@ import {
 import { z } from 'zod'
 
 import { env } from './env'
-import { companysRoutes } from './http/controllers/companies/routes'
+import { companiesRoutes } from './http/controllers/companies/routes'
+import { plansRoutes } from './http/controllers/plans/routes'
 import { usersRoutes } from './http/controllers/users/routes'
 import { appRoutes } from './http/routes'
-import { plansRoutes } from './http/controllers/plans/routes'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -61,7 +61,7 @@ app.register(fastifySwaggerUi, {
 // Registra as rotas da aplicação
 app.register(appRoutes)
 app.register(usersRoutes, { prefix: '/user' })
-app.register(companysRoutes, { prefix: '/company' })
+app.register(companiesRoutes, { prefix: '/company' })
 app.register(plansRoutes, { prefix: '/plan' })
 
 app.get(

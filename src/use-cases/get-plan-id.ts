@@ -1,31 +1,30 @@
+import { Plan } from '@prisma/client'
 
-import { Plan } from "@prisma/client"
+import { PlansRepository } from '@/repositories/plans-repository'
 
-import { PlansRepository } from "@/repositories/plans-repository"
-import { ResourceNotFoundError } from "./errors/resource-not-found-error"
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface GetPlanIdUseCaseRequest {
-    planId: number
+  planId: number
 }
 
 interface GetPlanIdUseCaseResponse {
-    plan: Plan
+  plan: Plan
 }
 
-export class GetPlanIdUseCase{
-    constructor(private  plansRepository: PlansRepository) {}
+export class GetPlanIdUseCase {
+  constructor(private plansRepository: PlansRepository) {}
 
-    async execute({
-        planId,
-    }: GetPlanIdUseCaseRequest): Promise<GetPlanIdUseCaseResponse> {
-        // Confere id esta no BD
-        const plan = await this.plansRepository.findById(planId)
+  async execute({
+    planId,
+  }: GetPlanIdUseCaseRequest): Promise<GetPlanIdUseCaseResponse> {
+    // Confere id esta no BD
+    const plan = await this.plansRepository.findById(planId)
 
-        if (!plan) {
-            throw new ResourceNotFoundError()
-        }
-
-        return { plan }
+    if (!plan) {
+      throw new ResourceNotFoundError()
     }
-} 
- 
+
+    return { plan }
+  }
+}

@@ -16,7 +16,7 @@ import {
 import { findManager, findManagerQuerySchema } from './findManager'
 import { search, searchCompanysQuerySchema } from './search'
 
-export async function companysRoutes(app: FastifyInstance) {
+export async function companiesRoutes(app: FastifyInstance) {
   /** Authenticated */
   app.addHook('onRequest', verifyJWT) // vai obrigar que todas as rotas abaixo tenha Token JWT Valido
 

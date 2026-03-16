@@ -8,8 +8,8 @@ import {
   createPlanBodyResponse,
   createPlanBodySchema,
 } from './createPlan'
-import { search, searchPlansQuerySchema } from './search'
 import { planId, planIdBodyResponse, planIdBodySchema } from './planId'
+import { search, searchPlansQuerySchema } from './search'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
