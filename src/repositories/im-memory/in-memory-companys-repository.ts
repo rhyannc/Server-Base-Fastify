@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { Company, Prisma, Status } from '@prisma/client'
 
-import { CompanysRepository } from '../companys-repository'
+import { CompanysRepository } from '../companies-repository'
 
 export class InMemoryCompanysRepository implements CompanysRepository {
   public items: Company[] = []

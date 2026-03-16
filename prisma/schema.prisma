@@ -46,6 +46,7 @@ model User {
   passwordHash     String
   avatar           String?
   active           Boolean           @default(true)
+  role             Role              @default(MEMBER) //ADMIN DO SISTEMA GLOBAL SAAS
   lastLoginAt      DateTime? // Último login
   createdBy        String? // Usuário que criou
   createdAt        DateTime          @default(now())

@@ -1,6 +1,6 @@
-import { Company } from '@prisma/client'
+import { Company, Status } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companys-repository'
+import { CompanysRepository } from '@/repositories/companies-repository'
 
 import { CompanyAlreadyExistsError } from './errors/company-already-exists-error'
 
@@ -17,6 +17,8 @@ interface CreateCompanyUseCaseRequest {
   complement?: string | null
   cep?: string | null
   createdBy?: string | null
+  active?: boolean
+  status?: Status
   managerId: string
 }
 
@@ -39,6 +41,8 @@ export class CreateCompanyUseCase {
     complement,
     cep,
     createdBy,
+    active,
+    status,
     managerId,
   }: CreateCompanyUseCaseRequest): Promise<CreateCompanyUseCaseResponse> {
     // Validar se CNPJ ja existe
@@ -62,6 +66,8 @@ export class CreateCompanyUseCase {
       complement,
       cep,
       createdBy,
+      active,
+      status,
       managerId,
     })
 

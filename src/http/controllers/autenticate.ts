@@ -33,19 +33,29 @@ export async function authenticate(
     })
 
     // Cria Token
-    const token = await reply.jwtSign({
-      sign: {
-        sub: user.id,
+    const token = await reply.jwtSign(
+      {
+        role: user.role, // Sala o tipo de User ADMIN ou MEMBRO
       },
-    })
+      {
+        sign: {
+          sub: user.id,
+        },
+      },
+    )
 
     // Cria refreshToken para revalidar um token apos 7 dias
-    const refreshToken = await reply.jwtSign({
-      sign: {
-        sub: user.id,
-        expiresIn: '7d',
+    const refreshToken = await reply.jwtSign(
+      {
+        role: user.role, // Sala o tipo de User ADMIN ou MEMBRO
       },
-    })
+      {
+        sign: {
+          sub: user.id,
+          expiresIn: '7d',
+        },
+      },
+    )
 
     return reply
       .setCookie('refreshToken', refreshToken, {

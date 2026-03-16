@@ -17,7 +17,6 @@ export const userIdBodyResponse = {
           email: z.string(),
           phone: z.string().nullable(),
           passwordHash: z.string(),
-          plan: z.string(),
           active: z.boolean(),
           role: z.string(),
           createdBy: z.string().nullable(),

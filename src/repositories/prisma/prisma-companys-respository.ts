@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 
 import { prisma } from '@/lib/prisma'
 
-import { CompanysRepository } from '../companys-repository'
+import { CompanysRepository } from '../companies-repository'
 
 export class PrismaCompanysRepository implements CompanysRepository {
   async searchMany(query: string, page: number) {

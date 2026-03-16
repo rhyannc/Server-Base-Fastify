@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { makeFindUserIdCompanysUseCase } from '@/use-cases/factories/make-find-companys-userId'
+import { makeFindUserIdCompanysUseCase } from '@/use-cases/factories/make-find-companies-userId'
 
 export const findManagerQuerySchema = z.object({
   userId: z.string().uuid().describe('ID do usuário (UUID)'),

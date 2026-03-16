@@ -1,6 +1,6 @@
 import { Company } from '@prisma/client'
 
-import { CompanysRepository } from '@/repositories/companys-repository'
+import { CompanysRepository } from '@/repositories/companies-repository'
 
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
