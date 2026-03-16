@@ -15,6 +15,8 @@ import {
 } from './createCompany'
 import { findManager, findManagerQuerySchema } from './findManager'
 import { search, searchCompanysQuerySchema } from './search'
+import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
+import { findCompanies, findCompaniesQuerySchema } from './findCompany'
 
 export async function companiesRoutes(app: FastifyInstance) {
   /** Authenticated */
@@ -63,6 +65,20 @@ export async function companiesRoutes(app: FastifyInstance) {
   )
 
   app.get(
+    '/companies',
+    {
+      schema: {
+        tags: ['Company'],
+        summary: 'Pesquisa todas as empresas mas somente usuário *ADMIN*',
+        security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
+        querystring: findCompaniesQuerySchema,
+      },
+      onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
+    },
+    findCompanies,
+  )
+
+  app.get(
     '/findmanager',
     {
       schema: {
@@ -75,4 +91,19 @@ export async function companiesRoutes(app: FastifyInstance) {
     },
     findManager,
   )
+
+  app.patch(
+    '/update',
+    {
+      schema: {
+        tags: ['Company'],
+        summary: 'Atualiza uma Empresa', /** FIX Tenho que atualizar recurso para que so ao Manager e ao Admin possa atualizar a empresa */
+        security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
+        body: updateCompanyBodySchema,
+        response: updateCompanyBodyResponse,
+      },
+    },
+    updateCompany,
+  )
+  
 }

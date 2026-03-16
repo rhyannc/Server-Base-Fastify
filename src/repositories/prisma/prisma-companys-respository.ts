@@ -5,7 +5,60 @@ import { prisma } from '@/lib/prisma'
 import { CompanysRepository } from '../companies-repository'
 
 export class PrismaCompanysRepository implements CompanysRepository {
-  async searchMany(query: string, page: number) {
+  
+
+  
+
+  async findById(id: string) {
+    const company = await prisma.company.findUnique({
+      where: {
+        id,
+      },
+    })
+    return company
+  }
+
+  async findByCnpj(cnpj: string) {
+    const company = await prisma.company.findUnique({
+      where: {
+        cnpj,
+      },
+    })
+    return company
+  }
+
+  async findMany(page: number) {
+    const companies = await prisma.company.findMany({
+      take: 20, // Total de resutados por pagina
+      skip: (page - 1) * 20,
+    })
+    return companies
+  }
+
+  /* async searchMany(query: string, page: number) {
+    const company = await prisma.company.findMany({
+      where: {
+        name: {
+          contains: query,
+        },
+      },
+      take: 20,
+      skip: (page - 1) * 20,
+    })
+  } */
+
+    async findManyByUserManager(userId: string, page: number) {
+    const companies = await prisma.company.findMany({
+      where: {
+        managerId: userId,
+      },
+      take: 20, // Total de resutados por pagina
+      skip: (page - 1) * 20,
+    })
+    return companies
+  }
+
+    async searchMany(query: string, page: number) {
     const companies = await prisma.company.findMany({
       where: {
         OR: [
@@ -28,52 +81,22 @@ export class PrismaCompanysRepository implements CompanysRepository {
     return companies
   }
 
-  async findManyByUserManager(userId: string, page: number) {
-    const companies = await prisma.company.findMany({
-      where: {
-        managerId: userId,
-      },
-      take: 20, // Total de resutados por pagina
-      skip: (page - 1) * 20,
-    })
-    return companies
-  }
-
-  async findById(id: string) {
-    const company = await prisma.company.findUnique({
-      where: {
-        id,
-      },
-    })
-    return company
-  }
-
-  async findByCnpj(cnpj: string) {
-    const company = await prisma.company.findUnique({
-      where: {
-        cnpj,
-      },
-    })
-    return company
-  }
-
-  /* async searchMany(query: string, page: number) {
-    const company = await prisma.company.findMany({
-      where: {
-        name: {
-          contains: query,
-        },
-      },
-      take: 20,
-      skip: (page - 1) * 20,
-    })
-  } */
-
   async create(data: Prisma.CompanyUncheckedCreateInput) {
     const company = await prisma.company.create({
       data,
     })
 
+    return company
+  }
+
+  async update(data: Prisma.CompanyUncheckedUpdateInput) {
+    const company = await prisma.company.update({ 
+      where: {
+        id: data.id as string, // O Prisma precisa saber QUAL ID atualizar
+      },
+      data, // Os dados novos
+    })
+    
     return company
   }
 }

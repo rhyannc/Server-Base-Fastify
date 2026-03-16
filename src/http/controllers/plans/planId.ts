@@ -1,4 +1,3 @@
-
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -8,23 +7,21 @@ export const planIdBodySchema = z.object({
   planId: z.coerce.number(),
 })
 
-
 export const planIdBodyResponse = {
   200: z
     .object({
-      plan: z
-        .object({
-          id: z.coerce.number(),
-          name: z.string(),
-          description: z.string(),
-          isActive: z.boolean(),
-          isPopular: z.boolean(),
-          price: z.coerce.number(),
-          maxCompanies: z.coerce.number(),
-          maxCollaborators: z.coerce.number(),
-          maxInvoices: z.coerce.number(),
-          createdAt: z.date(),
-        })
+      plan: z.object({
+        id: z.coerce.number(),
+        name: z.string(),
+        description: z.string(),
+        isActive: z.boolean(),
+        isPopular: z.boolean(),
+        price: z.coerce.number(),
+        maxCompanies: z.coerce.number(),
+        maxCollaborators: z.coerce.number(),
+        maxInvoices: z.coerce.number(),
+        createdAt: z.date(),
+      }),
     })
     .describe('Dados do Plano retornados com sucesso!'),
   401: z.object({ message: z.string() }).describe('Não Autoziado.'),
@@ -45,5 +42,5 @@ export async function planId(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(404).send({ message: 'Plano não encontrado' })
   }
 
-  return reply.status(200).send({ plan: { ...plan, } })
+  return reply.status(200).send({ plan: { ...plan } })
 }

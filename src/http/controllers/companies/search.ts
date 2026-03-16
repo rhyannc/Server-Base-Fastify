@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { makeSeachCompanysUseCase } from '@/use-cases/factories/make-search-companys'
+import { makeSearchCompaniesUseCase } from '@/use-cases/factories/make-search-companies'
 
 export const searchCompanysQuerySchema = z.object({
   q: z
@@ -14,9 +14,9 @@ export const searchCompanysQuerySchema = z.object({
 export async function search(request: FastifyRequest, reply: FastifyReply) {
   const { q, page } = searchCompanysQuerySchema.parse(request.query)
 
-  const searchCompanysUseCase = makeSeachCompanysUseCase()
+  const searchCompaniesUseCase = makeSearchCompaniesUseCase()
 
-  const { company } = await searchCompanysUseCase.execute({
+  const { company } = await searchCompaniesUseCase.execute({
     query: q,
     page,
   })

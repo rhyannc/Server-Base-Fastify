@@ -6,7 +6,7 @@ import { makeCreateCompanyUseCase } from '@/use-cases/factories/make-create-comp
 
 export const createCompanyBodySchema = z.object({
   name: z.string(),
-  cnpj: z.string().min(14, 'Precisa ter minimo 14 caracteres'),
+  cnpj: z.string().regex(/^\d+$/, 'Deve conter apenas números').min(14, 'Precisa ter minimo 14 caracteres'),
   email: z.string().email(),
   phone: z.string(),
   country: z.string().optional().describe('País (opcional, padrão BR)'),
@@ -15,7 +15,7 @@ export const createCompanyBodySchema = z.object({
   address: z.string().optional(),
   number: z.string().optional(),
   complement: z.string().optional(),
-  cep: z.string().optional(),
+  cep: z.string().regex(/^\d+$/, 'Deve conter apenas números').optional(),
   createdBy: z.string().optional().describe('Criado por)'),
   active: z.boolean().optional().default(true),
   status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional().default('ACTIVE'),

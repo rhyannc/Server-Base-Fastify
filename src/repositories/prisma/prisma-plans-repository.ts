@@ -45,4 +45,14 @@ export class PrismaPlansRepository implements PlansRepository {
     const plan = await prisma.plan.create({ data })
     return plan
   }
+
+  async update(data: Prisma.PlanUncheckedUpdateInput){ //tem que ter promisse?
+    const plan = await prisma.plan.update({
+      where: {
+        id: data.id as number, // O Prisma precisa saber QUAL ID atualizar
+      },
+      data, // Os dados novos
+    })
+    return plan
+  }
 }

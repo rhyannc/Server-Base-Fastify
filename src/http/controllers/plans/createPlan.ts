@@ -10,9 +10,9 @@ export const createPlanBodySchema = z.object({
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
   price: z.number(),
-  maxCollaborators: z.string(),
-  maxCompanies: z.string(),
-  maxInvoices: z.string(),
+  maxCollaborators: z.string().regex(/^\d+$/, "Deve conter apenas números"),
+  maxCompanies: z.string().regex(/^\d+$/, "Deve conter apenas números"),
+  maxInvoices: z.string().regex(/^\d+$/, "Deve conter apenas números"),
 })
 
 export const createPlanBodyResponse = {

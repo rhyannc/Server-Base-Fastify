@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { makeFindUserIdCompanysUseCase } from '@/use-cases/factories/make-find-companies-userId'
+import { makeFindUserIdCompaniesUseCase } from '@/use-cases/factories/make-find-companies-userId'
 
 export const findManagerQuerySchema = z.object({
   userId: z.string().uuid().describe('ID do usuário (UUID)'),
@@ -15,7 +15,7 @@ export async function findManager(
   const { userId, page } = findManagerQuerySchema.parse(request.query)
 
   // Inversion Dependency Factoreis Pattern
-  const FetchCompanysUserId = makeFindUserIdCompanysUseCase()
+  const FetchCompanysUserId = makeFindUserIdCompaniesUseCase()
 
   const { company } = await FetchCompanysUserId.execute({
     userId,

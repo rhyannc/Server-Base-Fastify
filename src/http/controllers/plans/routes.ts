@@ -8,9 +8,14 @@ import {
   createPlanBodyResponse,
   createPlanBodySchema,
 } from './createPlan'
+import { findPlans, findPlansQuerySchema } from './findPlans'
 import { planId, planIdBodyResponse, planIdBodySchema } from './planId'
 import { search, searchPlansQuerySchema } from './search'
-import { findPlans, findPlansQuerySchema } from './findPlans'
+import {
+  updatePlan,
+  updatePlanBodyResponse,
+  updatePlanBodySchema,
+} from './updatePlan'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
@@ -68,5 +73,20 @@ export async function plansRoutes(app: FastifyInstance) {
       },
     },
     findPlans,
+  )
+
+  app.patch(
+    '/update',
+    {
+      schema: {
+        tags: ['Plan'],
+        summary: 'Atualiza um Plano | somente usuário *ADMIN*',
+        security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
+        body: updatePlanBodySchema,
+        response: updatePlanBodyResponse,
+      },
+      onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
+    },
+    updatePlan,
   )
 }
