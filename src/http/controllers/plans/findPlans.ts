@@ -24,5 +24,6 @@ export async function findPlans(request: FastifyRequest, reply: FastifyReply) {
     })
   }
 
-  return reply.status(200).send({ plans })
+  return reply.status(200).send({ plans: {...plans, createdAt: undefined } })
+
 }

@@ -10,7 +10,7 @@ interface RegisterUseCaseRequest {
   email: string
   phone?: string | null
   password: string
-  createdBy?: string
+  createdBy?: string | null
 }
 
 interface RegisterUseCaseResponse {

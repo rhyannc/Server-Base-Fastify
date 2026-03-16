@@ -97,7 +97,7 @@ export async function companiesRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Company'],
-        summary: 'Atualiza uma Empresa', /** FIX Tenho que atualizar recurso para que so ao Manager e ao Admin possa atualizar a empresa */
+        summary: 'Atualiza uma Empresa - FIX FIX FIX', /** FIX Tenho que atualizar recurso para que so ao Manager e ao Admin possa atualizar a empresa */
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         body: updateCompanyBodySchema,
         response: updateCompanyBodyResponse,
