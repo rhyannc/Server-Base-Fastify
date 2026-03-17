@@ -12,6 +12,7 @@ import {
 import { z } from 'zod'
 
 import { env } from './env'
+import { collaboratorsRoutes } from './http/controllers/collaborators/routes'
 import { companiesRoutes } from './http/controllers/companies/routes'
 import { plansRoutes } from './http/controllers/plans/routes'
 import { usersRoutes } from './http/controllers/users/routes'
@@ -63,6 +64,7 @@ app.register(appRoutes)
 app.register(usersRoutes, { prefix: '/user' })
 app.register(companiesRoutes, { prefix: '/company' })
 app.register(plansRoutes, { prefix: '/plan' })
+app.register(collaboratorsRoutes, { prefix: '/collaborator' })
 
 app.get(
   '/cou/:id',
