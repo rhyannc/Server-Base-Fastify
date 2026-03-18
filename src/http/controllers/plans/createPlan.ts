@@ -10,14 +10,14 @@ export const createPlanBodySchema = z.object({
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
   price: z.number(),
-  maxCollaborators: z.string().regex(/^\d+$/, "Deve conter apenas números"),
-  maxCompanies: z.string().regex(/^\d+$/, "Deve conter apenas números"),
-  maxInvoices: z.string().regex(/^\d+$/, "Deve conter apenas números"),
+  maxCollaborators: z.number().optional(),
+  maxCompanies: z.number().optional(),
+  maxInvoices: z.number().optional(),
 })
 
 export const createPlanBodyResponse = {
   201: z
-    .object({ planId: z.number() })
+    .object({ planId: z.string() })
     .describe('Plano registrado com sucesso!'),
   409: z.object({ message: z.string() }).describe('Plano já existente'),
 }
@@ -45,9 +45,9 @@ export async function createPlan(request: FastifyRequest, reply: FastifyReply) {
       isActive: isActive ?? true,
       isPopular: isPopular ?? false,
       price,
-      maxCollaborators,
-      maxCompanies,
-      maxInvoices,
+      maxCollaborators: maxCollaborators ?? null,
+      maxCompanies: maxCompanies ?? null,
+      maxInvoices: maxInvoices ?? null,
     })
 
     return reply.status(201).send({ planId: plan.id }) // 👉 retorna o ID

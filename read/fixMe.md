@@ -7,3 +7,5 @@
 -PENSAR EM COMO FAZER A ASSINATURA DO PLANO SE AO CADASTRAR OU AO CADASTRAR A EMPRESA. OU APOS ENTRAR NO SYS 
 
 - UUID NO USR E INT NO PLANO ITENS 
+-chosenfalse nao deixa fazer as paradas
+-se plan null tudo full

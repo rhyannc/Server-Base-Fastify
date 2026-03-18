@@ -8,9 +8,9 @@ interface CreatePlanUseCaseRequest {
   isActive: boolean
   isPopular: boolean
   price: number
-  maxCompanies: string
-  maxCollaborators: string
-  maxInvoices: string
+  maxCompanies: number | null
+  maxCollaborators: number | null
+  maxInvoices: number | null
 }
 
 interface CreatePlanUseCaseResponse {

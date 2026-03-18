@@ -1,8 +1,10 @@
-import { Collaborator, Role, Status } from '@prisma/client'
+import { Collaborator, Role, Status, UsageMetric } from '@prisma/client'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { UsersRepository } from '@/repositories/users-repository'
+
+import { CheckAndIncrementUsageUseCase } from './check-and-increment-usage'
 
 import { CollaboratorAlreadyExistsError } from './errors/collaborator-already-exists-error'
 import { GenericUnauthorizedError } from './errors/generic-unauthorized-error'
@@ -25,6 +27,7 @@ export class CreateCollaboratorUseCase {
     private collaboratorsRepository: CollaboratorsRepository,
     private companiesRepository: CompaniesRepository,
     private usersRepository: UsersRepository,
+    private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
   ) {}
 
   async execute({
@@ -60,6 +63,12 @@ export class CreateCollaboratorUseCase {
     if (collaboratorExists) {
       throw new CollaboratorAlreadyExistsError()
     }
+
+    // Incrementa limite de uso de colaboradores da empresa (do Manager)
+    await this.checkAndIncrementUsageUseCase.execute({
+      userId: company.managerId,
+      metric: UsageMetric.COLLABORATORS,
+    })
 
     // 4. Cria o colaborador
     const collaborator = await this.collaboratorsRepository.create({

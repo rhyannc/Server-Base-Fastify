@@ -1,7 +1,9 @@
-import { Role } from '@prisma/client'
+import { Role, UsageMetric } from '@prisma/client'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
+
+import { DecrementUsageUseCase } from './decrement-usage'
 
 import { GenericUnauthorizedError } from './errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
@@ -14,6 +16,7 @@ export class RemoveCollaboratorUseCase {
   constructor(
     private collaboratorsRepository: CollaboratorsRepository,
     private companiesRepository: CompaniesRepository,
+    private decrementUsageUseCase: DecrementUsageUseCase,
   ) {}
 
   async execute({
@@ -43,5 +46,10 @@ export class RemoveCollaboratorUseCase {
     }
 
     await this.collaboratorsRepository.delete(collaboratorId)
+
+    await this.decrementUsageUseCase.execute({
+      userId: company.managerId,
+      metric: UsageMetric.COLLABORATORS,
+    })
   }
 }

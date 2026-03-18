@@ -4,20 +4,20 @@ import z from 'zod'
 import { makeUpdatePlansUseCase } from '@/use-cases/factories/make-update-plans'
 
 export const updatePlanBodySchema = z.object({
-  id: z.coerce.number(),
+  id: z.string(),
   name: z.string(),
   description: z.string(),
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
   price: z.number(),
-  maxCollaborators: z.string().regex(/^\d+$/, 'Deve conter apenas números'),
-  maxCompanies: z.string().regex(/^\d+$/, 'Deve conter apenas números'),
-  maxInvoices: z.string().regex(/^\d+$/, 'Deve conter apenas números'),
+  maxCollaborators: z.number(),
+  maxCompanies: z.number(),
+  maxInvoices: z.number(),
 })
 
 export const updatePlanBodyResponse = {
   201: z
-    .object({ planId: z.number() })
+    .object({ planId: z.string() })
     .describe('Plano atualizado com sucesso!'),
   409: z.object({ message: z.string() }).describe('Plano já existente'),
 }

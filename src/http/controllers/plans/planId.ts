@@ -4,14 +4,14 @@ import { z } from 'zod'
 import { makeGetPlanIdUseCase } from '@/use-cases/factories/make-get-plan-id-use-case'
 
 export const planIdBodySchema = z.object({
-  planId: z.coerce.number(),
+  planId: z.string(),
 })
 
 export const planIdBodyResponse = {
   200: z
     .object({
       plan: z.object({
-        id: z.coerce.number(),
+        id: z.string(),
         name: z.string(),
         description: z.string(),
         isActive: z.boolean(),

@@ -3,19 +3,55 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-companies-repository'
+import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
+import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
+import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 
+import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
 import { CreateCompanyUseCase } from '../create-company'
 import { CompanyAlreadyExistsError } from '../errors/company-already-exists-error'
 
 let companiesRepository: InMemoryCompaniesRepository
+let usagesRepository: InMemoryUsagesRepository
+let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
+let plansRepository: InMemoryPlansRepository
+let checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase
 let sut: CreateCompanyUseCase
 
 describe('Create Company Use Case', () => {
   // Before garante que cada teste nao ser totalmente zerado sem reaproveitar nada do teste anterior
-  beforeEach(() => {
+  beforeEach(async () => {
     companiesRepository = new InMemoryCompaniesRepository()
-    sut = new CreateCompanyUseCase(companiesRepository)
+    usagesRepository = new InMemoryUsagesRepository()
+    userSubscriptionsRepository = new InMemoryUserSubscriptionsRepository()
+    plansRepository = new InMemoryPlansRepository()
+    
+    checkAndIncrementUsageUseCase = new CheckAndIncrementUsageUseCase(
+      usagesRepository,
+      userSubscriptionsRepository,
+      plansRepository,
+    )
+
+    sut = new CreateCompanyUseCase(
+      companiesRepository,
+      checkAndIncrementUsageUseCase,
+    )
+
+    const plan = await plansRepository.create({
+      name: 'Pro',
+      price: 100,
+      maxCompanies: 10,
+      maxCollaborators: 50,
+      maxInvoices: 1000,
+    })
+
+    await userSubscriptionsRepository.create({
+      userId: '132',
+      planId: plan.id as number,
+      status: 'ACTIVE',
+    })
   })
+
   it('Deve se cadastrar a company', async () => {
     const { company } = await sut.execute({
       name: 'Company Tech',

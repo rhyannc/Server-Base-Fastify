@@ -8,7 +8,7 @@ import { UserSubscriptionAlreadyExistsError } from '@/use-cases/errors/user-subs
 import { makeCreateUserSubscriptionUseCase } from '@/use-cases/factories/make-create-user-subscription-use-case'
 
 export const subscribeBodySchema = z.object({
-  planId: z.number().int().positive(),
+  planId: z.string(),
   status: z
     .enum(['ACTIVE', 'TRIALING', 'PAST_DUE', 'CANCELED', 'EXPIRED'])
     .optional()
@@ -21,7 +21,7 @@ export const subscribeResponseSchema = {
       userSubscription: z.object({
         id: z.number(),
         userId: z.string(),
-        planId: z.number(),
+        planId: z.string(),
         status: z.string(),
       }),
     })

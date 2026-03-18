@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { PlansRepository } from '../plans-repository'
 
 export class PrismaPlansRepository implements PlansRepository {
-  async findById(id: number) {
+  async findById(id: string) {
     const plans = await prisma.plan.findUnique({
       where: {
         id,
@@ -50,7 +50,7 @@ export class PrismaPlansRepository implements PlansRepository {
   async update(data: Prisma.PlanUncheckedUpdateInput) {
     const plan = await prisma.plan.update({
       where: {
-        id: data.id as number, // O Prisma precisa saber QUAL ID atualizar
+        id: data.id as string, // O Prisma precisa saber QUAL ID atualizar
       },
       data, // Os dados novos
     })

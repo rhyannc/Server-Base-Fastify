@@ -2,8 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryCollaboratorsRepository } from '@/repositories/im-memory/in-memory-collaborators-repository'
 import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-companies-repository'
+import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
+import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
+import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
 
+import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
 import { CreateCollaboratorUseCase } from '../create-collaborator'
 import { CollaboratorAlreadyExistsError } from '../errors/collaborator-already-exists-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
@@ -11,18 +15,57 @@ import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 let collaboratorsRepository: InMemoryCollaboratorsRepository
 let companiesRepository: InMemoryCompaniesRepository
 let usersRepository: InMemoryUsersRepository
+let usagesRepository: InMemoryUsagesRepository
+let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
+let plansRepository: InMemoryPlansRepository
+let checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase
 let sut: CreateCollaboratorUseCase
+let managerIdForTests: string
 
 describe('Create Collaborator Use Case', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     collaboratorsRepository = new InMemoryCollaboratorsRepository()
     companiesRepository = new InMemoryCompaniesRepository()
     usersRepository = new InMemoryUsersRepository()
+    usagesRepository = new InMemoryUsagesRepository()
+    userSubscriptionsRepository = new InMemoryUserSubscriptionsRepository()
+    plansRepository = new InMemoryPlansRepository()
+
+    checkAndIncrementUsageUseCase = new CheckAndIncrementUsageUseCase(
+      usagesRepository,
+      userSubscriptionsRepository,
+      plansRepository,
+    )
+
     sut = new CreateCollaboratorUseCase(
       collaboratorsRepository,
       companiesRepository,
       usersRepository,
+      checkAndIncrementUsageUseCase,
     )
+
+    const plan = await plansRepository.create({
+      name: 'Pro',
+      price: 100,
+      maxCompanies: 10,
+      maxCollaborators: 50,
+      maxInvoices: 1000,
+    })
+
+    // Setup de um usuário genérico que será manager das empresas
+    const user = await usersRepository.create({
+      name: 'Manager',
+      email: 'manager@example.com',
+      passwordHash: '123456',
+    })
+    managerIdForTests = user.id
+
+    // Esse manager precisa de uma assinatura para os incrementos de limite funcionarem
+    await userSubscriptionsRepository.create({
+      userId: managerIdForTests,
+      planId: plan.id as number,
+      status: 'ACTIVE',
+    })
   })
 
   it('deve ser possível cadastrar um colaborador', async () => {
@@ -35,7 +78,7 @@ describe('Create Collaborator Use Case', () => {
     const company = await companiesRepository.create({
       name: 'Acme Corp',
       cnpj: '11122233344455',
-      managerId: user.id,
+      managerId: managerIdForTests, // manager
     })
 
     const { collaborator } = await sut.execute({
@@ -59,6 +102,7 @@ describe('Create Collaborator Use Case', () => {
     const company = await companiesRepository.create({
       name: 'Acme Corp',
       cnpj: '11122233344455',
+      managerId: managerIdForTests, // manager
     })
 
     await sut.execute({
@@ -99,6 +143,7 @@ describe('Create Collaborator Use Case', () => {
     const company = await companiesRepository.create({
       name: 'Acme Corp',
       cnpj: '11122233344455',
+      managerId: managerIdForTests, // manager
     })
 
     await expect(() =>

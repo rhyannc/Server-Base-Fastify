@@ -3,16 +3,20 @@ import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companie
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
 
 import { CreateCollaboratorUseCase } from '../create-collaborator'
+import { makeCheckAndIncrementUsageUseCase } from './make-check-and-increment-usage-use-case'
 
 export function makeCreateCollaboratorUseCase() {
   const collaboratorsRepository = new PrismaCollaboratorsRepository()
   const companiesRepository = new PrismaCompaniesRepository()
   const usersRepository = new PrismaUsersRepository()
-  const useCase = new CreateCollaboratorUseCase(
+  const checkAndIncrementUsageUseCase = makeCheckAndIncrementUsageUseCase()
+
+  const createCollaboratorUseCase = new CreateCollaboratorUseCase(
     collaboratorsRepository,
     companiesRepository,
     usersRepository,
+    checkAndIncrementUsageUseCase,
   )
 
-  return useCase
+  return createCollaboratorUseCase
 }

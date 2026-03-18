@@ -10,7 +10,7 @@ import { UserSubscriptionAlreadyExistsError } from './errors/user-subscription-a
 
 interface CreateUserSubscriptionUseCaseRequest {
   userId: string
-  planId: number
+  planId: string
   status?: SubscriptionStatus
 }
 

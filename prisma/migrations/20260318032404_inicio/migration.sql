@@ -19,7 +19,9 @@ CREATE TABLE "public"."users" (
     "passwordHash" TEXT NOT NULL,
     "avatar" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "role" "public"."Role" NOT NULL DEFAULT 'MEMBER',
     "lastLoginAt" TIMESTAMP(3),
+    "chosePlan" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -68,15 +70,15 @@ CREATE TABLE "public"."collaborators" (
 
 -- CreateTable
 CREATE TABLE "public"."plans" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isPopular" BOOLEAN NOT NULL DEFAULT false,
     "price" DECIMAL(10,2) NOT NULL,
-    "maxCompanies" TEXT NOT NULL,
-    "maxCollaborators" TEXT NOT NULL,
-    "maxInvoices" TEXT NOT NULL,
+    "maxCompanies" INTEGER,
+    "maxCollaborators" INTEGER,
+    "maxInvoices" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "plans_pkey" PRIMARY KEY ("id")
@@ -86,7 +88,7 @@ CREATE TABLE "public"."plans" (
 CREATE TABLE "public"."user_subscriptions" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
-    "planId" INTEGER NOT NULL,
+    "planId" TEXT NOT NULL,
     "status" "public"."SubscriptionStatus" NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expiresAt" TIMESTAMP(3),

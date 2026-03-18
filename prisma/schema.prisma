@@ -108,15 +108,15 @@ model Collaborator {
 }
 
 model Plan {
-  id                Int                @id @default(autoincrement())
+  id                String             @id @default(uuid())
   name              String
   description       String?
   isActive          Boolean            @default(true) // Plano ativo/inativo
   isPopular         Boolean            @default(false)
   price             Decimal            @db.Decimal(10, 2)
-  maxCompanies      Int
-  maxCollaborators  Int
-  maxInvoices       Int
+  maxCompanies      Int?
+  maxCollaborators  Int?
+  maxInvoices       Int?
   createdAt         DateTime           @default(now())
   userSubscriptions UserSubscription[]
 
@@ -128,7 +128,7 @@ model UserSubscription {
   user              User               @relation(fields: [userId], references: [id])
   userId            String             @unique
   plan              Plan               @relation(fields: [planId], references: [id])
-  planId            Int
+  planId            String
   status            SubscriptionStatus // active, trialing, past_due, canceled, expired
   startedAt         DateTime           @default(now()) // Data de início da assinatura
   expiresAt         DateTime? // Data de expiração da assinatura

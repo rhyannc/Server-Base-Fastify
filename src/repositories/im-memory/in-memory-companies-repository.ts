@@ -86,7 +86,7 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
       createdAt: new Date(),
       updatedBy: 'user',
       updatedAt: new Date(),
-      managerId: '123',
+      managerId: data.managerId,
     }
 
     this.items.push(company)

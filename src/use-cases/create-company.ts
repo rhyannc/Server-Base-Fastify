@@ -1,7 +1,8 @@
-import { Company, Status } from '@prisma/client'
+import { Company, Status, UsageMetric } from '@prisma/client'
 
 import { CompaniesRepository } from '@/repositories/companies-repository'
 
+import { CheckAndIncrementUsageUseCase } from './check-and-increment-usage'
 import { CompanyAlreadyExistsError } from './errors/company-already-exists-error'
 
 interface CreateCompanyUseCaseRequest {
@@ -27,7 +28,10 @@ interface CreateCompanyUseCaseResponse {
 }
 
 export class CreateCompanyUseCase {
-  constructor(private companiesRepository: CompaniesRepository) {}
+  constructor(
+    private companiesRepository: CompaniesRepository,
+    private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
+  ) {}
   async execute({
     name,
     cnpj,
@@ -51,6 +55,12 @@ export class CreateCompanyUseCase {
     if (companyWithsameCnpj) {
       throw new CompanyAlreadyExistsError()
     }
+
+    // Verifica limite do plano e incrementa o uso
+    await this.checkAndIncrementUsageUseCase.execute({
+      userId: managerId,
+      metric: UsageMetric.COMPANIES,
+    })
 
     // Cadastra no BD
     const company = await this.companiesRepository.create({

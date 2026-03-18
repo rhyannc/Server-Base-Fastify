@@ -5,7 +5,7 @@ import { PlansRepository } from '@/repositories/plans-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface GetPlanIdUseCaseRequest {
-  planId: number
+  planId: string
 }
 
 interface GetPlanIdUseCaseResponse {

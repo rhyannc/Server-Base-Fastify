@@ -3,15 +3,15 @@ import { Plan } from '@prisma/client'
 import { PlansRepository } from '@/repositories/plans-repository'
 
 interface UpdatePlanUseCaseRequest {
-  id: number
+  id: string
   name: string
   description: string
   isActive: boolean
   isPopular: boolean
   price: number
-  maxCompanies: string
-  maxCollaborators: string
-  maxInvoices: string
+  maxCompanies: number
+  maxCollaborators: number
+  maxInvoices: number
 }
 
 interface UpdatePlanUseCaseResponse {
