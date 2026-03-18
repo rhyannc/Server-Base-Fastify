@@ -48,6 +48,7 @@ model User {
   active           Boolean           @default(true)
   role             Role              @default(MEMBER) //ADMIN DO SISTEMA GLOBAL SAAS
   lastLoginAt      DateTime? // Último login
+  chosePlan        Boolean           @default(false)
   createdBy        String? // Usuário que criou
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -113,9 +114,9 @@ model Plan {
   isActive          Boolean            @default(true) // Plano ativo/inativo
   isPopular         Boolean            @default(false)
   price             Decimal            @db.Decimal(10, 2)
-  maxCompanies      String
-  maxCollaborators  String
-  maxInvoices       String
+  maxCompanies      Int
+  maxCollaborators  Int
+  maxInvoices       Int
   createdAt         DateTime           @default(now())
   userSubscriptions UserSubscription[]
 
