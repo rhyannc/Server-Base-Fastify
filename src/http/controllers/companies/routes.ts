@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { verifyUserRole } from '@/http/middlewares/verify-user-role'
+import { verifyChosePlan } from '@/http/middlewares/verify-chose-plan'
 
 import {
   companyId,
@@ -32,6 +33,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         body: createCompanyBodySchema,
         response: createCompanyBodyResponse,
       },
+      onRequest: [verifyChosePlan],
     },
     createCompany,
   )
