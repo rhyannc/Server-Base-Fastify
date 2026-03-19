@@ -4,8 +4,8 @@
 -O CAOLABORADOR SO PODE SER CRIADO PELO MANAGER OU PELO ADMIN
 -Update e delete de colaborador so pode ser feito pelo manager ou pelo admin
 -PARAMETERS NOS UPDATE
--PENSAR EM COMO FAZER A ASSINATURA DO PLANO SE AO CADASTRAR OU AO CADASTRAR A EMPRESA. OU APOS ENTRAR NO SYS 
+
 
 - UUID NO USRsub
--chosenfalse nao deixa fazer as paradas
+-chosenfalse alterar para true
 -se plan null tudo full

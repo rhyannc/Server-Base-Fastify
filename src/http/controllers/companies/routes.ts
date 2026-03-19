@@ -33,7 +33,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         body: createCompanyBodySchema,
         response: createCompanyBodyResponse,
       },
-      onRequest: [verifyChosePlan],
+      onRequest: [verifyChosePlan], // So permitir user com plano
     },
     createCompany,
   )
@@ -48,6 +48,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         params: companyIdBodySchema,
         response: companyIdBodyResponse,
       },
+      onRequest: [verifyChosePlan], // So permitir user com plano
     },
     companyId,
   )
@@ -61,7 +62,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         querystring: searchCompaniesQuerySchema,
       },
-      onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
+      onRequest: [verifyUserRole('ADMIN'), verifyChosePlan], // So vai permitir que ADMIN executem e user com plano
     },
     search,
   )
@@ -75,7 +76,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         querystring: findCompaniesQuerySchema,
       },
-      onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
+      onRequest: [verifyUserRole('ADMIN'), verifyChosePlan], // So vai permitir que ADMIN executem e user com plano
     },
     findCompanies,
   )
@@ -104,6 +105,7 @@ export async function companiesRoutes(app: FastifyInstance) {
         body: updateCompanyBodySchema,
         response: updateCompanyBodyResponse,
       },
+      onRequest: [verifyChosePlan], // So permitir user com plano
     },
     updateCompany,
   )
