@@ -36,7 +36,7 @@ describe('Check and Increment Usage Use Case', () => {
 
     await userSubscriptionsRepository.create({
       userId: 'user-1',
-      planId: plan.id as number,
+      planId: plan.id as string,
       status: 'ACTIVE',
     })
 
@@ -60,7 +60,7 @@ describe('Check and Increment Usage Use Case', () => {
 
     await userSubscriptionsRepository.create({
       userId: 'user-1',
-      planId: plan.id as number,
+      planId: plan.id as string,
       status: 'ACTIVE',
     })
 

@@ -1,12 +1,13 @@
 import { Plan, Prisma } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
+import { randomUUID } from 'node:crypto'
 
 import { PlansRepository } from '../plans-repository'
 
 export class InMemoryPlansRepository implements PlansRepository {
   public items: Plan[] = []
 
-  async findById(id: number) {
+  async findById(id: string) {
     const plan = this.items.find((item) => item.id === id)
 
     if (!plan) {
@@ -28,15 +29,15 @@ export class InMemoryPlansRepository implements PlansRepository {
 
   async create(data: Prisma.PlanCreateInput) {
     const plan = {
-      id: Math.floor(Math.random() * 1000000),
+      id: randomUUID(),
       name: data.name,
       description: data.description ?? null,
       isActive: data.isActive ?? true,
       isPopular: data.isPopular ?? false,
       price: new Decimal(data.price.toString()),
-      maxCompanies: data.maxCompanies,
-      maxCollaborators: data.maxCollaborators,
-      maxInvoices: data.maxInvoices,
+      maxCompanies: data.maxCompanies ?? null,
+      maxCollaborators: data.maxCollaborators ?? null,
+      maxInvoices: data.maxInvoices ?? null,
       createdAt: new Date(),
     }
 

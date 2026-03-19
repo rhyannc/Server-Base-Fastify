@@ -34,6 +34,7 @@ export class RemoveCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
+    // Verifica se a empresa do colaborador existe
     const company = await this.companiesRepository.findById(
       collaborator.companyId,
     )
@@ -41,12 +42,14 @@ export class RemoveCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
+    // Validação de Permissão (ADMIN ou Gerente da Empresa)
     if (authorRole !== 'ADMIN' && company.managerId !== authorId) {
       throw new GenericUnauthorizedError()
     }
 
     await this.collaboratorsRepository.delete(collaboratorId)
 
+    // Decrementa o uso de colaboradores no Usages
     await this.decrementUsageUseCase.execute({
       userId: company.managerId,
       metric: UsageMetric.COLLABORATORS,
