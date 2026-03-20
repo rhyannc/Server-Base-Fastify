@@ -5,10 +5,12 @@ import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-r
 
 import { PlanNotActiveError } from './errors/plan-not-active-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { UserSubscriptionAlreadyExistsError } from './errors/user-subscription-already-exists-error'
+import { UserSubscriptionNotExistsPlanError } from './errors/user-subscription-not-exists-plan-error'
 
 interface UpdateUserSubscriptionUseCaseRequest {
   userId: string
-  planId?: number
+  planId?: string
   status?: SubscriptionStatus
 }
 
@@ -27,13 +29,15 @@ export class UpdateUserSubscriptionUseCase {
     planId,
     status,
   }: UpdateUserSubscriptionUseCaseRequest): Promise<UpdateUserSubscriptionUseCaseResponse> {
+
+    // Verifica se o usuario ja tem plano
     const userSubscription =
       await this.userSubscriptionsRepository.findByUserId(userId)
-
     if (!userSubscription) {
-      throw new ResourceNotFoundError()
+      throw new UserSubscriptionNotExistsPlanError()
     }
 
+    //verificar se o plano existe e se esta ativo
     if (planId) {
       const plan = await this.plansRepository.findById(planId)
       if (!plan) {

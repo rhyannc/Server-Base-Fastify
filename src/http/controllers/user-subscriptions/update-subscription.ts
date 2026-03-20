@@ -7,7 +7,7 @@ import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-err
 import { makeUpdateUserSubscriptionUseCase } from '@/use-cases/factories/make-update-user-subscription-use-case'
 
 export const updateSubscriptionBodySchema = z.object({
-  planId: z.number().int().positive().optional(),
+  planId: z.string().uuid().optional(),
   status: z
     .enum(['ACTIVE', 'TRIALING', 'PAST_DUE', 'CANCELED', 'EXPIRED'])
     .optional(),
@@ -17,9 +17,9 @@ export const updateSubscriptionResponseSchema = {
   200: z
     .object({
       userSubscription: z.object({
-        id: z.number(),
+        id: z.string(),
         userId: z.string(),
-        planId: z.number(),
+        planId: z.string(),
         status: z.string(),
       }),
     })

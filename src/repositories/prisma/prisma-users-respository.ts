@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 
 import { prisma } from '@/lib/prisma'
 
@@ -65,10 +65,10 @@ export class PrismaUsersRepository implements UsersRepository {
     return users
   }
 
-  async update(data: Prisma.UserUncheckedUpdateInput) {
+  async update(data: User) {
     const user = await prisma.user.update({
       where: {
-        id: data.id as string,
+        id: data.id,
       },
       data,
     })

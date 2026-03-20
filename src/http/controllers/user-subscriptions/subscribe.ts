@@ -19,7 +19,7 @@ export const subscribeResponseSchema = {
   201: z
     .object({
       userSubscription: z.object({
-        id: z.number(),
+        id: z.string(),
         userId: z.string(),
         planId: z.string(),
         status: z.string(),

@@ -28,7 +28,7 @@ export class PrismaUserSubscriptionsRepository
   async update(data: Prisma.UserSubscriptionUncheckedUpdateInput) {
     const userSubscription = await prisma.userSubscription.update({
       where: {
-        id: Number(data.id),
+        id: String(data.id),
       },
       data,
     })

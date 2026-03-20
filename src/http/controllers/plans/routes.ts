@@ -26,7 +26,7 @@ export async function plansRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Plan'],
-        summary: 'Cria um Novo Plano',
+        summary: 'Cria um Novo Plano | somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         body: createPlanBodySchema,
         response: createPlanBodyResponse,

@@ -3,9 +3,7 @@
 -ACHO QUE DEVERIA TER UMA VALIDACAO DE ADMIN TAMBEM NO CASO DE USO 
 -O CAOLABORADOR SO PODE SER CRIADO PELO MANAGER OU PELO ADMIN
 -Update e delete de colaborador so pode ser feito pelo manager ou pelo admin
--PARAMETERS NOS UPDATE
+-PARAMETERS NOS UPDATE SAWWGUER
 
 
-- UUID NO USRsub
--chosenfalse alterar para true
 -se plan null tudo full

@@ -30,6 +30,7 @@ export class CreateUserSubscriptionUseCase {
     planId,
     status = 'ACTIVE',
   }: CreateUserSubscriptionUseCaseRequest): Promise<CreateUserSubscriptionUseCaseResponse> {
+    // verificar se o usuario existe
     const user = await this.usersRepository.findById(userId)
     if (!user) {
       throw new ResourceNotFoundError()
@@ -44,6 +45,7 @@ export class CreateUserSubscriptionUseCase {
       throw new PlanNotActiveError()
     }
 
+    // verificar se o usuario ja tem uma assinatura
     const subscriptionExists =
       await this.userSubscriptionsRepository.findByUserId(userId)
 
@@ -55,6 +57,13 @@ export class CreateUserSubscriptionUseCase {
       userId,
       planId,
       status,
+    })
+
+    // atualizar o campo chosePlan do usuario para true
+    const updatedUser = await this.usersRepository.update({
+      id: user.id,
+      chosePlan: true,
+      updatedAt: user.updatedAt, // Nao altera o updatedAt, deixando apenas para quando o usuario for atualizado
     })
 
     return { userSubscription }
