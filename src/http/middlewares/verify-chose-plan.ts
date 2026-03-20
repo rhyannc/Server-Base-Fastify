@@ -1,5 +1,5 @@
-// Interceptador para validar se o usuario já escolheu um plano
-// Que passado no Routes (onRequest: [verifyUserRol('ADMIN'))],)
+// Illlaa
+// lol
 
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { prisma } from '@/lib/prisma'
