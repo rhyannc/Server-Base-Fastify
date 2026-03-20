@@ -1,3 +1,4 @@
+//teste
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { prisma } from '@/lib/prisma'
 
@@ -18,3 +19,4 @@ export async function verifyChosePlan(
     })
   }
 }
+//lol
