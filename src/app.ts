@@ -20,6 +20,7 @@ import { usagesRoutes } from './http/controllers/usages/routes'
 import { userSubscriptionsRoutes } from './http/controllers/user-subscriptions/routes'
 import { usersRoutes } from './http/controllers/users/routes'
 import { appRoutes } from './http/routes'
+import { webhooksRoutes } from './http/controllers/webhooks/routes'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -77,6 +78,7 @@ app.register(plansRoutes, { prefix: '/plan' })
 app.register(collaboratorsRoutes, { prefix: '/collaborator' })
 app.register(userSubscriptionsRoutes, { prefix: '/subscriptions' })
 app.register(usagesRoutes, { prefix: '/usages' })
+app.register(webhooksRoutes, { prefix: '/webhooks' })
 
 app.get(
   '/cou/:id',

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, Status } from '@prisma/client'
 
 import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
@@ -90,4 +90,25 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
       },
     })
   }
+
+  async updateStatusByCompanyIds(
+    companyIds: string[],
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<void> {
+    if (companyIds.length === 0) return
+
+    const statusFilter = Array.isArray(fromStatus)
+      ? { in: fromStatus }
+      : fromStatus
+
+    await prisma.collaborator.updateMany({
+      where: {
+        companyId: { in: companyIds },
+        status: statusFilter,
+      },
+      data: { status: toStatus },
+    })
+  }
 }
+

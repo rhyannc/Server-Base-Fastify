@@ -46,7 +46,7 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       id: randomUUID(),
       companyId: data.companyId,
       userId: data.userId,
-      role: data.role ?? 'MEMBER',
+      role: data.role ?? 'COLLABORATOR',
       active: data.active ?? true,
       status: data.status ?? Status.ACTIVE,
       createdAt: new Date(),
@@ -80,4 +80,23 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       this.items.splice(collaboratorIndex, 1)
     }
   }
+
+  async updateStatusByCompanyIds(
+    companyIds: string[],
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<void> {
+    const statusArray = Array.isArray(fromStatus) ? fromStatus : [fromStatus]
+
+    this.items = this.items.map((item) => {
+      if (
+        companyIds.includes(item.companyId) &&
+        statusArray.includes(item.status)
+      ) {
+        return { ...item, status: toStatus }
+      }
+      return item
+    })
+  }
 }
+

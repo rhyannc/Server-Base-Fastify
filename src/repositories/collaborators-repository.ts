@@ -1,4 +1,4 @@
-import { Collaborator, Prisma } from '@prisma/client'
+import { Collaborator, Prisma, Status } from '@prisma/client'
 
 export interface CollaboratorsRepository {
   findById(id: string): Promise<Collaborator | null>
@@ -11,4 +11,10 @@ export interface CollaboratorsRepository {
   create(data: Prisma.CollaboratorUncheckedCreateInput): Promise<Collaborator>
   update(data: Prisma.CollaboratorUncheckedUpdateInput): Promise<Collaborator>
   delete(id: string): Promise<void>
+  updateStatusByCompanyIds(
+    companyIds: string[],
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<void>
 }
+

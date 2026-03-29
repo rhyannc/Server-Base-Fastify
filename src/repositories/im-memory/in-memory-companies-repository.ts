@@ -93,4 +93,25 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
 
     return company
   }
+
+  async updateStatusByManagerId(
+    managerId: string,
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<string[]> {
+    const statusArray = Array.isArray(fromStatus) ? fromStatus : [fromStatus]
+
+    const updatedIds: string[] = []
+
+    this.items = this.items.map((item) => {
+      if (item.managerId === managerId && statusArray.includes(item.status)) {
+        updatedIds.push(item.id)
+        return { ...item, status: toStatus }
+      }
+      return item
+    })
+
+    return updatedIds
+  }
 }
+

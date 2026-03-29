@@ -1,4 +1,4 @@
-import { Company, Prisma } from '@prisma/client'
+import { Company, Prisma, Status } from '@prisma/client'
 
 export interface CompaniesRepository {
   findById(id: string): Promise<Company | null>
@@ -8,4 +8,10 @@ export interface CompaniesRepository {
   searchMany(query: string, page: number): Promise<any[]>
   create(data: Prisma.CompanyUncheckedCreateInput): Promise<Company>
   update(data: Prisma.CompanyUncheckedUpdateInput): Promise<Company>
+  updateStatusByManagerId(
+    managerId: string,
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<string[]> // retorna IDs das empresas atualizadas
 }
+

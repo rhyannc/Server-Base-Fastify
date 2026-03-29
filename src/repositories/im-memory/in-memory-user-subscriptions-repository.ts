@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { Prisma, UserSubscription } from '@prisma/client'
 
 import { UserSubscriptionsRepository } from '../user-subscriptions-repository'
@@ -9,7 +11,7 @@ export class InMemoryUserSubscriptionsRepository
 
   async create(data: Prisma.UserSubscriptionUncheckedCreateInput) {
     const userSubscription = {
-      id: Math.floor(Math.random() * 1000000), // Emulate auto-increment Int ID
+      id: randomUUID(),
       userId: data.userId,
       planId: data.planId,
       status: data.status,

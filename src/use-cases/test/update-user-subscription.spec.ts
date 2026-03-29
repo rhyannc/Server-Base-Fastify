@@ -49,13 +49,13 @@ describe('Update User Subscription Use Case', () => {
 
     await userSubscriptionsRepository.create({
       userId: user.id,
-      planId: initialPlan.id as number,
+      planId: initialPlan.id,
       status: 'TRIALING',
     })
 
     const { userSubscription } = await sut.execute({
       userId: user.id,
-      planId: newPlan.id as number,
+      planId: newPlan.id,
       status: 'ACTIVE',
     })
 
@@ -95,7 +95,7 @@ describe('Update User Subscription Use Case', () => {
 
     await userSubscriptionsRepository.create({
       userId: user.id,
-      planId: initialPlan.id as number,
+      planId: initialPlan.id,
       status: 'TRIALING',
     })
 
@@ -133,14 +133,14 @@ describe('Update User Subscription Use Case', () => {
 
     await userSubscriptionsRepository.create({
       userId: user.id,
-      planId: initialPlan.id as number,
+      planId: initialPlan.id,
       status: 'TRIALING',
     })
 
     await expect(() =>
       sut.execute({
         userId: user.id,
-        planId: inactivePlan.id as number,
+        planId: inactivePlan.id,
       }),
     ).rejects.toBeInstanceOf(PlanNotActiveError)
   })

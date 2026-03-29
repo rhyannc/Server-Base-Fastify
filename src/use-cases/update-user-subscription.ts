@@ -34,7 +34,7 @@ export class UpdateUserSubscriptionUseCase {
     const userSubscription =
       await this.userSubscriptionsRepository.findByUserId(userId)
     if (!userSubscription) {
-      throw new UserSubscriptionNotExistsPlanError()
+      throw new ResourceNotFoundError()
     }
 
     //verificar se o plano existe e se esta ativo

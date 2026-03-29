@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, Status } from '@prisma/client'
 
 import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
@@ -99,4 +99,32 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
 
     return company
   }
+
+  async updateStatusByManagerId(
+    managerId: string,
+    fromStatus: Status | Status[],
+    toStatus: Status,
+  ): Promise<string[]> {
+    const statusFilter = Array.isArray(fromStatus)
+      ? { in: fromStatus }
+      : fromStatus
+
+    // Busca os IDs das empresas que serão atualizadas
+    const companies = await prisma.company.findMany({
+      where: { managerId, status: statusFilter },
+      select: { id: true },
+    })
+
+    const companyIds = companies.map((c) => c.id)
+
+    if (companyIds.length > 0) {
+      await prisma.company.updateMany({
+        where: { id: { in: companyIds } },
+        data: { status: toStatus },
+      })
+    }
+
+    return companyIds
+  }
 }
+

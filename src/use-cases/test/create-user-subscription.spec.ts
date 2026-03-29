@@ -46,7 +46,7 @@ describe('Create User Subscription Use Case', () => {
       planId: plan.id as number,
     })
 
-    expect(userSubscription.id).toEqual(expect.any(Number))
+    expect(userSubscription.id).toEqual(expect.any(String))
     expect(userSubscription.status).toEqual('ACTIVE')
   })
 
@@ -69,7 +69,7 @@ describe('Create User Subscription Use Case', () => {
     await expect(() =>
       sut.execute({
         userId: user.id,
-        planId: plan.id as number,
+        planId: plan.id,
       }),
     ).rejects.toBeInstanceOf(PlanNotActiveError)
   })
@@ -97,7 +97,7 @@ describe('Create User Subscription Use Case', () => {
     await expect(() =>
       sut.execute({
         userId: user.id,
-        planId: plan.id as number,
+        planId: plan.id,
       }),
     ).rejects.toBeInstanceOf(UserSubscriptionAlreadyExistsError)
   })
@@ -114,7 +114,7 @@ describe('Create User Subscription Use Case', () => {
     await expect(() =>
       sut.execute({
         userId: 'non-existing-user',
-        planId: plan.id as number,
+        planId: plan.id,
       }),
     ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
