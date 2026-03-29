@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 
+import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
 
 import { CompaniesRepository } from '../companies-repository'
@@ -32,8 +33,8 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
           },
         },
       },
-      take: 20, // Total de resutados por pagina
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION, // Total de resutados por pagina
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return companies
   }
@@ -43,8 +44,8 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
       where: {
         managerId: userId,
       },
-      take: 20, // Total de resutados por pagina
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION, // Total de resutados por pagina
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return companies
   }
@@ -74,8 +75,8 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
         },
       },
 
-      take: 20, // Total de resutados por pagina
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION, // Total de resutados por pagina
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return companies
   }

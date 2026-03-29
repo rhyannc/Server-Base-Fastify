@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 
+import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
 
 import { PlansRepository } from '../plans-repository'
@@ -36,8 +37,8 @@ export class PrismaPlansRepository implements PlansRepository {
           mode: 'insensitive',
         },
       },
-      take: 10,
-      skip: (page - 1) * 10,
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return plans
   }

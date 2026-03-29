@@ -1,5 +1,6 @@
 import { Prisma, User } from '@prisma/client'
 
+import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
 
 import { UsersRepository } from '../users-repository'
@@ -33,8 +34,8 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async findMany(page: number) {
     const users = await prisma.user.findMany({
-      take: 20,
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
 
     return users
@@ -58,8 +59,8 @@ export class PrismaUsersRepository implements UsersRepository {
           },
         ],
       },
-      take: 20,
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
 
     return users

@@ -29,6 +29,17 @@ export async function appRoutes(app: FastifyInstance) {
   app.post(
     '/session',
     {
+      config: {
+        rateLimit: {
+          max: 5, // máximo de 5 tentativas
+          timeWindow: '5 minutes', // por IP, a cada 5 minutos
+          errorResponseBuilder: () => ({
+            statusCode: 429,
+            message:
+              'Você exedeu o limite de requisições para essa ação, Aguarde 5 minutos para tentar novamente.',
+          }),
+        },
+      },
       schema: {
         tags: ['Register'],
         summary: 'Authentica um usuário',

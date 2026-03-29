@@ -1,7 +1,6 @@
 import { FastifyInstance } from 'fastify'
 
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
-import { verifyUserRole } from '@/http/middlewares/verify-user-role'
 
 import {
   createCollaborator,
@@ -26,22 +25,25 @@ import {
   updateCollaboratorBodySchema,
   updateCollaboratorParamsSchema,
 } from './updateCollaborator'
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
+import { verifyCompanyActive } from '@/http/middlewares/verify-company-active'
 
 
 export async function collaboratorsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
+  app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
 
   app.post(
     '/register',
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Cadastra um novo colaborador em uma empresa | somente usuário *ADMIN*',
+        summary: 'Cadastra um novo colaborador em uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         body: createCollaboratorBodySchema,
         response: createCollaboratorBodyResponse,
       },
-      onRequest: [verifyUserRole('ADMIN')], // Pode ser limitado a ADMIN do sistema ou Manager da empresa futuramente
+      preHandler: [verifyCompanyActive], // Bloqueia se a empresa estiver FROZEN ou ARCHIVED
     },
     createCollaborator,
   )
@@ -51,11 +53,12 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Lista todos os colaboradores de uma empresa',
+        summary: 'Lista todos os colaboradores de uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: findCollaboratorsByCompanyParamsSchema,
         querystring: findCollaboratorsByCompanyQuerySchema,
       },
+      preHandler: [verifyCompanyActive], // Bloqueia se a empresa estiver FROZEN ou ARCHIVED
     },
     findCollaboratorsByCompany,
   )
@@ -78,12 +81,11 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Atualiza dados de um colaborador',
+        summary: 'Atualiza dados de um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: updateCollaboratorParamsSchema,
         body: updateCollaboratorBodySchema,
       },
-      onRequest: [verifyUserRole('ADMIN')], // TODO: Adicionar validação de MANAGER depois conforme fixMe.md
     },
     updateCollaborator,
   )
@@ -93,11 +95,10 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Remove um colaborador',
+        summary: 'Remove um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: removeCollaboratorParamsSchema,
       },
-      onRequest: [verifyUserRole('ADMIN')], // TODO: Adicionar validação de MANAGER depois
     },
     removeCollaborator,
   )

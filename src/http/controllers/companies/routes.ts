@@ -18,10 +18,13 @@ import { findManager, findManagerQuerySchema } from './findManager'
 import { search, searchCompaniesQuerySchema } from './search'
 import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
 import { findCompanies, findCompaniesQuerySchema } from './findCompany'
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function companiesRoutes(app: FastifyInstance) {
   /** Authenticated */
   app.addHook('onRequest', verifyJWT) // vai obrigar que todas as rotas abaixo tenha Token JWT Valido
+  app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
+
 
   app.post(
     '/create',
@@ -72,7 +75,7 @@ export async function companiesRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Company'],
-        summary: 'Pesquisa todas as empresas mas somente usuário *ADMIN*',
+        summary: 'Exibe todas as empresas mas somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         querystring: findCompaniesQuerySchema,
       },
@@ -87,10 +90,11 @@ export async function companiesRoutes(app: FastifyInstance) {
       schema: {
         tags: ['Company'],
         summary:
-          'Pesquisa as empresas de um usuário manager(User que cadastrou a empresa)',
+          'Pesquisa as empresas de um usuário manager(User que cadastrou a empresa) | somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         querystring: findManagerQuerySchema,
       },
+      onRequest: [verifyUserRole('ADMIN'), verifyChosePlan], // So vai permitir que ADMIN executem
     },
     findManager,
   )
@@ -100,7 +104,7 @@ export async function companiesRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Company'],
-        summary: 'Atualiza uma Empresa - FIX FIX FIX', /** FIX Tenho que atualizar recurso para que so ao Manager e ao Admin possa atualizar a empresa */
+        summary: 'Atualiza uma Empresa | somente usuário *ADMIN* - LEAD - MANAGER', 
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         body: updateCompanyBodySchema,
         response: updateCompanyBodyResponse,

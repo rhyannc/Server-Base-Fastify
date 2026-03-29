@@ -10,10 +10,12 @@ import {
   updateMetricParamsSchema,
 } from './update-metric'
 import { userMetrics, userMetricsParamsSchema } from './user-metrics'
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function usagesRoutes(app: FastifyInstance) {
   // Todas as rotas de usos precisam de autenticação
   app.addHook('onRequest', verifyJWT)
+  app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
 
   // O próprio usuário consulta seus usos
   app.get(

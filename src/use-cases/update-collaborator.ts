@@ -1,4 +1,4 @@
-import { Collaborator, Role, Status } from '@prisma/client'
+import { Collaborator, Role, RoleCollaborator, Status } from '@prisma/client'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
@@ -8,7 +8,7 @@ import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface UpdateCollaboratorUseCaseRequest {
   collaboratorId: string
-  role?: Role
+  role?: RoleCollaborator
   active?: boolean
   status?: Status
 }
@@ -25,15 +25,16 @@ export class UpdateCollaboratorUseCase {
 
   async execute({
     collaboratorId,
-    authorId,
-    authorRole,
+    meId,
+    meSysRole,
     role,
     active,
     status,
   }: UpdateCollaboratorUseCaseRequest & {
-    authorId: string
-    authorRole: Role
+    meId: string
+    meSysRole: Role
   }): Promise<UpdateCollaboratorUseCaseResponse> {
+    //  Verifica se o COLABORADOR existe
     const collaborator =
       await this.collaboratorsRepository.findById(collaboratorId)
 
@@ -41,6 +42,7 @@ export class UpdateCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
+    // Verifica se a empresa existe
     const company = await this.companiesRepository.findById(
       collaborator.companyId,
     )
@@ -48,8 +50,18 @@ export class UpdateCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
-    if (authorRole !== 'ADMIN' && company.managerId !== authorId) {
-      throw new GenericUnauthorizedError()
+    //  Validação de Permissão (ADMIN ou Manager da Empresa)
+    if (meSysRole !== 'ADMIN' && company.managerId !== meId) {
+      // Verifica se sou um colaborador com role LEAD nessa empresa
+
+      const authorCollaborator =
+        await this.collaboratorsRepository.findByCompanyAndUser(
+          collaborator.companyId,
+          meId,
+        )
+      if (!authorCollaborator || authorCollaborator.role !== 'LEAD') {
+        throw new GenericUnauthorizedError()
+      }
     }
 
     const updatedCollaborator = await this.collaboratorsRepository.update({

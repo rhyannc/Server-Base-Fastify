@@ -1,6 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import z from 'zod'
 
+import { Role } from '@prisma/client'
+
 import { makeUpdateCompaniesUseCase } from '@/use-cases/factories/make-update-companies'
 
 export const updateCompanyBodySchema = z.object({
@@ -50,6 +52,8 @@ export async function updateCompany(
   const updateCompanyUseCase = makeUpdateCompaniesUseCase()
 
   const { company } = await updateCompanyUseCase.execute({
+    meId: request.user.sub,
+    meSysRole: request.user.role as Role,
     id,
     name,
     cnpj,

@@ -1,6 +1,10 @@
-import { Company, Status } from '@prisma/client'
+import { Company, Role } from '@prisma/client'
 
+import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
+
+import { CompanyNoExistError } from './errors/company-no-exist-error'
+import { GenericUnauthorizedError } from './errors/generic-unauthorized-error'
 
 interface UpdateCompanyUseCaseRequest {
   id: string
@@ -15,7 +19,6 @@ interface UpdateCompanyUseCaseRequest {
   number?: string | null
   complement?: string | null
   cep?: string | null
-
 }
 
 interface UpdateCompanyUseCaseResponse {
@@ -23,9 +26,14 @@ interface UpdateCompanyUseCaseResponse {
 }
 
 export class UpdateCompanyUseCase {
-  constructor(private companiesRepository: CompaniesRepository) {}
+  constructor(
+    private companiesRepository: CompaniesRepository,
+    private collaboratorsRepository: CollaboratorsRepository,
+  ) {}
 
   async execute({
+    meId,
+    meSysRole,
     id,
     name,
     cnpj,
@@ -38,8 +46,27 @@ export class UpdateCompanyUseCase {
     number,
     complement,
     cep,
- 
-  }: UpdateCompanyUseCaseRequest): Promise<UpdateCompanyUseCaseResponse> {
+  }: UpdateCompanyUseCaseRequest & {
+    meId: string
+    meSysRole: Role
+  }): Promise<UpdateCompanyUseCaseResponse> {
+    // Verifica se a empresa existe
+    const companyExists = await this.companiesRepository.findById(id)
+    if (!companyExists) {
+      throw new CompanyNoExistError()
+    }
+
+    //  Validação de Permissão (ADMIN ou Manager da Empresa)
+    if (meSysRole !== 'ADMIN' && companyExists.managerId !== meId) {
+      // Verifica se sou um colaborador com role LEAD nessa empresa
+
+      const authorCollaborator =
+        await this.collaboratorsRepository.findByCompanyAndUser(id, meId)
+      if (!authorCollaborator || authorCollaborator.role !== 'LEAD') {
+        throw new GenericUnauthorizedError()
+      }
+    }
+
     const company = await this.companiesRepository.update({
       id,
       name,
@@ -53,7 +80,6 @@ export class UpdateCompanyUseCase {
       number,
       complement,
       cep,
-
     })
 
     return {

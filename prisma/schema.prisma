@@ -15,7 +15,12 @@ datasource db {
 
 enum Role {
   ADMIN
-  MEMBER
+  USER
+}
+
+enum RoleCollaborator {
+  LEAD
+  COLLABORATOR
 }
 
 enum Status {
@@ -46,7 +51,7 @@ model User {
   passwordHash     String
   avatar           String?
   active           Boolean           @default(true)
-  role             Role              @default(MEMBER) //ADMIN DO SISTEMA GLOBAL SAAS
+  role             Role              @default(USER) //ADMIN DO SISTEMA GLOBAL SAAS
   lastLoginAt      DateTime? // Último login
   chosePlan        Boolean           @default(false)
   createdBy        String? // Usuário que criou
@@ -95,7 +100,7 @@ model Collaborator {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  role Role @default(MEMBER)
+  role RoleCollaborator @default(COLLABORATOR)
 
   active Boolean @default(true)
   status Status  @default(ACTIVE) // active, frozen, archived

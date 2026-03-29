@@ -16,10 +16,12 @@ import {
   updatePlanBodyResponse,
   updatePlanBodySchema,
 } from './updatePlan'
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
   app.addHook('onRequest', verifyJWT) // vai obrigar que todas as rotas abaixo tenha Token JWT Valido
+  app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
 
   app.post(
     '/create',

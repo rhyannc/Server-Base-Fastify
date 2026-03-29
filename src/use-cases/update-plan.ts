@@ -8,10 +8,10 @@ interface UpdatePlanUseCaseRequest {
   description: string
   isActive: boolean
   isPopular: boolean
-  price: number
-  maxCompanies: number
-  maxCollaborators: number
-  maxInvoices: number
+  price?: number
+  maxCompanies?: number
+  maxCollaborators?: number
+  maxInvoices?: number
 }
 
 interface UpdatePlanUseCaseResponse {

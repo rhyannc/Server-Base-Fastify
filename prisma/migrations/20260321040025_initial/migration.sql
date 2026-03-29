@@ -1,5 +1,8 @@
 -- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('ADMIN', 'MEMBER');
+CREATE TYPE "public"."Role" AS ENUM ('ADMIN', 'USER');
+
+-- CreateEnum
+CREATE TYPE "public"."RoleCollaborator" AS ENUM ('LEAD', 'COLLABORATOR');
 
 -- CreateEnum
 CREATE TYPE "public"."Status" AS ENUM ('ACTIVE', 'FROZEN', 'ARCHIVED');
@@ -19,7 +22,7 @@ CREATE TABLE "public"."users" (
     "passwordHash" TEXT NOT NULL,
     "avatar" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT true,
-    "role" "public"."Role" NOT NULL DEFAULT 'MEMBER',
+    "role" "public"."Role" NOT NULL DEFAULT 'USER',
     "lastLoginAt" TIMESTAMP(3),
     "chosePlan" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" TEXT,
@@ -59,7 +62,7 @@ CREATE TABLE "public"."collaborators" (
     "id" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "role" "public"."Role" NOT NULL DEFAULT 'MEMBER',
+    "role" "public"."RoleCollaborator" NOT NULL DEFAULT 'COLLABORATOR',
     "active" BOOLEAN NOT NULL DEFAULT true,
     "status" "public"."Status" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +89,7 @@ CREATE TABLE "public"."plans" (
 
 -- CreateTable
 CREATE TABLE "public"."user_subscriptions" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "planId" TEXT NOT NULL,
     "status" "public"."SubscriptionStatus" NOT NULL,

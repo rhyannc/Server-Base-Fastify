@@ -4,7 +4,6 @@ import { CollaboratorsRepository } from '@/repositories/collaborators-repository
 import { CompaniesRepository } from '@/repositories/companies-repository'
 
 import { DecrementUsageUseCase } from './decrement-usage'
-
 import { GenericUnauthorizedError } from './errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
@@ -21,11 +20,11 @@ export class RemoveCollaboratorUseCase {
 
   async execute({
     collaboratorId,
-    authorId,
-    authorRole,
+    meId,
+    meSysRole,
   }: RemoveCollaboratorUseCaseRequest & {
-    authorId: string
-    authorRole: Role
+    meId: string
+    meSysRole: Role
   }): Promise<void> {
     const collaborator =
       await this.collaboratorsRepository.findById(collaboratorId)
@@ -42,9 +41,18 @@ export class RemoveCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
-    // Validação de Permissão (ADMIN ou Gerente da Empresa)
-    if (authorRole !== 'ADMIN' && company.managerId !== authorId) {
-      throw new GenericUnauthorizedError()
+    // 2. Validação de Permissão (ADMIN ou Manager da Empresa)
+    if (meSysRole !== 'ADMIN' && company.managerId !== meId) {
+      // Verifica se sou um colaborador com role LEAD nessa empresa
+
+      const authorCollaborator =
+        await this.collaboratorsRepository.findByCompanyAndUser(
+          collaborator.companyId,
+          meId,
+        )
+      if (!authorCollaborator || authorCollaborator.role !== 'LEAD') {
+        throw new GenericUnauthorizedError()
+      }
     }
 
     await this.collaboratorsRepository.delete(collaboratorId)

@@ -4,19 +4,19 @@ import z from 'zod'
 import { makeUpdatePlansUseCase } from '@/use-cases/factories/make-update-plans'
 
 export const updatePlanBodySchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   name: z.string(),
   description: z.string(),
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
-  price: z.number(),
-  maxCollaborators: z.number(),
-  maxCompanies: z.number(),
-  maxInvoices: z.number(),
+  price: z.number().optional(),
+  maxCollaborators: z.number().optional(),
+  maxCompanies: z.number().optional(),
+  maxInvoices: z.number().optional(),
 })
 
 export const updatePlanBodyResponse = {
-  201: z
+  200: z
     .object({ planId: z.string() })
     .describe('Plano atualizado com sucesso!'),
   409: z.object({ message: z.string() }).describe('Plano já existente'),
@@ -50,5 +50,5 @@ export async function updatePlan(request: FastifyRequest, reply: FastifyReply) {
     maxInvoices,
   })
 
-  return reply.status(201).send({ planId: plan.id }) //  retorna o ID
+  return reply.status(200).send({ planId: plan.id }) //  retorna o ID
 }

@@ -40,7 +40,7 @@ export class CheckAndIncrementUsageUseCase {
       throw new ResourceNotFoundError()
     }
 
-    let limit = 0
+    let limit: number | null = null
     if (metric === UsageMetric.COMPANIES) {
       limit = plan.maxCompanies
     } else if (metric === UsageMetric.COLLABORATORS) {
@@ -58,7 +58,7 @@ export class CheckAndIncrementUsageUseCase {
       period,
     )
 
-    if (usage && usage.value >= limit) {
+    if (limit !== null && usage && usage.value >= limit) {
       throw new PlanLimitReachedError(metric)
     }
 

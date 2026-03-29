@@ -1,6 +1,8 @@
 import { User } from '@prisma/client'
 import { hash } from 'bcryptjs'
 
+import { env } from '@/env'
+
 import { UsersRepository } from '@/repositories/users-repository'
 
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
@@ -26,6 +28,12 @@ export class RegisterUseCase {
     password,
     createdBy,
   }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+
+    // Valida char senha
+    if (password.length < env.PASSWD_MIN_LENGTH || password.length > env.PASSWD_MAX_LENGTH) {
+      throw new Error(`Senha deve ter pelo menos ${env.PASSWD_MIN_LENGTH} caracteres e máximo ${env.PASSWD_MAX_LENGTH}`)
+    }
+
     // Crias Hash de senha usando o BCrypt
     const passwordHash = await hash(password, 4)
 

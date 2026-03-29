@@ -1,11 +1,16 @@
-import { Collaborator, Role, Status, UsageMetric } from '@prisma/client'
+import {
+  Collaborator,
+  Role,
+  RoleCollaborator,
+  Status,
+  UsageMetric,
+} from '@prisma/client'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { UsersRepository } from '@/repositories/users-repository'
 
 import { CheckAndIncrementUsageUseCase } from './check-and-increment-usage'
-
 import { CollaboratorAlreadyExistsError } from './errors/collaborator-already-exists-error'
 import { GenericUnauthorizedError } from './errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
@@ -13,7 +18,7 @@ import { ResourceNotFoundError } from './errors/resource-not-found-error'
 interface CreateCollaboratorUseCaseRequest {
   companyId: string
   userId: string
-  role?: Role
+  role?: RoleCollaborator
   active?: boolean
   status?: Status
 }
@@ -33,30 +38,39 @@ export class CreateCollaboratorUseCase {
   async execute({
     companyId,
     userId,
-    authorId,
-    authorRole,
+    meId,
+    meSysRole,
     role,
     active,
     status,
-  }: CreateCollaboratorUseCaseRequest & { authorId: string; authorRole: Role }): Promise<CreateCollaboratorUseCaseResponse> {
+  }: CreateCollaboratorUseCaseRequest & {
+    meId: string
+    meSysRole: Role
+  }): Promise<CreateCollaboratorUseCaseResponse> {
     // 1. Verifica se a empresa existe
     const company = await this.companiesRepository.findById(companyId)
     if (!company) {
       throw new ResourceNotFoundError()
     }
 
-    // 2. Validação de Permissão (ADMIN ou Gerente da Empresa)
-    if (authorRole !== 'ADMIN' && company.managerId !== authorId) {
-      throw new GenericUnauthorizedError()
+    // 2. Validação de Permissão (ADMIN ou Manager da Empresa)
+    if (meSysRole !== 'ADMIN' && company.managerId !== meId) {
+      // Verifica se EU sou um colaborador com role LEAD nessa empresa
+
+      const authorCollaborator =
+        await this.collaboratorsRepository.findByCompanyAndUser(companyId, meId)
+      if (!authorCollaborator || authorCollaborator.role !== 'LEAD') {
+        throw new GenericUnauthorizedError()
+      }
     }
 
-    // 2. Verifica se o usuário existe
+    // 3. Verifica se o usuário existe
     const user = await this.usersRepository.findById(userId)
     if (!user) {
       throw new ResourceNotFoundError()
     }
 
-    // 3. Verifica se o usuário já é colaborador desta empresa
+    // 4. Verifica se o usuário já é colaborador desta empresa
     const collaboratorExists =
       await this.collaboratorsRepository.findByCompanyAndUser(companyId, userId)
 
@@ -64,7 +78,7 @@ export class CreateCollaboratorUseCase {
       throw new CollaboratorAlreadyExistsError()
     }
 
-    // Incrementa limite de uso de colaboradores da empresa (do Manager)
+    // Verifica limite do plano e Incrementa limite de uso de colaboradores da empresa (do Manager)
     await this.checkAndIncrementUsageUseCase.execute({
       userId: company.managerId,
       metric: UsageMetric.COLLABORATORS,

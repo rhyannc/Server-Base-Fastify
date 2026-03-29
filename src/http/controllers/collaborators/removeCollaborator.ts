@@ -23,8 +23,8 @@ export async function removeCollaborator(
 
     await removeCollaboratorUseCase.execute({
       collaboratorId,
-      authorId: request.user.sub,
-      authorRole: request.user.role as Role,
+      meId: request.user.sub,
+      meSysRole: request.user.role as Role,
     })
 
     return reply.status(204).send()

@@ -9,7 +9,7 @@ import { makeCreateCollaboratorUseCase } from '@/use-cases/factories/make-create
 export const createCollaboratorBodySchema = z.object({
   companyId: z.string().uuid(),
   userId: z.string().uuid(),
-  role: z.enum(['ADMIN', 'MEMBER']).optional().default('MEMBER'),
+  role: z.enum(['LEAD', 'COLLABORATOR']).optional().default('COLLABORATOR'),
   active: z.boolean().optional().default(true),
   status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional().default('ACTIVE'),
 })
@@ -37,8 +37,8 @@ export async function createCollaborator(
     const { collaborator } = await createCollaboratorUseCase.execute({
       companyId,
       userId,
-      authorId: request.user.sub,
-      authorRole: request.user.role as Role,
+      meId: request.user.sub,
+      meSysRole: request.user.role as Role,
       role,
       active,
       status,

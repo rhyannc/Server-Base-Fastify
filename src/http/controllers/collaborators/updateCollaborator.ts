@@ -13,7 +13,7 @@ export const updateCollaboratorParamsSchema = z.object({
 
 // schema de validação para o corpo da requisição.
 export const updateCollaboratorBodySchema = z.object({
-  role: z.enum(['ADMIN', 'MEMBER']).optional(),
+  role: z.enum(['LEAD', 'COLLABORATOR']).optional(),
   active: z.boolean().optional(),
   status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional(),
 })
@@ -38,8 +38,8 @@ export async function updateCollaborator(
 
     const { collaborator } = await updateCollaboratorUseCase.execute({
       collaboratorId,
-      authorId: request.user.sub,
-      authorRole: request.user.role as Role,
+      meId: request.user.sub,
+      meSysRole: request.user.role as Role,
       role,
       active,
       status,

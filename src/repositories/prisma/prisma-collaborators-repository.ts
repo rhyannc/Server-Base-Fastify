@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 
+import { env } from '@/env'
 import { prisma } from '@/lib/prisma'
 
 import { CollaboratorsRepository } from '../collaborators-repository'
@@ -40,8 +41,8 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
           },
         },
       },
-      take: 20,
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return collaborators
   }
@@ -59,8 +60,8 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
           },
         },
       },
-      take: 20,
-      skip: (page - 1) * 20,
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
     })
     return collaborators
   }

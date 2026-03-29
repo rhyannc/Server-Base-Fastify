@@ -12,10 +12,12 @@ import {
   updateSubscriptionBodySchema,
   updateSubscriptionResponseSchema,
 } from './update-subscription'
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function userSubscriptionsRoutes(app: FastifyInstance) {
   /** Authenticated */
   app.addHook('onRequest', verifyJWT) // vai obrigar que todas as rotas abaixo tenha Token JWT Valido
+  app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
 
   app.post(
     '/',
