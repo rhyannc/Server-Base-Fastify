@@ -53,7 +53,13 @@ export class CreateCollaboratorUseCase {
       throw new ResourceNotFoundError()
     }
 
-    // 2. Validação de Permissão (ADMIN ou Manager da Empresa)
+    // 2. Verifica se o usuário a ser adicionado existe
+    const user = await this.usersRepository.findById(userId)
+    if (!user) {
+      throw new ResourceNotFoundError()
+    }
+
+    // 3. Validação de Permissão (ADMIN ou Manager da Empresa ou LEAD de Colaboradores)
     if (meSysRole !== 'ADMIN' && company.managerId !== meId) {
       // Verifica se EU sou um colaborador com role LEAD nessa empresa
 
@@ -62,12 +68,6 @@ export class CreateCollaboratorUseCase {
       if (!authorCollaborator || authorCollaborator.role !== 'LEAD') {
         throw new GenericUnauthorizedError()
       }
-    }
-
-    // 3. Verifica se o usuário existe
-    const user = await this.usersRepository.findById(userId)
-    if (!user) {
-      throw new ResourceNotFoundError()
     }
 
     // 4. Verifica se o usuário já é colaborador desta empresa

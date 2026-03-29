@@ -1,17 +1,11 @@
-Validaçao final de alt dados de company com usage de plano(remocao de qtd)
+Validaçao final de alteracao de dados de company com usage de plano(remocao de qtd)
+
+-LASTACESS CREAT UM UMPDATE PARA QUANDO O FRONT ENTRAR NESSA COMPANIES
 
 
 -Middleware de permissão para colaboradores
 -Middleware de permissão para Plano
 
--se o plano mudar tem que fazer as pliticas de alteracaoes. 
 
-TRIAL -> ACTIVE -> CPNY_ATIVO
-TRIAL -> EXPIRED -> CPNY_FROZEN
+-verificaçao refinada na usage
 
-ATIVO -> CANCELLED -> CPNY_ARCHIVED
-ATIVO -> VENCIDO -> CPNY_FROZEN
-
-CANCELLED -> ATIVO -> CPNY_ATIVO
-VENCIDO   -> ATIVO -> CPNY_ATIVO
- 

@@ -126,5 +126,14 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
 
     return companyIds
   }
+
+  async findManyByManagerId(managerId: string) {
+    const companies = await prisma.company.findMany({
+      where: { managerId },
+      orderBy: { lastAccess: { sort: 'desc', nulls: 'last' } },
+    })
+
+    return companies
+  }
 }
 

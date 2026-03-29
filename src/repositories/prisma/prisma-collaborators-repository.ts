@@ -110,5 +110,29 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
       data: { status: toStatus },
     })
   }
+
+  async findManyByManagerId(managerId: string) {
+    const collaborators = await prisma.collaborator.findMany({
+      where: {
+        company: { managerId },
+      },
+      orderBy: { createdAt: 'asc' }, // Mais antigos primeiro para arquivamento
+    })
+
+    return collaborators
+  }
+
+  async countActiveByManagerId(managerId: string) {
+    const count = await prisma.collaborator.count({
+      where: {
+        company: { managerId },
+        status: {
+          in: ['ACTIVE', 'FROZEN'],
+        },
+      },
+    })
+
+    return count
+  }
 }
 

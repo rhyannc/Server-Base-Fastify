@@ -16,5 +16,8 @@ export interface CollaboratorsRepository {
     fromStatus: Status | Status[],
     toStatus: Status,
   ): Promise<void>
+
+  findManyByManagerId(managerId: string): Promise<Collaborator[]>
+  countActiveByManagerId(managerId: string): Promise<number>
 }
 

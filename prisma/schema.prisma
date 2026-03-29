@@ -66,24 +66,25 @@ model User {
 }
 
 model Company {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
-  cnpj       String?  @unique
+  cnpj       String?   @unique
   email      String?
   phone      String?
-  country    String?  @default("BR")
+  country    String?   @default("BR")
   city       String?
   state      String?
   address    String?
   number     String?
   complement String?
   cep        String?
-  active     Boolean  @default(true)
-  status     Status   @default(ACTIVE) // active, frozen, archived
+  active     Boolean   @default(true)
+  status     Status    @default(ACTIVE) // active, frozen, archived
+  lastAccess DateTime? // Último login
   createdBy  String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
   updatedBy  String?
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime  @updatedAt
 
   manager       User           @relation(fields: [managerId], references: [id])
   managerId     String

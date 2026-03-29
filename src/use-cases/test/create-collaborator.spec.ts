@@ -63,7 +63,7 @@ describe('Create Collaborator Use Case', () => {
     // Esse manager precisa de uma assinatura para os incrementos de limite funcionarem
     await userSubscriptionsRepository.create({
       userId: managerIdForTests,
-      planId: plan.id as number,
+      planId: String(plan.id),
       status: 'ACTIVE',
     })
   })
@@ -84,12 +84,12 @@ describe('Create Collaborator Use Case', () => {
     const { collaborator } = await sut.execute({
       companyId: company.id,
       userId: user.id,
-      authorId: user.id,
-      authorRole: 'ADMIN',
+      meId: managerIdForTests,
+      meSysRole: 'ADMIN',
     })
 
     expect(collaborator.id).toEqual(expect.any(String))
-    expect(collaborator.role).toEqual('MEMBER')
+    expect(collaborator.role).toEqual('COLLABORATOR')
   })
 
   it('não deve ser possível cadastrar o mesmo colaborador na mesma empresa duas vezes', async () => {
@@ -108,16 +108,16 @@ describe('Create Collaborator Use Case', () => {
     await sut.execute({
       companyId: company.id,
       userId: user.id,
-      authorId: user.id,
-      authorRole: 'ADMIN',
+      meId: managerIdForTests,
+      meSysRole: 'ADMIN',
     })
 
     await expect(() =>
       sut.execute({
         companyId: company.id,
         userId: user.id,
-        authorId: user.id,
-        authorRole: 'ADMIN',
+        meId: managerIdForTests,
+        meSysRole: 'ADMIN',
       }),
     ).rejects.toBeInstanceOf(CollaboratorAlreadyExistsError)
   })
@@ -133,8 +133,8 @@ describe('Create Collaborator Use Case', () => {
       sut.execute({
         companyId: 'non-existing-company-id',
         userId: user.id,
-        authorId: user.id,
-        authorRole: 'ADMIN',
+        meId: managerIdForTests,
+        meSysRole: 'ADMIN',
       }),
     ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
@@ -150,8 +150,8 @@ describe('Create Collaborator Use Case', () => {
       sut.execute({
         companyId: company.id,
         userId: 'non-existing-user-id',
-        authorId: 'any-id',
-        authorRole: 'ADMIN',
+        meId: managerIdForTests,
+        meSysRole: 'ADMIN',
       }),
     ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })

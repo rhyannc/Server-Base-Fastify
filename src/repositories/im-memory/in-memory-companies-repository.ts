@@ -61,6 +61,7 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
       if (data.active !== undefined) this.items[companyIndex].active = data.active as boolean
       if (data.status !== undefined) this.items[companyIndex].status = data.status as Status
       if (data.managerId !== undefined) this.items[companyIndex].managerId = data.managerId as string
+      if (data.lastAccess !== undefined) this.items[companyIndex].lastAccess = data.lastAccess as Date | null
     }
 
     return this.items[companyIndex]
@@ -87,6 +88,7 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
       updatedBy: 'user',
       updatedAt: new Date(),
       managerId: data.managerId,
+      lastAccess: null,
     }
 
     this.items.push(company)
@@ -112,6 +114,17 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
     })
 
     return updatedIds
+  }
+
+  async findManyByManagerId(managerId: string) {
+    return this.items
+      .filter((item) => item.managerId === managerId)
+      .sort((a, b) => {
+        if (a.lastAccess === b.lastAccess) return 0
+        if (a.lastAccess === null) return 1 // a (null) vai para o final
+        if (b.lastAccess === null) return -1 // b (null) vai para o final
+        return b.lastAccess.getTime() - a.lastAccess.getTime()
+      })
   }
 }
 

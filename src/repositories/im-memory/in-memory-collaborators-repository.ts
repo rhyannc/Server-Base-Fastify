@@ -3,9 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { Collaborator, Prisma, Status } from '@prisma/client'
 
 import { CollaboratorsRepository } from '../collaborators-repository'
+import { InMemoryCompaniesRepository } from './in-memory-companies-repository'
 
 export class InMemoryCollaboratorsRepository implements CollaboratorsRepository {
   public items: Collaborator[] = []
+
+  constructor(private companiesRepository: InMemoryCompaniesRepository = new InMemoryCompaniesRepository()) {}
 
   async findById(id: string) {
     const collaborator = this.items.find((item) => item.id === id)
@@ -97,6 +100,28 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       }
       return item
     })
+  }
+
+  async findManyByManagerId(managerId: string) {
+    const managerCompanies = this.companiesRepository.items.filter(
+      (company) => company.managerId === managerId,
+    )
+    const companyIds = managerCompanies.map((c) => c.id)
+
+    return this.items
+      .filter((item) => companyIds.includes(item.companyId))
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+  }
+
+  async countActiveByManagerId(managerId: string) {
+    const managerCompanies = this.companiesRepository.items.filter(
+      (company) => company.managerId === managerId,
+    )
+    const companyIds = managerCompanies.map((c) => c.id)
+
+    return this.items.filter(
+      (item) => companyIds.includes(item.companyId) && (item.status === 'ACTIVE' || item.status === 'FROZEN'),
+    ).length
   }
 }
 

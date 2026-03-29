@@ -13,5 +13,7 @@ export interface CompaniesRepository {
     fromStatus: Status | Status[],
     toStatus: Status,
   ): Promise<string[]> // retorna IDs das empresas atualizadas
+
+  findManyByManagerId(managerId: string): Promise<Company[]>
 }
 

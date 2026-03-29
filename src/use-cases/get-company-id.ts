@@ -25,6 +25,12 @@ export class GetCompanyIdUseCase {
       throw new ResourceNotFoundError()
     }
 
+    // Atualiza o lastAccess ao entrar na empresa
+    await this.companiesRepository.update({
+      id: companyId,
+      lastAccess: new Date(),
+    })
+
     return { company }
   }
 }
