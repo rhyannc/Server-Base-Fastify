@@ -134,5 +134,13 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
 
     return count
   }
+
+  async findByCompanyId(companyId: string) {
+    const collaborators = await prisma.collaborator.findMany({
+      where: { companyId },
+    })
+
+    return collaborators
+  }
 }
 

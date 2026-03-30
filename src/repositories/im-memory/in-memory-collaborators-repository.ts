@@ -123,5 +123,9 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       (item) => companyIds.includes(item.companyId) && (item.status === 'ACTIVE' || item.status === 'FROZEN'),
     ).length
   }
+
+  async findByCompanyId(companyId: string) {
+    return this.items.filter((item) => item.companyId === companyId)
+  }
 }
 

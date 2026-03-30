@@ -27,19 +27,23 @@ export class CheckAndIncrementUsageUseCase {
     userId,
     metric,
   }: CheckAndIncrementUsageUseCaseRequest): Promise<CheckAndIncrementUsageUseCaseResponse> {
+    // Busca assinatura do usuário
     const subscription =
       await this.userSubscriptionsRepository.findByUserId(userId)
 
+    // Se não tiver assinatura, lança erro
     if (!subscription) {
       throw new ResourceNotFoundError()
     }
 
+    // Busca plano da assinatura
     const plan = await this.plansRepository.findById(subscription.planId)
 
     if (!plan) {
       throw new ResourceNotFoundError()
     }
 
+    // Define o limite baseado na métrica
     let limit: number | null = null
     if (metric === UsageMetric.COMPANIES) {
       limit = plan.maxCompanies

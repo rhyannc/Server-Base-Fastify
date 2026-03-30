@@ -84,6 +84,8 @@ export class CreateCollaboratorUseCase {
       metric: UsageMetric.COLLABORATORS,
     })
 
+    
+
     // 4. Cria o colaborador
     const collaborator = await this.collaboratorsRepository.create({
       companyId,

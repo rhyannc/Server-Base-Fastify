@@ -12,6 +12,9 @@ import {
   updateSubscriptionBodySchema,
   updateSubscriptionResponseSchema,
 } from './update-subscription'
+import {
+  getMeSubscription,
+} from './getMeSubscription'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function userSubscriptionsRoutes(app: FastifyInstance) {
@@ -45,5 +48,17 @@ export async function userSubscriptionsRoutes(app: FastifyInstance) {
       },
     },
     updateSubscription,
+  )
+
+  app.get(
+    '/me',
+    {
+      schema: {
+        tags: ['User Subscription'],
+        summary: 'Obtém detalhes da assinatura do usuário logado',
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    getMeSubscription,
   )
 }

@@ -20,6 +20,7 @@ import { search, searchCompaniesQuerySchema } from './search'
 import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
 import { findCompanies, findCompaniesQuerySchema } from './findCompany'
 import { selectCompany, selectCompanyBodyResponse, selectCompanyParamsSchema } from './selectCompany'
+import { transferManagerCompany, transferManagerCompanyBodyResponse, transferManagerCompanyBodySchema, transferManagerCompanyParamsSchema } from './transferManagerCompany'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function companiesRoutes(app: FastifyInstance) {
@@ -129,6 +130,22 @@ export async function companiesRoutes(app: FastifyInstance) {
       onRequest: [verifyChosePlan],
     },
     selectCompany,
+  )
+
+  app.patch(
+    '/company/:companyId/transfer',
+    {
+      schema: {
+        tags: ['Company'],
+        summary: 'Transfere a gerência de uma empresa para outro usuário | somente usuário *ADMIN*',
+        security: [{ bearerAuth: [] }],
+        params: transferManagerCompanyParamsSchema,
+        body: transferManagerCompanyBodySchema,
+        response: transferManagerCompanyBodyResponse,
+      },
+      onRequest: [verifyUserRole('ADMIN'), verifyChosePlan],
+    },
+    transferManagerCompany,
   )
   
 }
