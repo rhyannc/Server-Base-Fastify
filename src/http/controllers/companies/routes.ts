@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import { z } from 'zod'
 
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { verifyUserRole } from '@/http/middlewares/verify-user-role'
@@ -18,6 +19,7 @@ import { findManager, findManagerQuerySchema } from './findManager'
 import { search, searchCompaniesQuerySchema } from './search'
 import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
 import { findCompanies, findCompaniesQuerySchema } from './findCompany'
+import { selectCompany, selectCompanyBodyResponse, selectCompanyParamsSchema } from './selectCompany'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function companiesRoutes(app: FastifyInstance) {
@@ -112,6 +114,21 @@ export async function companiesRoutes(app: FastifyInstance) {
       onRequest: [verifyChosePlan], // So permitir user com plano
     },
     updateCompany,
+  )
+
+  app.patch(
+    '/company/:companyId/access',
+    {
+      schema: {
+        tags: ['Company'],
+        summary: 'Registra acesso a uma empresa e valida se está ATIVA',
+        security: [{ bearerAuth: [] }],
+        params: selectCompanyParamsSchema,
+        response: selectCompanyBodyResponse,
+      },
+      onRequest: [verifyChosePlan],
+    },
+    selectCompany,
   )
   
 }
