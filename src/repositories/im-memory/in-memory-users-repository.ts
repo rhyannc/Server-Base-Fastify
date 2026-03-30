@@ -65,7 +65,7 @@ export class InMemoryUsersRepository implements UsersRepository {
       passwordHash: data.passwordHash,
       avatar: null,
       active: true,
-      role: 'MEMBER',
+      role: 'USER',
       lastLoginAt: new Date(),
       createdBy: 'user-0',
       createdAt: new Date(),

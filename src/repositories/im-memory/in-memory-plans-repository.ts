@@ -17,8 +17,12 @@ export class InMemoryPlansRepository implements PlansRepository {
     return plan
   }
 
-  async findMany(page: number) {
-    return this.items.slice((page - 1) * 20, page * 20)
+  async findMany(page: number, onlyActive = true) {
+    let items = this.items
+    if (onlyActive) {
+      items = items.filter((item) => item.isActive)
+    }
+    return items.slice((page - 1) * 20, page * 20)
   }
 
   async searchMany(query: string, page: number) {

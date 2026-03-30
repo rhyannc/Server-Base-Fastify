@@ -15,13 +15,11 @@ export class PrismaPlansRepository implements PlansRepository {
     return plans
   }
 
-  async findMany(page: number) {
+  async findMany(page: number, onlyActive = true) {
     const plans = await prisma.plan.findMany({
-      take: 10, // limita a quantidade de resultados por página
-      skip: (page - 1) * 10, // pula os resultados anteriores
-      where: {
-        isActive: true,
-      },
+      take: env.TAKE_PAGINATION,// limita a quantidade de resultados por página
+      skip: (page - 1) * env.TAKE_PAGINATION, // pula os resultados anteriores
+      where:  onlyActive ? { isActive: true } : {},  
       orderBy: {
         name: 'asc',
       },

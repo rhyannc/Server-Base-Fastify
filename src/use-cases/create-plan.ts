@@ -29,12 +29,6 @@ export class CreatePlanUseCase {
     maxCollaborators,
     maxInvoices,
   }: CreatePlanUseCaseRequest): Promise<CreatePlanUseCaseResponse> {
-    // Verifica se o plano ja existe
-    /* const planExists = await this.plansRepository.findByName(name)
-    
-    if (planExists) {
-      throw new Error('Plan already exists')
-    } */
 
     // Cadastra no BD
     const plan = await this.plansRepository.create({

@@ -1,13 +1,14 @@
 import { Plan } from '@prisma/client'
 
 import { PlansRepository } from '@/repositories/plans-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface UpdatePlanUseCaseRequest {
   id: string
-  name: string
-  description: string
-  isActive: boolean
-  isPopular: boolean
+  name?: string
+  description?: string
+  isActive?: boolean
+  isPopular?: boolean
   price?: number
   maxCompanies?: number
   maxCollaborators?: number
@@ -32,16 +33,22 @@ export class UpdatePlanUseCase {
     maxCollaborators,
     maxInvoices,
   }: UpdatePlanUseCaseRequest): Promise<UpdatePlanUseCaseResponse> {
+    const planExists = await this.plansRepository.findById(id)
+
+    if (!planExists) {
+      throw new ResourceNotFoundError()
+    }
+
     const plan = await this.plansRepository.update({
       id,
-      name,
-      description,
-      isActive,
-      isPopular,
-      price,
-      maxCompanies,
-      maxCollaborators,
-      maxInvoices,
+      name: name ?? planExists.name,
+      description: description ?? planExists.description,
+      isActive: isActive ?? planExists.isActive,
+      isPopular: isPopular ?? planExists.isPopular,
+      price: price ?? Number(planExists.price),
+      maxCompanies: maxCompanies ?? planExists.maxCompanies,
+      maxCollaborators: maxCollaborators ?? planExists.maxCollaborators,
+      maxInvoices: maxInvoices ?? planExists.maxInvoices,
     })
 
     return { plan }

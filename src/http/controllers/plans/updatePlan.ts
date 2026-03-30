@@ -5,10 +5,10 @@ import { makeUpdatePlansUseCase } from '@/use-cases/factories/make-update-plans'
 
 export const updatePlanBodySchema = z.object({
   id: z.string().uuid(),
-  name: z.string(),
-  description: z.string(),
-  isActive: z.boolean().default(true),
-  isPopular: z.boolean().default(false),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
+  isPopular: z.boolean().optional(),
   price: z.number().optional(),
   maxCollaborators: z.number().optional(),
   maxCompanies: z.number().optional(),
