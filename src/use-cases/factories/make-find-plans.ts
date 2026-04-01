@@ -1,6 +1,6 @@
 import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-repository'
 
-import { FetchPlansUseCase } from '../fetch-plans'
+import { FetchPlansUseCase } from '../plans/fetch-plans'
 
 export function makeFindPlansUseCase() {
   const plansRepository = new PrismaPlansRepository()

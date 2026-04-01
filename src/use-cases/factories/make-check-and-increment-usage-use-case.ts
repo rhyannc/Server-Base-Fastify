@@ -2,7 +2,7 @@ import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-reposi
 import { PrismaUsagesRepository } from '@/repositories/prisma/prisma-usages-repository'
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 
 export function makeCheckAndIncrementUsageUseCase() {
   const usagesRepository = new PrismaUsagesRepository()

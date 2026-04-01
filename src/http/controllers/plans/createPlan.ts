@@ -13,6 +13,8 @@ export const createPlanBodySchema = z.object({
   maxCollaborators: z.number().optional(),
   maxCompanies: z.number().optional(),
   maxInvoices: z.number().optional(),
+  stripeProductId: z.string().optional(),
+  stripePriceId: z.string().optional(),
 })
 
 export const createPlanBodyResponse = {
@@ -33,6 +35,8 @@ export async function createPlan(request: FastifyRequest, reply: FastifyReply) {
     maxCollaborators,
     maxCompanies,
     maxInvoices,
+    stripeProductId,
+    stripePriceId,
   } = createPlanBodySchema.parse(request.body)
 
   try {
@@ -48,6 +52,8 @@ export async function createPlan(request: FastifyRequest, reply: FastifyReply) {
       maxCollaborators: maxCollaborators ?? null,
       maxCompanies: maxCompanies ?? null,
       maxInvoices: maxInvoices ?? null,
+      stripeProductId: stripeProductId ?? null,
+      stripePriceId: stripePriceId ?? null,
     })
 
     return reply.status(201).send({ planId: plan.id }) // 👉 retorna o ID

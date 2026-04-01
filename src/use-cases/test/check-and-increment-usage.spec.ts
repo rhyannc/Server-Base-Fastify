@@ -5,7 +5,7 @@ import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plan
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { PlanLimitReachedError } from '../errors/plan-limit-reached-error'
 
 let usagesRepository: InMemoryUsagesRepository

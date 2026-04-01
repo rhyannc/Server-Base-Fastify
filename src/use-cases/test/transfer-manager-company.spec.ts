@@ -5,9 +5,9 @@ import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-user
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
-import { DecrementUsageUseCase } from '../decrement-usage'
-import { TransferManagerCompanyUseCase } from '../transfer-manager-company'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
+import { DecrementUsageUseCase } from '../usages/decrement-usage'
+import { TransferManagerCompanyUseCase } from '../companies/transfer-manager-company'
 import { PlanLimitChangeManagerRachedError } from '../errors/plan-limit-change-manager-rached-error'
 import { UsageMetric } from '@prisma/client'
 

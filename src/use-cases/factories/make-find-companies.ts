@@ -1,6 +1,6 @@
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { FetchCompaniesUseCase } from '../fetch-companies'
+import { FetchCompaniesUseCase } from '../companies/fetch-companies'
 
 export function makeFindCompaniesUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()

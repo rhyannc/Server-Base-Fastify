@@ -9,7 +9,7 @@ import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-user
 
 import { PlanNotActiveError } from '../errors/plan-not-active-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
-import { UpdateUserSubscriptionUseCase } from '../update-user-subscription'
+import { UpdateUserSubscriptionUseCase } from '../subscriptions/update-user-subscription'
 
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let usersRepository: InMemoryUsersRepository

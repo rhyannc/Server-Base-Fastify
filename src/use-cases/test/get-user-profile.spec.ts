@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
 
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
-import { GetUserProfileUseCase } from '../get-user-profile'
+import { GetUserProfileUseCase } from '../users/get-user-profile'
 
 let usersRepository: InMemoryUsersRepository
 let sut: GetUserProfileUseCase

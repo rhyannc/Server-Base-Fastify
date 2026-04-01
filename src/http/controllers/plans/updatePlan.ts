@@ -13,6 +13,8 @@ export const updatePlanBodySchema = z.object({
   maxCollaborators: z.number().optional(),
   maxCompanies: z.number().optional(),
   maxInvoices: z.number().optional(),
+  stripeProductId: z.string().optional(),
+  stripePriceId: z.string().optional(),
 })
 
 export const updatePlanBodyResponse = {
@@ -34,6 +36,8 @@ export async function updatePlan(request: FastifyRequest, reply: FastifyReply) {
     maxCollaborators,
     maxCompanies,
     maxInvoices,
+    stripeProductId,
+    stripePriceId,
   } = updatePlanBodySchema.parse(request.body)
 
   const updatePlanUseCase = makeUpdatePlansUseCase()
@@ -48,6 +52,8 @@ export async function updatePlan(request: FastifyRequest, reply: FastifyReply) {
     maxCollaborators,
     maxCompanies,
     maxInvoices,
+    stripeProductId,
+    stripePriceId,
   })
 
   return reply.status(200).send({ planId: plan.id }) //  retorna o ID

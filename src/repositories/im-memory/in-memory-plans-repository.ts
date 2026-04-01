@@ -42,6 +42,8 @@ export class InMemoryPlansRepository implements PlansRepository {
       maxCompanies: data.maxCompanies ?? null,
       maxCollaborators: data.maxCollaborators ?? null,
       maxInvoices: data.maxInvoices ?? null,
+      stripeProductId: data.stripeProductId ?? null,
+      stripePriceId: data.stripePriceId ?? null,
       createdAt: new Date(),
     }
 

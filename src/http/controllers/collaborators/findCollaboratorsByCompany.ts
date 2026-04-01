@@ -2,7 +2,7 @@ import { Role } from '@prisma/client'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { makeFetchCompanyCollaboratorsUseCase } from '@/use-cases/factories/make-fetch-company-collaborators-use-case'
+import { makeFetchCollaboratorsByCompanyUseCase } from '@/use-cases/factories/make-fetch-collaborators-by-company-use-case'
 
 export const findCollaboratorsByCompanyParamsSchema = z.object({
   companyId: z.string().uuid(),
@@ -21,10 +21,10 @@ export async function findCollaboratorsByCompany(
   )
   const { page } = findCollaboratorsByCompanyQuerySchema.parse(request.query)
 
-  const fetchCompanyCollaboratorsUseCase =
-    makeFetchCompanyCollaboratorsUseCase()
+  const fetchCollaboratorsByCompanyUseCase =
+    makeFetchCollaboratorsByCompanyUseCase()
 
-  const { collaborators } = await fetchCompanyCollaboratorsUseCase.execute({
+  const { collaborators } = await fetchCollaboratorsByCompanyUseCase.execute({
     companyId,
     meId: request.user.sub,
     meSysRole: request.user.role as Role,

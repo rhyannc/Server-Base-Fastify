@@ -5,9 +5,9 @@ import { PrismaUsagesRepository } from '@/repositories/prisma/prisma-usages-repo
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
 
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
-import { DecrementUsageUseCase } from '../decrement-usage'
-import { TransferManagerCompanyUseCase } from '../transfer-manager-company'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
+import { DecrementUsageUseCase } from '../usages/decrement-usage'
+import { TransferManagerCompanyUseCase } from '../companies/transfer-manager-company'
 
 export function makeTransferManagerCompanyUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()

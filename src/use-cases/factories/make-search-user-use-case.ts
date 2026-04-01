@@ -1,6 +1,6 @@
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
 
-import { SearchUserUseCase } from '../search-user'
+import { SearchUserUseCase } from '../users/search-user'
 
 export function makeSearchUserUseCase() {
   const usersRepository = new PrismaUsersRepository()

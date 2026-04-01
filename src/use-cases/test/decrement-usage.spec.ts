@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 
-import { DecrementUsageUseCase } from '../decrement-usage'
+import { DecrementUsageUseCase } from '../usages/decrement-usage'
 
 let usagesRepository: InMemoryUsagesRepository
 let sut: DecrementUsageUseCase

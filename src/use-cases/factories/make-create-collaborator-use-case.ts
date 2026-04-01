@@ -2,7 +2,7 @@ import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-coll
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
 
-import { CreateCollaboratorUseCase } from '../create-collaborator'
+import { CreateCollaboratorUseCase } from '../collaborators/create-collaborator'
 import { makeCheckAndIncrementUsageUseCase } from './make-check-and-increment-usage-use-case'
 
 export function makeCreateCollaboratorUseCase() {

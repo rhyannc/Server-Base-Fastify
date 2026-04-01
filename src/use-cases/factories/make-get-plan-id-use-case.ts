@@ -1,6 +1,6 @@
 import { PrismaPlansRepository } from "@/repositories/prisma/prisma-plans-repository"
 
-import { GetPlanIdUseCase } from "../get-plan-id"
+import { GetPlanIdUseCase } from "../plans/get-plan-id"
 
 
 export function makeGetPlanIdUseCase() {

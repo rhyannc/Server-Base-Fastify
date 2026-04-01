@@ -28,7 +28,15 @@ export const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
+import fastifyRawBody from 'fastify-raw-body'
+
 app.register(fastifyCookie)
+app.register(fastifyRawBody, {
+  field: 'rawBody',
+  global: false,
+  encoding: 'utf8',
+  runFirst: true,
+})
 
 // Habilita rate limit (necessário para as configs por rota funcionarem)
 app.register(fastifyRateLimit, {

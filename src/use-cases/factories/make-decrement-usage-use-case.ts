@@ -1,6 +1,6 @@
 import { PrismaUsagesRepository } from '@/repositories/prisma/prisma-usages-repository'
 
-import { DecrementUsageUseCase } from '../decrement-usage'
+import { DecrementUsageUseCase } from '../usages/decrement-usage'
 
 export function makeDecrementUsageUseCase() {
   const usagesRepository = new PrismaUsagesRepository()

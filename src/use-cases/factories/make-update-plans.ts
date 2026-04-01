@@ -1,6 +1,6 @@
 import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-repository'
 
-import { UpdatePlanUseCase } from '../update-plan'
+import { UpdatePlanUseCase } from '../plans/update-plan'
 
 export function makeUpdatePlansUseCase() {
   const plansRepository = new PrismaPlansRepository()

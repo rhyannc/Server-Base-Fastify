@@ -1,6 +1,6 @@
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { FetchCompaniesUserId } from '../fetch-companies-user-manager'
+import { FetchCompaniesUserId } from '../companies/fetch-companies-user-manager'
 
 export function makeFindUserIdCompaniesUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()

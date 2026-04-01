@@ -4,7 +4,7 @@ import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plan
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
 
-import { CreateUserSubscriptionUseCase } from '../create-user-subscription'
+import { CreateUserSubscriptionUseCase } from '../subscriptions/create-user-subscription'
 import { PlanNotActiveError } from '../errors/plan-not-active-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { UserSubscriptionAlreadyExistsError } from '../errors/user-subscription-already-exists-error'

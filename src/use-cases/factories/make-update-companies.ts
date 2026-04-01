@@ -1,7 +1,7 @@
 import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-collaborators-repository'
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { UpdateCompanyUseCase } from '../update-company'
+import { UpdateCompanyUseCase } from '../companies/update-company'
 
 export function makeUpdateCompaniesUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()

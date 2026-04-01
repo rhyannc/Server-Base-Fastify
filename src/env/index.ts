@@ -11,6 +11,9 @@ const envSchema = z.object({
 
   PASSWD_MIN_LENGTH: z.coerce.number().default(6),
   PASSWD_MAX_LENGTH: z.coerce.number().default(20),
+
+  STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
 })
 
 const _env = envSchema.safeParse(process.env)

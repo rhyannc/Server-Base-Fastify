@@ -7,8 +7,8 @@ import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usa
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
 
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
-import { CreateCollaboratorUseCase } from '../create-collaborator'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
+import { CreateCollaboratorUseCase } from '../collaborators/create-collaborator'
 import { CollaboratorAlreadyExistsError } from '../errors/collaborator-already-exists-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 

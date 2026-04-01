@@ -15,6 +15,7 @@ import {
   subscriptionCanceledBodyResponse,
   subscriptionCanceledBodySchema,
 } from './subscription-canceled'
+import { handleStripeWebhook } from './stripe'
 
 export async function webhooksRoutes(app: FastifyInstance) {
   // Webhooks NÃO usam verifyJWT — são chamados por serviços externos (gateway de pagamento)
@@ -59,6 +60,21 @@ export async function webhooksRoutes(app: FastifyInstance) {
       },
     },
     subscriptionCanceled,
+  )
+
+  app.post(
+    '/stripe',
+    {
+      // @ts-ignore
+      config: {
+        rawBody: true,
+      },
+      schema: {
+        tags: ['Webhooks'],
+        summary: 'Recebe eventos oficiais do Stripe',
+      },
+    },
+    handleStripeWebhook,
   )
 }
 

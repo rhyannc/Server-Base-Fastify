@@ -17,6 +17,8 @@ import {
   updatePlanBodySchema,
 } from './updatePlan'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
+import { checkout, checkoutBodySchema } from './checkout'
+import { portal, portalBodySchema } from './portal'
 
 export async function plansRoutes(app: FastifyInstance) {
   /** Authenticated */
@@ -90,5 +92,31 @@ export async function plansRoutes(app: FastifyInstance) {
       onRequest: [verifyUserRole('ADMIN')], // So vai permitir que ADMIN executem
     },
     updatePlan,
+  )
+
+  app.post(
+    '/checkout',
+    {
+      schema: {
+        tags: ['Plan'],
+        summary: 'Gera link de pagamento no Stripe Checkout',
+        security: [{ bearerAuth: [] }],
+        body: checkoutBodySchema,
+      },
+    },
+    checkout,
+  )
+
+  app.post(
+    '/portal',
+    {
+      schema: {
+        tags: ['Plan'],
+        summary: 'Gera link do Customer Portal do Stripe',
+        security: [{ bearerAuth: [] }],
+        body: portalBodySchema,
+      },
+    },
+    portal,
   )
 }

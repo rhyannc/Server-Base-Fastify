@@ -7,8 +7,8 @@ import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plan
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 
-import { CheckAndIncrementUsageUseCase } from '../check-and-increment-usage'
-import { CreateCompanyUseCase } from '../create-company'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
+import { CreateCompanyUseCase } from '../companies/create-company'
 import { CompanyAlreadyExistsError } from '../errors/company-already-exists-error'
 
 let companiesRepository: InMemoryCompaniesRepository

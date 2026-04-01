@@ -4,7 +4,7 @@ import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-
 
 import { CompanyNotActiveError } from '../errors/company-not-active-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
-import { SelectCompanyUseCase } from '../select-company'
+import { SelectCompanyUseCase } from '../companies/select-company'
 
 let companiesRepository: InMemoryCompaniesRepository
 let sut: SelectCompanyUseCase

@@ -1,6 +1,6 @@
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { SearchCompaniesUseCase } from '../search-companies'
+import { SearchCompaniesUseCase } from '../companies/search-companies'
 
 export function makeSearchCompaniesUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()

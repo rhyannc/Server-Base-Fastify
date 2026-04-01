@@ -24,6 +24,8 @@ export class InMemoryUserSubscriptionsRepository
         : null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      stripeSubscriptionId: data.stripeSubscriptionId ?? null,
+      stripePriceId: data.stripePriceId ?? null,
     }
 
     this.items.push(userSubscription)

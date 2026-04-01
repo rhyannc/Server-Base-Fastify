@@ -4,7 +4,7 @@ import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-reposi
 import { PrismaUsagesRepository } from '@/repositories/prisma/prisma-usages-repository'
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 
-import { UpdateUserSubscriptionUseCase } from '../update-user-subscription'
+import { UpdateUserSubscriptionUseCase } from '../subscriptions/update-user-subscription'
 
 export function makeUpdateUserSubscriptionUseCase() {
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()

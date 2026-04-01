@@ -1,7 +1,7 @@
 import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-collaborators-repository'
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 
-import { RemoveCollaboratorUseCase } from '../remove-collaborator'
+import { RemoveCollaboratorUseCase } from '../collaborators/remove-collaborator'
 import { makeDecrementUsageUseCase } from './make-decrement-usage-use-case'
 
 export function makeRemoveCollaboratorUseCase() {

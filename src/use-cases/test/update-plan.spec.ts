@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
-import { UpdatePlanUseCase } from '../update-plan'
+import { UpdatePlanUseCase } from '../plans/update-plan'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 let plansRepository: InMemoryPlansRepository

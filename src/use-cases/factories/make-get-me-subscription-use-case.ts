@@ -1,6 +1,6 @@
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-repository'
-import { GetMeSubscriptionUseCase } from '../get-me-subscription'
+import { GetMeSubscriptionUseCase } from '../subscriptions/get-me-subscription'
 
 export function makeGetMeSubscriptionUseCase() {
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()

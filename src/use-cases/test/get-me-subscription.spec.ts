@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
-import { GetMeSubscriptionUseCase } from '../get-me-subscription'
+import { GetMeSubscriptionUseCase } from '../subscriptions/get-me-subscription'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
