@@ -62,7 +62,7 @@ api-backend/
 |── stripe-cli                 # Stripe CLI para testes locais
 |── vite.config.ts             # Configuração do Vitest para reconheça os atalho
 ```
-
+<br>
 ## ⚙️ Configuração & Instalação
 
 ### Pré-requisitos
@@ -131,7 +131,7 @@ Com o servidor rodando, acesse a rota `/docs` no seu navegador para visualizar e
 http://localhost:3333/docs
 ```
 
-<br>
+<br><br>
 
 ### 💳 Simulando Webhooks do Stripe Localmente
 Para testar o recebimento de eventos do Stripe (como assinaturas pagas ou falhas), instale e utilize a [Stripe CLI](https://docs.stripe.com/stripe-cli/):
@@ -143,7 +143,7 @@ ou
 ```
 > **Nota**: Ao rodar o comando acima pela primeira vez, o Stripe CLI gerará uma chave de webhook local temporária (`whsec_...`). Copie essa chave e cole no seu `.env` preenchendo o valor de `STRIPE_WEBHOOK_SECRET` para que a rotas validem as chamadas locais!
 
-<br>
+<br><br>
 
 ### 🏭 Ambientes Produtivos
 Geração de binários buildados via `tsup`:
@@ -251,5 +251,6 @@ save-exact=true
 4. Empurre! (`git push origin feature/MinhaInovacao`)
 5. Abra o Pull Request!
 
+<br>
 ## 📄 Licença
 Acesso Livre: **ISC License**. Empreste, refatore e lucre!
