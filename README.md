@@ -3,11 +3,11 @@
 Uma base moderna e robusta para construção de APIs SaaS (Software as a Service). 
 Construída com as melhores práticas de Clean Architecture e SOLID, utilizando **TypeScript**, **Fastify**, e **Prisma ORM**.
 
-
+<br>
 ## 📋 Descrição
 
 Este projeto serve como motor (Backend API RESTful) para um sistema SaaS completo, onde empresas podem se registrar, convidar colaboradores, gerenciar acessos e ser faturadas via Stripe. O objetivo é fornecer uma API de alta performance e pronta para produção, focada em segurança, manutenibilidade e escalabilidade.
-
+<br>
 
 ### ✨ O que já temos implementado
 - 🏢 **Multi-tenancy B2B**: Gestão de Empresas (Tenants) e Colaboradores com Níveis de Acesso.
@@ -19,7 +19,7 @@ Este projeto serve como motor (Backend API RESTful) para um sistema SaaS complet
 - 📖 **Documentação Automática**: Swagger e Swagger UI já configurados e funcionando para testar todos os endpoints.
 - 📊 **Testes Unitários**: Cobertura massiva e rápida dos Use Cases utilizando In-Memory Databases pelo **Vitest**.
 
-
+<br><br>
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -35,7 +35,7 @@ Este projeto serve como motor (Backend API RESTful) para um sistema SaaS complet
 | **Stripe** | Plataforma global de Assinaturas e Webhooks B2B |
 | **Resend & Nodemailer** | Disparo de E-mails de Onboarding e Senhas |
 
-
+<br><br>
 
 ## 📁 Estrutura e Arquitetura
 
@@ -123,7 +123,7 @@ Quando iniciado com sucesso, você verá a mensagem:
 ```
 O servidor será iniciado em modo de desenvolvimento com hot-reload na porta 3333.
 
-
+<br><br>
 
 ### 📖 Documentação da API (Swagger)
 Com o servidor rodando, acesse a rota `/docs` no seu navegador para visualizar e testar interativamente todos os endpoints catalogados:
@@ -131,7 +131,7 @@ Com o servidor rodando, acesse a rota `/docs` no seu navegador para visualizar e
 http://localhost:3333/docs
 ```
 
-
+<br>
 
 ### 💳 Simulando Webhooks do Stripe Localmente
 Para testar o recebimento de eventos do Stripe (como assinaturas pagas ou falhas), instale e utilize a [Stripe CLI](https://docs.stripe.com/stripe-cli/):
@@ -143,7 +143,7 @@ ou
 ```
 > **Nota**: Ao rodar o comando acima pela primeira vez, o Stripe CLI gerará uma chave de webhook local temporária (`whsec_...`). Copie essa chave e cole no seu `.env` preenchendo o valor de `STRIPE_WEBHOOK_SECRET` para que a rotas validem as chamadas locais!
 
-
+<br>
 
 ### 🏭 Ambientes Produtivos
 Geração de binários buildados via `tsup`:
@@ -155,7 +155,7 @@ npm run build
 npm start
 ```
 
-
+<br>
 
 ## 🧪 Suíte de Testes Unitários
 Nosso repositório é testável em milissegundos sem a necessidade de conexões ativas de Cloud usando vitest mock pattern.
@@ -167,7 +167,7 @@ Nosso repositório é testável em milissegundos sem a necessidade de conexões 
 | `npm run test:ui` | Visual gráfico maravilhoso no navegador sobre os cenários |
 | `npm run test:coverage` | Exibe se faltam "linhas de código" não testadas pelo Dev |
 
-
+<br>
 
 ## 🛠️ Qualidade de Código Integrada
 Atualmente nosso workflow é protegido e padronizado por:
@@ -199,7 +199,7 @@ npx eslint src/ --ext .ts
 npx eslint src/ --ext .ts --fix
 ```
 
-
+<br><br>
 
 ## 📝 Características Técnicas
 ### **TypeScript**
@@ -207,7 +207,7 @@ npx eslint src/ --ext .ts --fix
 - ✅ **ES Modules** - Uso de módulos ES6+
 - ✅ **Path Mapping** - Aliases para importações (`@/*`)
 
-
+<br><br>
 
 ## Configurações de Qualidade de Código
 #### --ESLint com Import Sorting
@@ -242,7 +242,7 @@ save-exact=true
 - 🔄 **Controle total** - Você decide quando atualizar cada dependência
 
 
-
+<br><br><br>
 
 ## 🤝 Contribuindo
 1. Faça o seu `fork` deste repositório
