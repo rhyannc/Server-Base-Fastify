@@ -1,4 +1,7 @@
 import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-collaborators-repository'
+import { EtherealMailProvider } from '@/providers/mail/implementations/EtherealMailProvider'
+import { ResendMailProvider } from '@/providers/mail/implementations/ResendMailProvider'
+import { env } from '@/env'
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-respository'
 
@@ -10,12 +13,17 @@ export function makeCreateCollaboratorUseCase() {
   const companiesRepository = new PrismaCompaniesRepository()
   const usersRepository = new PrismaUsersRepository()
   const checkAndIncrementUsageUseCase = makeCheckAndIncrementUsageUseCase()
+  
+  const mailProvider = env.NODE_ENV === 'production' 
+    ? new ResendMailProvider() 
+    : new EtherealMailProvider()
 
   const createCollaboratorUseCase = new CreateCollaboratorUseCase(
     collaboratorsRepository,
     companiesRepository,
     usersRepository,
     checkAndIncrementUsageUseCase,
+    mailProvider
   )
 
   return createCollaboratorUseCase

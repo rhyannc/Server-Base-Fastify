@@ -2,7 +2,7 @@ import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-coll
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 
-import { PaymentFailedUseCase } from '../../webhooks/payment-failed'
+import { PaymentFailedUseCase } from '../../gateways/stripe/payment-failed'
 
 export function makePaymentFailedUseCase() {
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()

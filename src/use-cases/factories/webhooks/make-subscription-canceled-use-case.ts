@@ -2,7 +2,7 @@ import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-coll
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 import { PrismaUserSubscriptionsRepository } from '@/repositories/prisma/prisma-user-subscriptions-repository'
 
-import { SubscriptionCanceledUseCase } from '../../webhooks/subscription-canceled'
+import { SubscriptionCanceledUseCase } from '../../gateways/stripe/subscription-canceled'
 
 export function makeSubscriptionCanceledUseCase() {
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()

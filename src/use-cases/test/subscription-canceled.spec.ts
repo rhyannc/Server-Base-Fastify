@@ -4,7 +4,7 @@ import { InMemoryCollaboratorsRepository } from '@/repositories/im-memory/in-mem
 import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-companies-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 
-import { SubscriptionCanceledUseCase } from '../webhooks/subscription-canceled'
+import { SubscriptionCanceledUseCase } from '../gateways/stripe/subscription-canceled'
 
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let companiesRepository: InMemoryCompaniesRepository

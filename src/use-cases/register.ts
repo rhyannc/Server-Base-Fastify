@@ -4,6 +4,9 @@ import { hash } from 'bcryptjs'
 import { env } from '@/env'
 
 import { UsersRepository } from '@/repositories/users-repository'
+import { TokensRepository } from '@/repositories/tokens-repository'
+import { IMailProvider } from '@/providers/mail/IMailProvider'
+import { verifyEmailTemplate } from '@/providers/mail/templates/verify-email'
 
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 
@@ -20,7 +23,11 @@ interface RegisterUseCaseResponse {
 }
 
 export class RegisterUseCase {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private tokensRepository: TokensRepository,
+    private mailProvider: IMailProvider
+  ) {}
   async execute({
     name,
     email,
@@ -51,6 +58,23 @@ export class RegisterUseCase {
       phone,
       passwordHash,
       createdBy,
+    })
+
+    // Gera o token de verificação (expira em 24 horas)
+    const expiresAt = new Date()
+    expiresAt.setHours(expiresAt.getHours() + 24)
+
+    const verificationToken = await this.tokensRepository.create({
+      userId: user.id,
+      type: 'EMAIL_VERIFICATION',
+      expiresAt,
+    })
+
+    // Envia o e-mail de verificação
+    await this.mailProvider.sendMail({
+      to: user.email,
+      subject: 'Bem-vindo ao SaaS! Verifique seu e-mail',
+      body: verifyEmailTemplate({ name: user.name, token: verificationToken.token }),
     })
 
     return { user } // Retorna o usuário criado

@@ -6,6 +6,7 @@ import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plan
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
+import { FakeMailProvider } from '@/providers/mail/implementations/FakeMailProvider'
 
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { CreateCollaboratorUseCase } from '../collaborators/create-collaborator'
@@ -19,6 +20,7 @@ let usagesRepository: InMemoryUsagesRepository
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let plansRepository: InMemoryPlansRepository
 let checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase
+let mailProvider: FakeMailProvider
 let sut: CreateCollaboratorUseCase
 let managerIdForTests: string
 
@@ -37,11 +39,14 @@ describe('Create Collaborator Use Case', () => {
       plansRepository,
     )
 
+    mailProvider = new FakeMailProvider()
+
     sut = new CreateCollaboratorUseCase(
       collaboratorsRepository,
       companiesRepository,
       usersRepository,
       checkAndIncrementUsageUseCase,
+      mailProvider,
     )
 
     const plan = await plansRepository.create({

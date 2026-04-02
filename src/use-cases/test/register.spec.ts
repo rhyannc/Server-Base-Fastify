@@ -3,18 +3,24 @@ import { compare } from 'bcryptjs'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
+import { InMemoryTokensRepository } from '@/repositories/im-memory/in-memory-tokens-repository'
+import { FakeMailProvider } from '@/providers/mail/implementations/FakeMailProvider'
 
 import { UserAlreadyExistsError } from '../errors/user-already-exists-error'
 import { RegisterUseCase } from '../register'
 
 let usersRepository: InMemoryUsersRepository
+let tokensRepository: InMemoryTokensRepository
+let mailProvider: FakeMailProvider
 let sut: RegisterUseCase
 
 describe('Register Use Case', () => {
   // Before garante que cada teste nao ser totalmente zerado sem reaproveitar nada do teste anterior
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
-    sut = new RegisterUseCase(usersRepository)
+    tokensRepository = new InMemoryTokensRepository()
+    mailProvider = new FakeMailProvider()
+    sut = new RegisterUseCase(usersRepository, tokensRepository, mailProvider)
   })
   it('Deve se cadastrar', async () => {
     const { user } = await sut.execute({

@@ -10,6 +10,9 @@ import { CollaboratorsRepository } from '@/repositories/collaborators-repository
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { UsersRepository } from '@/repositories/users-repository'
 
+import { IMailProvider } from '@/providers/mail/IMailProvider'
+import { collaboratorInviteTemplate } from '@/providers/mail/templates/collaborator-invite'
+
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { CollaboratorAlreadyExistsError } from '../errors/collaborator-already-exists-error'
 import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
@@ -33,6 +36,7 @@ export class CreateCollaboratorUseCase {
     private companiesRepository: CompaniesRepository,
     private usersRepository: UsersRepository,
     private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
+    private mailProvider: IMailProvider,
   ) {}
 
   async execute({
@@ -93,6 +97,13 @@ export class CreateCollaboratorUseCase {
       role,
       active,
       status,
+    })
+
+    // Envia o e-mail de convite
+    await this.mailProvider.sendMail({
+      to: user.email,
+      subject: `Você foi adicionado à empresa ${company.name}`,
+      body: collaboratorInviteTemplate({ userName: user.name, companyName: company.name }),
     })
 
     return { collaborator }

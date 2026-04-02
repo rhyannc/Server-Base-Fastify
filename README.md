@@ -1,83 +1,99 @@
+<h1 align="center">Template SaaS API Base</h1>
 
-Uma Base para construção de API's,  moderna e robusta, construída com TypeScript e Fastify, oferecendo alta performance e escalabilidade.
+Uma base moderna e robusta para construção de APIs SaaS (Software as a Service). 
+Construída com as melhores práticas de Clean Architecture e SOLID, utilizando **TypeScript**, **Fastify**, e **Prisma ORM**.
 
 ## 📋 Descrição
 
-Este projeto é uma API RESTful desenvolvida para gerenciar operações de locação. A aplicação utiliza tecnologias modernas de desenvolvimento web, oferecendo uma base sólida e escalável para sistemas de locação com foco em performance e manutenibilidade.
+Este projeto serve como motor (Backend API RESTful) para um sistema SaaS completo, onde empresas podem se registrar, convidar colaboradores, gerenciar acessos e ser faturadas via Stripe. O objetivo é fornecer uma API de alta performance e pronta para produção, focada em segurança, manutenibilidade e escalabilidade.
 
-### ✨ Características Principais
-- ⚡ **Alta Performance** - Fastify como framework web
-- 🔒 **Type Safety** - TypeScript com modo strict
-- 🛡️ **Validação Robusta** - Zod para schemas e validação
-- 🔄 **Hot Reload** - Desenvolvimento com recarregamento automático
-- 📦 **Build Otimizado** - tsup para produção
-- 🎯 **ESLint** - Padrões de código consistentes
+### ✨ O que já temos implementado
+- 🏢 **Multi-tenancy B2B**: Gestão de Empresas (Tenants) e Colaboradores com Níveis de Acesso.
+- 🔐 **Autenticação & Segurança**: Rotas com suporte a rate limiting, Login com JWT, Recuperação de Esquecimento de Senha e Verificação obrigatória de conta por E-mail.
+- 💳 **Assinaturas & Limites**: Integração completa com **Stripe** (via Webhooks), validando o limite máximo de empresas, colaboradores permitidas pelo plano escolhido.
+- 📧 **Sistema de E-mails**: Infraestrutura transacional pronta com providers plugáveis (**Resend** em Produção e **Ethereal Nodemailer** em modo de Desenvolvimento) isolada com templates HTML centralizados.
+- ⚡ **Alta Performance**: Core 100% construído sobre o ecossistema Fastify.
+- 🛡️ **Validação Robusta**: Validação estrita de todos os dados de entrada/saída HTTP diretamente acoplada aos schemas usando **Zod**.
+- 📖 **Documentação Automática**: Swagger e Swagger UI já configurados e funcionando para testar todos os endpoints.
+- 📊 **Testes Unitários**: Cobertura massiva e rápida dos Use Cases utilizando In-Memory Databases pelo **Vitest**.
 
 ## 🚀 Tecnologias Utilizadas
 
-### **Backend**
-| Tecnologia | Versão | Descrição |
-|------------|--------|-----------|
-| **Node.js** | 22+ | Runtime JavaScript |
-| **TypeScript** | 5.9.2 | Linguagem de programação tipada |
-| **Fastify** | 5.5.0 | Framework web rápido e eficiente |
-| **Zod** | 4.0.17 | Validação de esquemas e tipos |
-| **dotenv** | 17.2.1 | Gerenciamento de variáveis de ambiente |
+| Tecnologia | Finalidade |
+|------------|-----------|
+| **Node.js 22+** | Runtime de execução |
+| **TypeScript** | Controle de tipagem e segurança em tempo de transpilação |
+| **Fastify** | Framework web ultrarrápido |
+| **Prisma ORM** | Construção das Migrations, Interface e Modelagem (PostgreSQL) |
+| **Zod** | Validação de esquemas e proteção |
+| **dotenv** | Gerenciamento de variáveis de ambiente |
+| **Vitest** | Engine de Testes Unitários e UI de Coverage |
+| **Stripe** | Plataforma global de Assinaturas e Webhooks B2B |
+| **Resend & Nodemailer** | Disparo de E-mails de Onboarding e Senhas |
 
-### **Desenvolvimento**
-| Ferramenta | Versão | Descrição |
-|------------|--------|-----------|
-| **tsx** | 4.20.4 | Executor TypeScript para desenvolvimento |
-| **tsup** | 8.5.0 | Bundler para produção |
-| **ESLint** | 2.2.2 | Linter com configuração Rocketseat |
-| **eslint-plugin-simple-import-sort** | 12.1.1 | Plugin para ordenação automática de imports |
-| **@types/node** | 24.3.0 | Tipos TypeScript para Node.js |
+## 📁 Estrutura e Arquitetura
 
-## 📁 Estrutura do Projeto
+O projeto isola totalmente os Casos de Uso (*Regras de Negócio Puras*) dos Controladores (*Mecanismo de Entrega Web*) e Repositórios (*Infraestrutura Prática*):
 
 ```
-api-locacao/
+api-backend/
+├── 📁 prisma/                 # Schema do Banco de Dados e Migrations (PostgreSQL)
 ├── 📁 src/
-│   ├── 🚀 app.ts          # Configuração principal do Fastify
-│   ├── 🌐 server.ts       # Servidor HTTP
-│   ├── 🧪 teste.ts        # Arquivo de testes
-│   └── 📁 env/
-│       └── ⚙️ index.ts    # Configuração de variáveis de ambiente
-├── 📄 package.json        # Dependências e scripts
-├── ⚙️ tsconfig.json       # Configuração TypeScript
-├── 🔧 .eslintrc.json      # Configuração do ESLint
-├── 📦 .npmrc              # Configuração do npm (versões exatas)
-├── 📖 README.md          # Documentação do projeto
-└── 🔒 .gitignore         # Arquivos ignorados pelo Git
+│   ├── 📁 env/                # Schema global de validação do `.env`
+│   ├── 📁 http/               # Controllers, Middlewares e Rotas Fastify
+│   ├── 📁 providers/          # Serviços Externos (ex: MailProviders, Stripe, Templates)
+│   ├── 📁 repositories/       # Contratos Inteface e Acessos ao Banco (Prisma/Mocked)
+│   ├── 📁 use-cases/          # Regras de Negócio Core (separadas por domínio)
+│   ├── 🚀 app.ts              # Setup do Fastify (Swagger, RateLimit, Error Handling)
+│   └── 🌐 server.ts           # Ponto de entrada - Servidor HTTP
+|── 🧪.env                     # Arquivo de variáveis de ambiente
+├── 📄 package.json            # Scripts de execução e dependências
+├── ⚙️ tsconfig.json           # Configuração do TypeScript
+├── 🔧 .eslintrc.json          # Regras do ESLint (Import sorting, formatação)
+├── 📦 .npmrc                  # Trava para instalar dependências em versões exatas
+├── 📖 README.md               # Documentação do projeto
+└── 🔒 .gitignore              # Arquivos ignorados pelo Git
+|── stripe-cli                 # Stripe CLI para testes locais
+|── vite.config.ts             # Configuração do Vitest para reconheça os atalho
 ```
 
-## ⚙️ Configuração
+## ⚙️ Configuração & Instalação
 
 ### Pré-requisitos
-- **Node.js** 22 ou superior
+- **Node.js** v22 ou superior
+- Instalação limpa do **Docker** e **Docker Compose**
+- Contas no **Stripe** e **Resend** (Opções gratuitas atendem muito bem testes)
 
-### 🛠️ Instalação
-
- **Instale as dependências:**
+### 1. Inicializando
 ```bash
 npm i
 ```
 
-3. **Configure as variáveis de ambiente:**
+### 2. Variáveis de Ambiente
 Ajuste o arquivo `.env` na raiz do projeto:
 ```env
-# Ambiente de execução
+# Ambiente de desenvolvimento
 NODE_ENV=dev
 
 # Porta do servidor
 PORT=3333
+
+# Criptografia global
+JWT_SECRET="SuaChaveSecreta"
+
+# DB
+DATABASE_URL="postgresql://docker:docker@localhost:5432/apisolid?schema=public"
+
+# Integrações
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+RESEND_API_KEY="re_..."
 ```
 
-## 🏃‍♂️ Como Executar
-
-### DOCKER
-Com o docker já instalado execute no terminal o comando abaixo para criaçao do banco
+### 3. Banco de Dados
+A API já possui um `docker-compose.yml` pré-configurado com PostgreSQL:
 ```bash
+# Sobe o container Postgres em Background
 docker compose up -d
 ```
 
@@ -88,23 +104,38 @@ npx prisma generate
 npx prisma migrate dev
 ```
 
-### TESTES UNITARIOS
-Implementação de testes unitarios com Vitest, modelo visual com :ui e coverage para analisar onde passa mais vezes 
-```bash
-npm run test
-npm run test:watch
-npm run test:ui
-npm run test:coverage
-```
+## 🏃‍♂️ Como Executar
 
-
-### 🚀 Desenvolvimento
+### 🚀 Ambientes Locais (Desenvolvimento)
+Utiliza a poderosa engine `tsx` de hot-reload imediato:
 ```bash
 npm run dev
 ```
+
+Quando iniciado com sucesso, você verá a mensagem:
+```
+✅ HTTP Server Online! 🚀
+```
 O servidor será iniciado em modo de desenvolvimento com hot-reload na porta 3333.
 
-### 🏭 Produção
+### 📖 Documentação da API (Swagger)
+Com o servidor rodando, acesse a rota `/docs` no seu navegador para visualizar e testar interativamente todos os endpoints catalogados:
+```
+http://localhost:3333/docs
+```
+
+### 💳 Simulando Webhooks do Stripe Localmente
+Para testar o recebimento de eventos do Stripe (como assinaturas pagas ou falhas), instale e utilize a [Stripe CLI](https://docs.stripe.com/stripe-cli/):
+```bash
+stripe listen --forward-to localhost:3333/webhooks/stripe
+
+ou 
+./stripe-cli login
+```
+> **Nota**: Ao rodar o comando acima pela primeira vez, o Stripe CLI gerará uma chave de webhook local temporária (`whsec_...`). Copie essa chave e cole no seu `.env` preenchendo o valor de `STRIPE_WEBHOOK_SECRET` para que a rotas validem as chamadas locais!
+
+### 🏭 Ambientes Produtivos
+Geração de binários buildados via `tsup`:
 ```bash
 # Compilar o projeto
 npm run build
@@ -113,30 +144,19 @@ npm run build
 npm start
 ```
 
-## 🔧 Scripts Disponíveis
+## 🧪 Suíte de Testes Unitários
+Nosso repositório é testável em milissegundos sem a necessidade de conexões ativas de Cloud usando vitest mock pattern.
 
-| Comando | Descrição |
+| Comando Base | Efeito |
 |---------|-----------|
-| `npm run dev` | Inicia o servidor em modo desenvolvimento com hot-reload |
-| `npm run build` | Compila o projeto para produção usando tsup |
-| `npm start` | Executa a versão compilada em produção |
+| `npm run test` | Varre e testa a aplicação por completo uma unidade vez |
+| `npm run test:watch` | Rodagem silenciosa acompanhando novos códigos salvos |
+| `npm run test:ui` | Visual gráfico maravilhoso no navegador sobre os cenários |
+| `npm run test:coverage` | Exibe se faltam "linhas de código" não testadas pelo Dev |
 
-## 🛠️ Ferramentas de Qualidade
-
-### **ESLint com Import Sorting**
-O projeto está configurado para ordenar automaticamente os imports. Para corrigir problemas de ordenação:
-
-```bash
-# Verificar problemas de linting
-npx eslint src/ --ext .ts
-
-# Corrigir automaticamente problemas de ordenação
-npx eslint src/ --ext .ts --fix
-```
-
-### **Controle de Versões**
-Com o `.npmrc` configurado, ao instalar novos pacotes:
-
+## 🛠️ Qualidade de Código Integrada
+Atualmente nosso workflow é protegido e padronizado por:
+1. **Automação NPM Exato** (`.npmrc` trava dependências sem breaking changes ao instalar novos pacotes).
 ```bash
 # Instala com versão exata (sem ^ ou ~)
 npm install nome-do-pacote
@@ -155,33 +175,24 @@ npm install nome-do-pacote@versao-especifica
 }
 ```
 
-## 🌐 Endpoints
+2. **ESLint Rigoroso** apontando cheiros ruins no código baseado em padrões de código e importações sempre alfanumérico agrupadas (`eslint-plugin-simple-import-sort`).
+```bash
+# Verificar problemas de linting
+npx eslint src/ --ext .ts
 
-A API está configurada para rodar na porta **3333** por padrão.
-
-### Status do Servidor
-Quando iniciado com sucesso, você verá a mensagem:
+# Corrigir automaticamente problemas de ordenação
+npx eslint src/ --ext .ts --fix
 ```
-✅ HTTP Server Online! 🚀
-```
 
-## 🛡️ Validação de Ambiente
-
-O projeto utiliza Zod para validar as variáveis de ambiente, garantindo que:
-- `NODE_ENV` seja 'dev', 'test' ou 'production'
-- `PORT` seja um número válido (padrão: 3333)
 
 ## 📝 Características Técnicas
-
 ### **TypeScript**
 - ✅ **Strict Mode** - Tipagem rigorosa para maior segurança
 - ✅ **ES Modules** - Uso de módulos ES6+
 - ✅ **Path Mapping** - Aliases para importações (`@/*`)
-- ✅ **Node.js 22** - Suporte às funcionalidades mais recentes
 
-### **🔧 Configurações de Qualidade de Código**
-
-#### **ESLint com Import Sorting**
+## Configurações de Qualidade de Código
+#### ESLint com Import Sorting**
 O projeto utiliza `eslint-plugin-simple-import-sort` para manter a organização dos imports:
 
 ```json
@@ -193,7 +204,6 @@ O projeto utiliza `eslint-plugin-simple-import-sort` para manter a organização
   }
 }
 ```
-
 **Benefícios:**
 - 📦 **Ordenação automática** de imports por categoria
 - 🎯 **Consistência** no estilo de código
@@ -207,61 +217,19 @@ O arquivo `.npmrc` garante que as versões dos pacotes sejam fixas:
 # Serve para manter as versões exatas dos pacotes instalados no package.json
 save-exact=true
 ```
-
 **Benefícios:**
-- 🔒 **Estabilidade** - Evita atualizações automáticas que quebrem a aplicação
-- 🛡️ **Reprodutibilidade** - Mesmo comportamento em diferentes ambientes
-- 📋 **Controle** - Você decide quando atualizar dependências
-- 🚫 **Prevenção** de bugs causados por mudanças em dependências
+- 🔒 **Ambientes idênticos** - Todos os desenvolvedores usam exatamente as mesmas versões
+- 🛡️ **Prevenção de quebras** - Evita que atualizações automáticas quebrem o projeto
+- 🎯 **Builds consistentes** - Mesmos resultados em diferentes ambientes
+- 🔄 **Controle total** - Você decide quando atualizar cada dependência
 
-### **Desenvolvimento**
-- ✅ **Hot Reload** - Recarregamento automático durante desenvolvimento
-- ✅ **Environment Validation** - Validação automática de variáveis de ambiente
-- ✅ **ESLint** - Padrões de código consistentes
-- ✅ **Import Sorting** - Ordenação automática de imports com `eslint-plugin-simple-import-sort`
-- ✅ **Exact Versions** - Controle de versões exatas com `.npmrc`
-- ✅ **Source Maps** - Debugging facilitado
 
-### **Performance**
-- ✅ **Fastify** - Framework otimizado para alta performance
-- ✅ **Tree Shaking** - Eliminação de código não utilizado
-- ✅ **ESM** - Módulos nativos do Node.js
-
-## 🔮 Roadmap
-
-### 🎯 Funcionalidades Planejadas
-- [ ] **Rotas de CRUD** para locações
-- [ ] **Autenticação e autorização** (JWT)
-- [ ] **Integração com banco de dados** (PostgreSQL/MongoDB)
-- [ ] **Documentação da API** (Swagger/OpenAPI)
-- [ ] **Testes automatizados** (Jest/Vitest)
-- [ ] **Middleware de logging** (Pino)
-- [ ] **Monitoramento** (Health checks)
-- [ ] **Rate limiting** e segurança
-- [ ] **Docker** para containerização
-- [ ] **CI/CD** pipeline
-
-### 🏗️ Arquitetura Futura
-```
-src/
-├── 📁 routes/          # Rotas da API
-├── 📁 controllers/     # Controladores
-├── 📁 services/        # Lógica de negócio
-├── 📁 models/          # Modelos de dados
-├── 📁 middleware/      # Middlewares customizados
-├── 📁 utils/           # Utilitários
-└── 📁 tests/           # Testes automatizados
-```
-
-## 🤝 Contribuição
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+## 🤝 Contribuindo
+1. Faça o seu `fork` deste repositório
+2. Crie uma branch para a nova incrível feature (`git checkout -b feature/MinhaInovacao`)
+3. Efetue commit e rode os lint/tests (`git commit -m 'feat: Novo sistema adicionado'`)
+4. Empurre! (`git push origin feature/MinhaInovacao`)
+5. Abra o Pull Request!
 
 ## 📄 Licença
-
-Este projeto está sob a licença **ISC**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
+Acesso Livre: **ISC License**. Empreste, refatore e lucre!

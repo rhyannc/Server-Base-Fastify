@@ -14,6 +14,8 @@ const envSchema = z.object({
 
   STRIPE_SECRET_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
+
+  RESEND_API_KEY: z.string().optional(),
 })
 
 const _env = envSchema.safeParse(process.env)
