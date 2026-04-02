@@ -3,9 +3,11 @@
 Uma base moderna e robusta para construção de APIs SaaS (Software as a Service). 
 Construída com as melhores práticas de Clean Architecture e SOLID, utilizando **TypeScript**, **Fastify**, e **Prisma ORM**.
 
+
 ## 📋 Descrição
 
 Este projeto serve como motor (Backend API RESTful) para um sistema SaaS completo, onde empresas podem se registrar, convidar colaboradores, gerenciar acessos e ser faturadas via Stripe. O objetivo é fornecer uma API de alta performance e pronta para produção, focada em segurança, manutenibilidade e escalabilidade.
+
 
 ### ✨ O que já temos implementado
 - 🏢 **Multi-tenancy B2B**: Gestão de Empresas (Tenants) e Colaboradores com Níveis de Acesso.
@@ -16,6 +18,8 @@ Este projeto serve como motor (Backend API RESTful) para um sistema SaaS complet
 - 🛡️ **Validação Robusta**: Validação estrita de todos os dados de entrada/saída HTTP diretamente acoplada aos schemas usando **Zod**.
 - 📖 **Documentação Automática**: Swagger e Swagger UI já configurados e funcionando para testar todos os endpoints.
 - 📊 **Testes Unitários**: Cobertura massiva e rápida dos Use Cases utilizando In-Memory Databases pelo **Vitest**.
+
+
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -30,6 +34,8 @@ Este projeto serve como motor (Backend API RESTful) para um sistema SaaS complet
 | **Vitest** | Engine de Testes Unitários e UI de Coverage |
 | **Stripe** | Plataforma global de Assinaturas e Webhooks B2B |
 | **Resend & Nodemailer** | Disparo de E-mails de Onboarding e Senhas |
+
+
 
 ## 📁 Estrutura e Arquitetura
 
@@ -107,7 +113,6 @@ npx prisma migrate dev
 ## 🏃‍♂️ Como Executar
 
 ### 🚀 Ambientes Locais (Desenvolvimento)
-Utiliza a poderosa engine `tsx` de hot-reload imediato:
 ```bash
 npm run dev
 ```
@@ -118,11 +123,15 @@ Quando iniciado com sucesso, você verá a mensagem:
 ```
 O servidor será iniciado em modo de desenvolvimento com hot-reload na porta 3333.
 
+
+
 ### 📖 Documentação da API (Swagger)
 Com o servidor rodando, acesse a rota `/docs` no seu navegador para visualizar e testar interativamente todos os endpoints catalogados:
 ```
 http://localhost:3333/docs
 ```
+
+
 
 ### 💳 Simulando Webhooks do Stripe Localmente
 Para testar o recebimento de eventos do Stripe (como assinaturas pagas ou falhas), instale e utilize a [Stripe CLI](https://docs.stripe.com/stripe-cli/):
@@ -134,6 +143,8 @@ ou
 ```
 > **Nota**: Ao rodar o comando acima pela primeira vez, o Stripe CLI gerará uma chave de webhook local temporária (`whsec_...`). Copie essa chave e cole no seu `.env` preenchendo o valor de `STRIPE_WEBHOOK_SECRET` para que a rotas validem as chamadas locais!
 
+
+
 ### 🏭 Ambientes Produtivos
 Geração de binários buildados via `tsup`:
 ```bash
@@ -144,6 +155,8 @@ npm run build
 npm start
 ```
 
+
+
 ## 🧪 Suíte de Testes Unitários
 Nosso repositório é testável em milissegundos sem a necessidade de conexões ativas de Cloud usando vitest mock pattern.
 
@@ -153,6 +166,8 @@ Nosso repositório é testável em milissegundos sem a necessidade de conexões 
 | `npm run test:watch` | Rodagem silenciosa acompanhando novos códigos salvos |
 | `npm run test:ui` | Visual gráfico maravilhoso no navegador sobre os cenários |
 | `npm run test:coverage` | Exibe se faltam "linhas de código" não testadas pelo Dev |
+
+
 
 ## 🛠️ Qualidade de Código Integrada
 Atualmente nosso workflow é protegido e padronizado por:
@@ -185,14 +200,17 @@ npx eslint src/ --ext .ts --fix
 ```
 
 
+
 ## 📝 Características Técnicas
 ### **TypeScript**
 - ✅ **Strict Mode** - Tipagem rigorosa para maior segurança
 - ✅ **ES Modules** - Uso de módulos ES6+
 - ✅ **Path Mapping** - Aliases para importações (`@/*`)
 
+
+
 ## Configurações de Qualidade de Código
-#### ESLint com Import Sorting**
+#### --ESLint com Import Sorting
 O projeto utiliza `eslint-plugin-simple-import-sort` para manter a organização dos imports:
 
 ```json
@@ -210,7 +228,7 @@ O projeto utiliza `eslint-plugin-simple-import-sort` para manter a organização
 - 🔄 **Prevenção de conflitos** em merge
 - ⚡ **Melhor legibilidade** do código
 
-#### **Controle de Versões Exatas (.npmrc)**
+#### --Controle de Versões Exatas (.npmrc)
 O arquivo `.npmrc` garante que as versões dos pacotes sejam fixas:
 
 ```ini
@@ -222,6 +240,8 @@ save-exact=true
 - 🛡️ **Prevenção de quebras** - Evita que atualizações automáticas quebrem o projeto
 - 🎯 **Builds consistentes** - Mesmos resultados em diferentes ambientes
 - 🔄 **Controle total** - Você decide quando atualizar cada dependência
+
+
 
 
 ## 🤝 Contribuindo
