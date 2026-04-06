@@ -44,7 +44,8 @@ export class CreateCheckoutSessionUseCase {
 
       customerId = stripeCustomer.id
 
-      // Atualizar usuário com o ID do cliente Stripe (deveríamos fazer isso via repositório, mas, para simplificar, vamos considerar se o repositório permite atualizações parciais; caso contrário, precisamos de um método específico. Supondo que possamos atualizar o usuário diretamente via Prisma ou pelo método de atualização do repositório, vamos usar o Prisma diretamente aqui para simplificar, até que a opção de atualização do repositório seja verificada).
+      // Atualizar usuário com o ID do cliente Stripe (deveríamos fazer isso via repositório, mas, para simplificar, vamos considerar se o repositório permite atualizações parciais; caso contrário, 
+      // precisamos de um método específico. Supondo que possamos atualizar o usuário diretamente via Prisma ou pelo método de atualização do repositório, vamos usar o Prisma diretamente aqui para simplificar, até que a opção de atualização do repositório seja verificada).
       // Como não se conhece nenhum método genérico de atualização, talvez seja necessário adicionar um. Supondo que exista um método `update` padrão:
       user.stripeCustomerId = customerId
       await this.usersRepository.update(user)

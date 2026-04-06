@@ -6,6 +6,7 @@ import { PlansRepository } from '@/repositories/plans-repository'
 import { UsagesRepository } from '@/repositories/usages-repository'
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
 
+import { stripe } from '@/providers/stripe-provider'
 import { PlanNotActiveError } from '../errors/plan-not-active-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { UserSubscriptionAlreadyExistsError } from '../errors/user-subscription-already-exists-error'
@@ -14,7 +15,7 @@ import { UserSubscriptionNotExistsPlanError } from '../errors/user-subscription-
 interface UpdateUserSubscriptionUseCaseRequest {
   userId: string
   planId?: string
-  status?: SubscriptionStatus
+
 }
 
 interface UpdateUserSubscriptionUseCaseResponse {
@@ -33,7 +34,7 @@ export class UpdateUserSubscriptionUseCase {
   async execute({
     userId,
     planId,
-    status,
+
   }: UpdateUserSubscriptionUseCaseRequest): Promise<UpdateUserSubscriptionUseCaseResponse> {
 
     // Verifica se o usuario ja tem plano
@@ -43,8 +44,8 @@ export class UpdateUserSubscriptionUseCase {
       throw new ResourceNotFoundError()
     }
 
-    //verificar se o plano existe e se esta ativo
-    if (planId) {
+    // verificar se o plano existe e se está ativo
+    if (planId && planId !== userSubscription.planId) {
       const plan = await this.plansRepository.findById(planId)
       if (!plan) {
         throw new ResourceNotFoundError()
@@ -53,18 +54,39 @@ export class UpdateUserSubscriptionUseCase {
       if (!plan.isActive) {
         throw new PlanNotActiveError()
       }
-      
+
+      // Se o usuário tem uma assinatura no Stripe, atualiza lá primeiro
+      if (userSubscription.stripeSubscriptionId && plan.stripePriceId) {
+        const subscription = await stripe.subscriptions.retrieve(
+          userSubscription.stripeSubscriptionId,
+        )
+
+        // Atualiza a assinatura no Stripe com o novo preço e cobrança pró-rata imediata
+        await stripe.subscriptions.update(userSubscription.stripeSubscriptionId, {
+          items: [
+            {
+              id: subscription.items.data[0].id,
+              price: plan.stripePriceId,
+            },
+          ],
+          proration_behavior: 'always_invoice',
+        })
+
+        userSubscription.stripePriceId = plan.stripePriceId
+      }
+
       userSubscription.planId = planId
     }
 
-    if (status) {
-      userSubscription.status = status
-    }
 
     const updatedSubscription = await this.userSubscriptionsRepository.update({
       id: userSubscription.id,
       planId: userSubscription.planId,
       status: userSubscription.status,
+      stripePriceId: userSubscription.stripePriceId,
+      cardLast4: userSubscription.cardLast4,
+      cardBrand: userSubscription.cardBrand,
+      paymentMethodId: userSubscription.paymentMethodId,
     })
 
     // Lógica de Downgrade: Verificar limites do novo plano

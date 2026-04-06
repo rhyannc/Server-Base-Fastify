@@ -136,7 +136,7 @@ http://localhost:3333/docs
 ### 💳 Simulando Webhooks do Stripe Localmente
 Para testar o recebimento de eventos do Stripe (como assinaturas pagas ou falhas), instale e utilize a [Stripe CLI](https://docs.stripe.com/stripe-cli/):
 ```bash
-stripe listen --forward-to localhost:3333/webhooks/stripe
+./stripe-cli listen --forward-to localhost:3333/webhooks/stripe
 
 ou 
 ./stripe-cli login

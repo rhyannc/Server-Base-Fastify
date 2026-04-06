@@ -35,4 +35,14 @@ export class PrismaUserSubscriptionsRepository
 
     return userSubscription
   }
+
+  async findByStripeSubscriptionId(stripeSubscriptionId: string) {
+    const userSubscription = await prisma.userSubscription.findUnique({
+      where: {
+        stripeSubscriptionId,
+      },
+    })
+
+    return userSubscription
+  }
 }

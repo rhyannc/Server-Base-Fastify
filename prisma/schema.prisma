@@ -63,6 +63,7 @@ model User {
   companies        Company[]
   usages           Usage[]
   tokens           Token[]
+  invoices         Invoice[]
 
   @@map("users")
 }
@@ -119,6 +120,7 @@ model Plan {
   id                String             @id @default(uuid())
   name              String
   description       String?
+  features          String[]
   isActive          Boolean            @default(true) // Plano ativo/inativo
   isPopular         Boolean            @default(false)
   price             Decimal            @db.Decimal(10, 2)
@@ -129,6 +131,7 @@ model Plan {
   stripePriceId     String?
   createdAt         DateTime           @default(now())
   userSubscriptions UserSubscription[]
+  invoices          Invoice[]
 
   @@map("plans")
 }
@@ -142,6 +145,8 @@ model UserSubscription {
   status               SubscriptionStatus // active, trialing, past_due, canceled, expired
   stripeSubscriptionId String?            @unique
   stripePriceId        String?
+  cardLast4            String?
+  cardBrand            String?
   startedAt            DateTime           @default(now()) // Data de início da assinatura
   expiresAt            DateTime? // Data de expiração da assinatura
   trialEndsAt          DateTime? // Data de expiração do período de teste
@@ -152,6 +157,25 @@ model UserSubscription {
   updatedAt DateTime @updatedAt
 
   @@map("user_subscriptions")
+}
+
+model Invoice {
+  id                   String             @id @default(uuid())
+  user                 User               @relation(fields: [userId], references: [id])
+  userId               String
+  plan                 Plan               @relation(fields: [planId], references: [id])
+  planId               String
+  status               SubscriptionStatus
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  price                Decimal            @db.Decimal(10, 2)
+  currency             String             @default("BRL")
+  startedAt            DateTime           @default(now())
+  cardLast4            String?
+  cardBrand            String?
+  createdAt            DateTime           @default(now())
+
+  @@map("invoices")
 }
 
 model Usage {

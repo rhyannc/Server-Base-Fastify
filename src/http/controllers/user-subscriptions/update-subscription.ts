@@ -8,9 +8,7 @@ import { makeUpdateUserSubscriptionUseCase } from '@/use-cases/factories/make-up
 
 export const updateSubscriptionBodySchema = z.object({
   planId: z.string().uuid().optional(),
-  status: z
-    .enum(['ACTIVE', 'TRIALING', 'PAST_DUE', 'CANCELED', 'EXPIRED'])
-    .optional(),
+
 })
 
 export const updateSubscriptionResponseSchema = {
@@ -30,7 +28,7 @@ export async function updateSubscription(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { planId, status } = updateSubscriptionBodySchema.parse(request.body)
+  const { planId } = updateSubscriptionBodySchema.parse(request.body)
   const userId = request.user.sub
 
   try {
@@ -38,8 +36,7 @@ export async function updateSubscription(
 
     const { userSubscription } = await updateUserSubscriptionUseCase.execute({
       userId,
-      planId,
-      status: status as SubscriptionStatus,
+      planId
     })
 
     return reply.status(200).send({ userSubscription })

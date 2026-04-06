@@ -9,6 +9,8 @@ export const getMeSubscriptionResponseSchema = {
       userId: z.string(),
       planId: z.string(),
       status: z.string(),
+      cardLast4: z.string().nullable(),
+      cardBrand: z.string().nullable(),
       startedAt: z.date(),
       expiresAt: z.date().nullable(),
       plan: z.object({

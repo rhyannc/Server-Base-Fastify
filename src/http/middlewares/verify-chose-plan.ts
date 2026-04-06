@@ -17,7 +17,7 @@ export async function verifyChosePlan(
 
   if (!user || !user.chosePlan) {
     return reply.status(403).send({
-      message: 'Acesso negado. Você precisa escolher um plano para acessar este recurso.',
+      message: 'Acesso negado. Você precisa assinar um plano para utilizar este recurso.',
     })
   }
 }

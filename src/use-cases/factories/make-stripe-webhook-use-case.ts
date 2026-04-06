@@ -1,3 +1,6 @@
+import { PrismaCollaboratorsRepository } from '../../repositories/prisma/prisma-collaborators-repository'
+import { PrismaCompaniesRepository } from '../../repositories/prisma/prisma-companies-respository'
+import { PrismaInvoicesRepository } from '../../repositories/prisma/prisma-invoices-repository'
 import { PrismaUserSubscriptionsRepository } from '../../repositories/prisma/prisma-user-subscriptions-repository'
 import { PrismaUsersRepository } from '../../repositories/prisma/prisma-users-respository'
 import { StripeWebhookUseCase } from '../gateways/stripe/stripe-webhook'
@@ -5,7 +8,17 @@ import { StripeWebhookUseCase } from '../gateways/stripe/stripe-webhook'
 export function makeStripeWebhookUseCase() {
   const usersRepository = new PrismaUsersRepository()
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()
-  const useCase = new StripeWebhookUseCase(usersRepository, userSubscriptionsRepository)
+  const companiesRepository = new PrismaCompaniesRepository()
+  const collaboratorsRepository = new PrismaCollaboratorsRepository()
+  const invoicesRepository = new PrismaInvoicesRepository()
+  
+  const useCase = new StripeWebhookUseCase(
+    usersRepository, 
+    userSubscriptionsRepository,
+    companiesRepository,
+    collaboratorsRepository,
+    invoicesRepository
+  )
 
   return useCase
 }

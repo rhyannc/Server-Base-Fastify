@@ -4,6 +4,9 @@ import { CompaniesRepository } from '@/repositories/companies-repository'
 
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { CompanyAlreadyExistsError } from '../errors/company-already-exists-error'
+import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
+import { UserSubscriptionNotExistsPlanError } from '../errors/user-subscription-not-exists-plan-error'
+import { SubscriptionNotActiveError } from '../errors/subscription-not-active-error'
 
 interface CreateCompanyUseCaseRequest {
   name: string
@@ -30,6 +33,7 @@ interface CreateCompanyUseCaseResponse {
 export class CreateCompanyUseCase {
   constructor(
     private companiesRepository: CompaniesRepository,
+    private userSubscriptionsRepository: UserSubscriptionsRepository,
     private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
   ) {}
   async execute({
@@ -56,11 +60,25 @@ export class CreateCompanyUseCase {
       throw new CompanyAlreadyExistsError()
     }
 
+    // Verifica se Plano esta ativo ou Trial
+    const subscription = await this.userSubscriptionsRepository.findByUserId(managerId)
+
+    if (!subscription) {
+      throw new UserSubscriptionNotExistsPlanError()
+    }
+
+    if (subscription.status !== 'ACTIVE' && subscription.status !== 'TRIALING') {
+      throw new SubscriptionNotActiveError()
+    }
+
+
     // Verifica limite do plano e incrementa o uso
     await this.checkAndIncrementUsageUseCase.execute({
       userId: managerId,
       metric: UsageMetric.COMPANIES,
     })
+
+    
 
     // Cadastra no BD
     const company = await this.companiesRepository.create({

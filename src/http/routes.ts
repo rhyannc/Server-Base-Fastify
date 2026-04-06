@@ -51,12 +51,12 @@ export async function appRoutes(app: FastifyInstance) {
     {
       config: {
         rateLimit: {
-          max: 5, // máximo de 5 tentativas
+          max: 10, // máximo de 5 tentativas
           timeWindow: '5 minutes', // por IP, a cada 5 minutos
           errorResponseBuilder: () => ({
             statusCode: 429,
             message:
-              'Você exedeu o limite de requisições para essa ação, Aguarde 5 minutos para tentar novamente.',
+              'Você exedeu o limite de tentativas, Aguarde 5 minutos para tentar novamente!',
           }),
         },
       },

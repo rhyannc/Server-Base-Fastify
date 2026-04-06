@@ -8,4 +8,7 @@ export interface UserSubscriptionsRepository {
   update(
     data: Prisma.UserSubscriptionUncheckedUpdateInput,
   ): Promise<UserSubscription>
+  findByStripeSubscriptionId(
+    stripeSubscriptionId: string,
+  ): Promise<UserSubscription | null>
 }

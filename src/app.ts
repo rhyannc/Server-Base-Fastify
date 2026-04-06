@@ -28,7 +28,7 @@ export const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-import fastifyRawBody from 'fastify-raw-body'
+import fastifyRawBody from 'fastify-raw-body' // Plugin para ler o body da requisição
 
 app.register(fastifyCookie)
 app.register(fastifyRawBody, {
@@ -88,20 +88,14 @@ app.register(userSubscriptionsRoutes, { prefix: '/subscriptions' })
 app.register(usagesRoutes, { prefix: '/usages' })
 app.register(webhooksRoutes, { prefix: '/webhooks' })
 
+// Rota para testar se a API está funcionando
 app.get(
-  '/cou/:id',
-  {
-    schema: {
-      params: z.object({
-        id: z.string(),
-      }),
-    },
-  },
+  '/',
   async (request, reply) => {
-    const id = 'Meu ovo'
-    return reply.status(200).send({ id })
+    return reply.status(200).send('It Works!')
   },
 )
+
 
 // TRATAMENTO DE ERROS DE FORMA GLOBAL
 /*

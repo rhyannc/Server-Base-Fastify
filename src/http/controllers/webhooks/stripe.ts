@@ -10,6 +10,8 @@ export async function handleStripeWebhook(
 ) {
   const signature = request.headers['stripe-signature']
 
+  console.log("inicio da assinatura")
+
   // Verifica se a assinatura está presente
   if (!signature) {
     return reply.status(400).send({ message: 'Missing stripe-signature header' })
@@ -26,6 +28,7 @@ export async function handleStripeWebhook(
       signature,
       env.STRIPE_WEBHOOK_SECRET,
     )
+    console.log("fim da assinatura")
   } catch (err) {
     if (err instanceof Error) {
       console.error(`Webhook signature verification failed: ${err.message}`)

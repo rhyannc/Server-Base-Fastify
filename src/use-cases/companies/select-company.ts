@@ -21,10 +21,12 @@ export class SelectCompanyUseCase {
   }: SelectCompanyUseCaseRequest): Promise<SelectCompanyUseCaseResponse> {
     const company = await this.companiesRepository.findById(companyId)
 
+    // Verifica se a empresa existe
     if (!company) {
       throw new ResourceNotFoundError()
     }
 
+    // Verifica se a empresa esta ativa
     if (company.status !== 'ACTIVE') {
       throw new CompanyNotActiveError()
     }

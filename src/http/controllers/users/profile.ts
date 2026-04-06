@@ -12,6 +12,8 @@ export const meBodyResponse = {
           name: z.string(),
           email: z.string(),
           phone: z.string().nullable(),
+          avatar: z.string().nullable(),
+          chosePlan: z.boolean(),
           passwordHash: z.string(),
           active: z.boolean(),
           role: z.string(),

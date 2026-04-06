@@ -18,6 +18,7 @@ import {
   updateUserBodySchema,
 } from './updateUser'
 import { userId, userIdBodyResponse, userIdBodySchema } from './userId'
+import { logout, logoutBodyResponse } from './logout'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function usersRoutes(app: FastifyInstance) {
@@ -108,5 +109,18 @@ export async function usersRoutes(app: FastifyInstance) {
       onRequest: [verifyUserRole('ADMIN')],
     },
     updateUser,
+  )
+
+  app.post(
+    '/logout',
+    {
+      schema: {
+        tags: ['User'],
+        summary: 'Realiza o logout do usuário logado',
+        security: [{ bearerAuth: [] }],
+        response: logoutBodyResponse,
+      },
+    },
+    logout,
   )
 }
