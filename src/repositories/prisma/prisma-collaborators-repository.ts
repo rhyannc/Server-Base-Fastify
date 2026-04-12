@@ -55,8 +55,17 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
       include: {
         company: {
           select: {
+            id: true,
             name: true,
+            description: true,
             cnpj: true,
+            email: true,
+            phone: true,
+            address: true,
+            city: true,
+            active: true,
+            status: true,
+            
           },
         },
       },

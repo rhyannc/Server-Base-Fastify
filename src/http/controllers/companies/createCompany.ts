@@ -6,7 +6,11 @@ import { makeCreateCompanyUseCase } from '@/use-cases/factories/make-create-comp
 
 export const createCompanyBodySchema = z.object({
   name: z.string(),
-  cnpj: z.string().regex(/^\d+$/, 'Deve conter apenas números').min(14, 'Precisa ter minimo 14 caracteres'),
+  description: z.string(),
+  cnpj: z
+    .string()
+    .regex(/^\d+$/, 'Deve conter apenas números')
+    .min(14, 'Precisa ter minimo 14 caracteres'),
   email: z.string().email(),
   phone: z.string(),
   country: z.string().optional().describe('País (opcional, padrão BR)'),
@@ -39,6 +43,7 @@ export async function createCompany(
 ) {
   const {
     name,
+    description,
     cnpj,
     email,
     phone,
@@ -61,6 +66,7 @@ export async function createCompany(
 
     const { company } = await createCompanyUseCase.execute({
       name,
+      description,
       cnpj,
       email,
       phone,

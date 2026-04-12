@@ -9,6 +9,7 @@ import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
 interface UpdateCompanyUseCaseRequest {
   id: string
   name: string
+  description?: string | null
   cnpj?: string | null
   email?: string | null
   phone?: string | null
@@ -36,6 +37,7 @@ export class UpdateCompanyUseCase {
     meSysRole,
     id,
     name,
+    description,
     cnpj,
     email,
     phone,
@@ -70,6 +72,7 @@ export class UpdateCompanyUseCase {
     const company = await this.companiesRepository.update({
       id,
       name,
+      description,
       cnpj,
       email,
       phone,

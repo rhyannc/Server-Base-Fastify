@@ -13,6 +13,7 @@ export const companyIdBodyResponse = {
       company: z.object({
         id: z.string().uuid(),
         name: z.string(),
+        description: z.string(),
         cnpj: z.string().nullable(),
         email: z.string(),
         phone: z.string().nullable(),

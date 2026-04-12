@@ -2,28 +2,24 @@ import {
   Collaborator,
   Role,
   RoleCollaborator,
-  Status,
   UsageMetric,
 } from '@prisma/client'
 
+import { IMailProvider } from '@/providers/mail/IMailProvider'
+import { collaboratorInviteTemplate } from '@/providers/mail/templates/collaborator-invite'
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { UsersRepository } from '@/repositories/users-repository'
 
-import { IMailProvider } from '@/providers/mail/IMailProvider'
-import { collaboratorInviteTemplate } from '@/providers/mail/templates/collaborator-invite'
-
-import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { CollaboratorAlreadyExistsError } from '../errors/collaborator-already-exists-error'
 import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
+import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 
 interface CreateCollaboratorUseCaseRequest {
   companyId: string
-  userId: string
+  email: string
   role?: RoleCollaborator
-  active?: boolean
-  status?: Status
 }
 
 interface CreateCollaboratorUseCaseResponse {
@@ -41,12 +37,10 @@ export class CreateCollaboratorUseCase {
 
   async execute({
     companyId,
-    userId,
+    email,
     meId,
     meSysRole,
     role,
-    active,
-    status,
   }: CreateCollaboratorUseCaseRequest & {
     meId: string
     meSysRole: Role
@@ -58,7 +52,7 @@ export class CreateCollaboratorUseCase {
     }
 
     // 2. Verifica se o usuário a ser adicionado existe
-    const user = await this.usersRepository.findById(userId)
+    const user = await this.usersRepository.findByEmail(email)
     if (!user) {
       throw new ResourceNotFoundError()
     }
@@ -76,7 +70,10 @@ export class CreateCollaboratorUseCase {
 
     // 4. Verifica se o usuário já é colaborador desta empresa
     const collaboratorExists =
-      await this.collaboratorsRepository.findByCompanyAndUser(companyId, userId)
+      await this.collaboratorsRepository.findByCompanyAndUser(
+        companyId,
+        user.id,
+      )
 
     if (collaboratorExists) {
       throw new CollaboratorAlreadyExistsError()
@@ -88,22 +85,21 @@ export class CreateCollaboratorUseCase {
       metric: UsageMetric.COLLABORATORS,
     })
 
-    
-
     // 4. Cria o colaborador
     const collaborator = await this.collaboratorsRepository.create({
       companyId,
-      userId,
+      userId: user.id,
       role,
-      active,
-      status,
     })
 
     // Envia o e-mail de convite
     await this.mailProvider.sendMail({
       to: user.email,
       subject: `Você foi adicionado à empresa ${company.name}`,
-      body: collaboratorInviteTemplate({ userName: user.name, companyName: company.name }),
+      body: collaboratorInviteTemplate({
+        userName: user.name,
+        companyName: company.name,
+      }),
     })
 
     return { collaborator }

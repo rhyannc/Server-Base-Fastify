@@ -10,6 +10,7 @@ import { SubscriptionNotActiveError } from '../errors/subscription-not-active-er
 
 interface CreateCompanyUseCaseRequest {
   name: string
+  description?: string | null
   cnpj?: string | null
   email?: string | null
   phone?: string | null
@@ -38,6 +39,7 @@ export class CreateCompanyUseCase {
   ) {}
   async execute({
     name,
+    description,
     cnpj,
     email,
     phone,
@@ -83,6 +85,7 @@ export class CreateCompanyUseCase {
     // Cadastra no BD
     const company = await this.companiesRepository.create({
       name,
+      description,
       cnpj,
       email,
       phone,

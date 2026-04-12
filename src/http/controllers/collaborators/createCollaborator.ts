@@ -8,10 +8,8 @@ import { makeCreateCollaboratorUseCase } from '@/use-cases/factories/make-create
 
 export const createCollaboratorBodySchema = z.object({
   companyId: z.string().uuid(),
-  userId: z.string().uuid(),
+  emailCollaborator: z.string().email(),
   role: z.enum(['LEAD', 'COLLABORATOR']).optional().default('COLLABORATOR'),
-  active: z.boolean().optional().default(true),
-  status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional().default('ACTIVE'),
 })
 
 export const createCollaboratorBodyResponse = {
@@ -21,14 +19,16 @@ export const createCollaboratorBodyResponse = {
   409: z
     .object({ message: z.string() })
     .describe('Usuário já é colaborador desta empresa'),
-  404: z.object({ message: z.string() }).describe('Usuário ou Empresa não encontrados'),
+  404: z
+    .object({ message: z.string() })
+    .describe('Usuário ou Empresa não encontrados'),
 }
 
 export async function createCollaborator(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { companyId, userId, role, active, status } =
+  const { companyId, emailCollaborator, role } =
     createCollaboratorBodySchema.parse(request.body)
 
   try {
@@ -36,12 +36,10 @@ export async function createCollaborator(
 
     const { collaborator } = await createCollaboratorUseCase.execute({
       companyId,
-      userId,
+      email: emailCollaborator,
       meId: request.user.sub,
       meSysRole: request.user.role as Role,
       role,
-      active,
-      status,
     })
 
     return reply.status(201).send({ collaboratorId: collaborator.id })

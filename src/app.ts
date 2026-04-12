@@ -65,7 +65,7 @@ app.register(fastifySwagger, {
           scheme: 'bearer',
           bearerFormat: 'JWT',
         },
-      },
+      }, 
     },
   },
 

@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify'
-import { z } from 'zod'
 
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
+import { verifyChosePlan } from '@/http/middlewares/verify-chose-plan'
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { verifyUserRole } from '@/http/middlewares/verify-user-role'
-import { verifyChosePlan } from '@/http/middlewares/verify-chose-plan'
 
 import {
   companyId,
@@ -15,19 +15,37 @@ import {
   createCompanyBodyResponse,
   createCompanyBodySchema,
 } from './createCompany'
-import { findManager, findManagerQuerySchema } from './findManager'
-import { search, searchCompaniesQuerySchema } from './search'
-import { updateCompany, updateCompanyBodyResponse, updateCompanyBodySchema } from './updatecompany'
 import { findCompanies, findCompaniesQuerySchema } from './findCompany'
-import { selectCompany, selectCompanyBodyResponse, selectCompanyParamsSchema } from './selectCompany'
-import { transferManagerCompany, transferManagerCompanyBodyResponse, transferManagerCompanyBodySchema, transferManagerCompanyParamsSchema } from './transferManagerCompany'
-import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
+import { findManager, findManagerQuerySchema } from './findManager'
+import { meCollaborator, meCollaboratorQuerySchema } from './meCollaborator'
+import { meManager, meQuerySchema } from './meManager'
+import { search, searchCompaniesQuerySchema } from './search'
+import {
+  selectCompany,
+  selectCompanyBodyResponse,
+  selectCompanyParamsSchema,
+} from './selectCompany'
+import {
+  toggleCompanyStatus,
+  toggleCompanyStatusParamsSchema,
+  toggleCompanyStatusResponseSchema,
+} from './toggleCompanyStatus'
+import {
+  transferManagerCompany,
+  transferManagerCompanyBodyResponse,
+  transferManagerCompanyBodySchema,
+  transferManagerCompanyParamsSchema,
+} from './transferManagerCompany'
+import {
+  updateCompany,
+  updateCompanyBodyResponse,
+  updateCompanyBodySchema,
+} from './updatecompany'
 
 export async function companiesRoutes(app: FastifyInstance) {
   /** Authenticated */
   app.addHook('onRequest', verifyJWT) // vai obrigar que todas as rotas abaixo tenha Token JWT Valido
   app.addHook('onRequest', verifyActiveUser) // Valida se o usuario esta ativo, se false bloqueia todas as rotas
-
 
   app.post(
     '/create',
@@ -45,7 +63,7 @@ export async function companiesRoutes(app: FastifyInstance) {
   )
 
   app.get(
-    '/company/:companyId',
+    '/:companyId',
     {
       schema: {
         tags: ['Company'],
@@ -88,6 +106,35 @@ export async function companiesRoutes(app: FastifyInstance) {
   )
 
   app.get(
+    '/memanager',
+    {
+      schema: {
+        tags: ['Company'],
+        summary: 'Lista todas as empresas onde o usuário logado é o manager',
+        security: [{ bearerAuth: [] }],
+        querystring: meQuerySchema,
+      },
+      onRequest: [verifyChosePlan],
+    },
+    meManager,
+  )
+
+  app.get(
+    '/mecollaborator',
+    {
+      schema: {
+        tags: ['Company'],
+        summary:
+          'Lista todas as empresas nas quais o usuário autenticado é colaborador o Lider',
+        security: [{ bearerAuth: [] }],
+        querystring: meCollaboratorQuerySchema,
+      },
+      onRequest: [verifyChosePlan],
+    },
+    meCollaborator,
+  )
+
+  app.get(
     '/findmanager',
     {
       schema: {
@@ -107,7 +154,8 @@ export async function companiesRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Company'],
-        summary: 'Atualiza uma Empresa | somente usuário *ADMIN* - LEAD - MANAGER', 
+        summary:
+          'Atualiza uma Empresa | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }], // indica rota com JWT no Swager
         body: updateCompanyBodySchema,
         response: updateCompanyBodyResponse,
@@ -118,7 +166,7 @@ export async function companiesRoutes(app: FastifyInstance) {
   )
 
   app.patch(
-    '/company/:companyId/access',
+    '/:companyId/access',
     {
       schema: {
         tags: ['Company'],
@@ -133,11 +181,28 @@ export async function companiesRoutes(app: FastifyInstance) {
   )
 
   app.patch(
-    '/company/:companyId/transfer',
+    '/:companyId/status',
     {
       schema: {
         tags: ['Company'],
-        summary: 'Transfere a gerência de uma empresa para outro usuário | somente usuário *ADMIN*',
+        summary:
+          'Alterna o status de uma empresa entre ACTIVE e FROZEN | somente usuário *ADMIN* ou MANAGER da empresa',
+        security: [{ bearerAuth: [] }],
+        params: toggleCompanyStatusParamsSchema,
+        response: toggleCompanyStatusResponseSchema,
+      },
+      onRequest: [verifyChosePlan],
+    },
+    toggleCompanyStatus,
+  )
+
+  app.patch(
+    '/:companyId/transfer',
+    {
+      schema: {
+        tags: ['Company'],
+        summary:
+          'Transfere a gerência de uma empresa para outro usuário | somente usuário *ADMIN*',
         security: [{ bearerAuth: [] }],
         params: transferManagerCompanyParamsSchema,
         body: transferManagerCompanyBodySchema,
@@ -147,5 +212,4 @@ export async function companiesRoutes(app: FastifyInstance) {
     },
     transferManagerCompany,
   )
-  
 }
