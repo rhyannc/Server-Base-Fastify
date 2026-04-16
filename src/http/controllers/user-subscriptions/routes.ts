@@ -20,6 +20,10 @@ import {
   fetchInvoices,
   fetchInvoicesResponseSchema,
 } from './fetch-invoices'
+import {
+  cancelSubscription,
+  cancelSubscriptionResponseSchema,
+} from './cancel-subscription'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function userSubscriptionsRoutes(app: FastifyInstance) {
@@ -81,5 +85,18 @@ export async function userSubscriptionsRoutes(app: FastifyInstance) {
       },
     },
     fetchInvoices,
+  )
+
+  app.patch(
+    '/cancel',
+    {
+      schema: {
+        tags: ['User Subscription'],
+        summary: 'Cancela a assinatura do usuário logado e arquiva empresas/colaboradores',
+        security: [{ bearerAuth: [] }],
+        response: cancelSubscriptionResponseSchema,
+      },
+    },
+    cancelSubscription,
   )
 }

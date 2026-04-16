@@ -31,6 +31,7 @@ export class CreateCheckoutSessionUseCase {
     }
 
     let customerId = user.stripeCustomerId
+   
 
     // Se o usuário não tiver um customerId, cria um no Stripe
     if (!customerId) {
@@ -51,6 +52,7 @@ export class CreateCheckoutSessionUseCase {
       await this.usersRepository.update(user)
     }
 
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
@@ -61,6 +63,14 @@ export class CreateCheckoutSessionUseCase {
         },
       ],
       mode: 'subscription',
+     
+      // Aqui está a mágica:
+      ...(user.trialUsed === false && {
+                                        subscription_data: {
+                                                              trial_period_days: 7,
+                                                            },
+          }),
+
       success_url: successUrl,
       cancel_url: cancelUrl,
       client_reference_id: userId, // Para facilitar a identificação do usuário no webhook caso o ID do cliente esteja ausente por algum motivo.

@@ -21,20 +21,29 @@ export async function handleStripeWebhook(
 
   try {
     // fastify-raw-body insere o texto puro em request.rawBody
-    const payload = (request as any).rawBody || request.body
+    const rawBody = (request as any).rawBody
+    
+    if (!rawBody) {
+      console.error('⚠️ rawBody está undefined! O plugin fastify-raw-body pode não estar funcionando.')
+      console.error('request.body type:', typeof request.body)
+    }
+
+    // Usa rawBody (string) diretamente — NÃO pode usar JSON.stringify pois altera a formatação
+    // e invalida a assinatura do Stripe
+    const payload = typeof rawBody === 'string' ? rawBody : JSON.stringify(request.body)
     
     event = stripe.webhooks.constructEvent(
-      typeof payload === 'string' ? payload : JSON.stringify(payload),
+      payload,
       signature,
       env.STRIPE_WEBHOOK_SECRET,
     )
-    console.log("fim da assinatura")
+    console.log("✅ Assinatura do webhook verificada com sucesso")
   } catch (err) {
     if (err instanceof Error) {
-      console.error(`Webhook signature verification failed: ${err.message}`)
-      return reply.status(400).send({ message: `Webhook Error: ${err.message}` })
+      console.error(`❌ Webhook signature verification failed: ${err.message}`)
+      console.error('💡 Verifique se o STRIPE_WEBHOOK_SECRET no .env corresponde ao secret mostrado pelo "stripe listen"')
     }
-    return reply.status(400).send({ message: 'Webhook Error' })
+    return reply.status(400).send({ message: `Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}` })
   }
 
   try {

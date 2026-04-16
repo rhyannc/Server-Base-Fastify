@@ -108,6 +108,7 @@ Execute os comando para gerar as migrate e criaçao das tabelas
 ```bash
 npx prisma generate
 npx prisma migrate dev
+npx prisma db seed
 ```
 
 ## 🏃‍♂️ Como Executar

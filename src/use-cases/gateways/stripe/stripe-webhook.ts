@@ -35,15 +35,19 @@ export class StripeWebhookUseCase {
       // Checkout Session Completed - Cria a assinatura
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        console.log(
-          `[Stripe Webhook] session.mode: ${session.mode}, session.subscription: ${session.subscription}`,
-        )
-
+        console.log(`[Stripe Webhook] session.mode: ${session.mode}, session.subscription: ${session.subscription}`,)
+    
         // Verifica se a sessão é de assinatura e se tem uma assinatura
         if (session.mode === 'subscription' && session.subscription) {
           const customerId = session.customer as string
           const subscriptionId = session.subscription as string
           const userId = session.client_reference_id
+
+          const result = await stripe.subscriptions.retrieve(subscriptionId) as any
+
+          // DATA FINAL DO CICLO DE PAGAMENTO
+          const finalTimestamp = result.current_period_end || result.items?.data[0]?.current_period_end;
+
 
           console.log(
             `[Stripe Webhook] customerId: ${customerId}, subscriptionId: ${subscriptionId}, userId: ${userId}`,
@@ -60,8 +64,11 @@ export class StripeWebhookUseCase {
               const subscription =
                 await stripe.subscriptions.retrieve(subscriptionId)
               const stripePriceId = subscription.items.data[0].price.id
+
+
+ 
               console.log(
-                `[Stripe Webhook] stripePriceId da assinatura Stripe: ${stripePriceId}`,
+                `[Stripe Webhook 67] stripePriceId da assinatura Stripe: ${stripePriceId}`,
               )
 
               // Busca o plano no banco pelo stripePriceId
@@ -137,15 +144,17 @@ export class StripeWebhookUseCase {
                 `[Stripe Webhook] Assinatura existente: ${existingSubscription ? existingSubscription.id : 'NENHUMA'}`,
               )
 
+              // Cria ou atualiza a assinatura UserSubscription
               if (existingSubscription) {
                 await this.userSubscriptionsRepository.update({
                   id: existingSubscription.id,
                   planId: plan.id,
                   stripeSubscriptionId: subscriptionId,
                   stripePriceId,
-                  status: 'ACTIVE',
+                  status: subscription.status === 'trialing' ? 'TRIALING' : 'ACTIVE',
                   cardLast4,
                   cardBrand,
+                  expiresAt: new Date(finalTimestamp * 1000),
                 })
                 console.log(
                   `[Stripe Webhook] Assinatura ATUALIZADA com sucesso.`,
@@ -156,11 +165,13 @@ export class StripeWebhookUseCase {
                   planId: plan.id,
                   stripeSubscriptionId: subscriptionId,
                   stripePriceId,
-                  status: 'ACTIVE',
+                  status: subscription.status === 'trialing' ? 'TRIALING' : 'ACTIVE',
                   cardLast4,
                   cardBrand,
+                  expiresAt: new Date(finalTimestamp * 1000),
                 })
                 console.log(`[Stripe Webhook] Assinatura CRIADA com sucesso.`)
+
               }
 
               // Criação da invoice para historico de pagamentos
@@ -179,7 +190,11 @@ export class StripeWebhookUseCase {
                 cardLast4,
                 cardBrand,
               })
-              console.log(`[Stripe Webhook] Invoice registrada com sucesso.`)
+              console.log(`[Stripe Webhook 01-INVOICE] Invoice registrada com sucesso.`)
+
+             if(subscription.status === 'trialing') {
+              user.trialUsed = true // Marca que o user usou o periodo de demostracao
+             }  
 
               user.chosePlan = true // Indica que o usuário escolheu um plano
               await this.usersRepository.update(user)
@@ -210,6 +225,9 @@ export class StripeWebhookUseCase {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const stripePriceId = subscription.items.data[0].price.id
+        const finalTimestamp =  subscription.items?.data[0]?.current_period_end;
+
+        console.log('AQUI ESTA O FINAL TIMESTAMP ******** seja renovação ou pro-rata', finalTimestamp)
 
         const existingSub =
           await this.userSubscriptionsRepository.findByStripeSubscriptionId(
@@ -262,6 +280,7 @@ export class StripeWebhookUseCase {
                   )
                 ).card?.brand
               : undefined,
+              expiresAt: new Date(finalTimestamp * 1000),
           })
 
           console.log(`[Stripe Webhook- UPDATE DE PLANO] Assinatura sincronizada. O pagamento será registrado pelo evento invoice.payment_succeeded.`)
@@ -304,7 +323,7 @@ export class StripeWebhookUseCase {
         const subscriptionId = stripeInvoice.subscription || 
                                stripeInvoice.parent?.subscription_details?.subscription;
 
-        console.log('AQUI ESTA O SUB ID ********', subscriptionId)
+        console.log('AQUI ESTA O SUB ID ******** seja renovação ou pro-rata', subscriptionId)
 
         if (subscriptionId) {
           // Busca o stripePriceId em todas as linhas da fatura, ignorando créditos
@@ -385,7 +404,7 @@ export class StripeWebhookUseCase {
               cardLast4: cardLast4 || existingSub.cardLast4,
               cardBrand: cardBrand || existingSub.cardBrand,
             })
-            console.log(`[Stripe Webhook] Invoice de ${stripeInvoice.billing_reason} registrada com sucesso. Valor: R$ ${stripeInvoice.amount_paid / 100}`)
+            console.log(`[Stripe Webhook 02-INVOICE] Invoice de ${stripeInvoice.billing_reason} registrada com sucesso. Valor: R$ ${stripeInvoice.amount_paid / 100}`)
           }
         }
         break
