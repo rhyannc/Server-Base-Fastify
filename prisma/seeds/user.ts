@@ -32,5 +32,103 @@ await prisma.user.upsert({
   },
 })
 
-  // pode continuar com Plus e Pro...
+
+await prisma.user.upsert({
+  where: { email: 'nico@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Nico Rosberg',
+    email: 'nico@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'lauda@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Lauda',
+    email: 'lauda@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'massa@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Felipe Massa',
+    email: 'massa@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'piquet@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Nelson Piquet',
+    email: 'piquet@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'fittipaldi@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Emerson Fittipaldi',
+    email: 'fittipaldi@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'senna@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Ayrton Senna',
+    email: 'senna@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+
+await prisma.user.upsert({
+  where: { email: 'barrichello@hotmail.com' },
+  update: {},
+  create: {
+    name: 'Rubens Barrichello',
+    email: 'barrichello@hotmail.com',
+    phone: '31999223344',
+    passwordHash:
+      '$2b$04$x5nLRUhx49mPCCi2546f..8hBRWQ18sbBfjVXP1WY7ksfbG0dwrrS',
+    role: 'USER',
+  },
+})
+
+  
 }
