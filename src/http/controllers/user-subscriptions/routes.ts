@@ -24,6 +24,10 @@ import {
   cancelSubscription,
   cancelSubscriptionResponseSchema,
 } from './cancel-subscription'
+import {
+  resumeSubscription,
+  resumeSubscriptionResponseSchema,
+} from './resume-subscription'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function userSubscriptionsRoutes(app: FastifyInstance) {
@@ -98,5 +102,18 @@ export async function userSubscriptionsRoutes(app: FastifyInstance) {
       },
     },
     cancelSubscription,
+  )
+
+  app.patch(
+    '/resume',
+    {
+      schema: {
+        tags: ['User Subscription'],
+        summary: 'Reativa a assinatura do usuário logado (desfaz cancelamento agendado)',
+        security: [{ bearerAuth: [] }],
+        response: resumeSubscriptionResponseSchema,
+      },
+    },
+    resumeSubscription,
   )
 }

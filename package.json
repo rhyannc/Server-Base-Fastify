@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx --watch src/server.ts",
     "stripe": ".\\stripe listen --forward-to localhost:3333/webhooks/stripe",
-    "stripemac": "stripe-cli listen --forward-to localhost:3333/webhooks/stripe",
+    "stripemac": "./stripe-cli listen --forward-to localhost:3333/webhooks/stripe",
     "start": "node build/server.js",
     "build": "tsup src/server.ts --out-dir build",
     "test": "vitest run",

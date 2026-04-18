@@ -7,7 +7,6 @@ import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-r
 import { stripe } from '@/providers/stripe-provider'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { SubscriptionNotActiveError } from '../errors/subscription-not-active-error'
-import { SubscriptionCanceledUseCase } from '../gateways/stripe/subscription-canceled'
 
 interface CancelUserSubscriptionUseCaseRequest {
   userId: string
@@ -41,27 +40,30 @@ export class CancelUserSubscriptionUseCase {
       throw new SubscriptionNotActiveError()
     }
 
-    // 3. Cancela a assinatura no Stripe (se existir stripeSubscriptionId)
+    // 3. Cancela a assinatura no Stripe (agenda para o fim do período)
     if (subscription.stripeSubscriptionId) {
-      await stripe.subscriptions.cancel(subscription.stripeSubscriptionId)
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      })
       console.log(
-        `[Cancel Subscription] Assinatura cancelada no Stripe: ${subscription.stripeSubscriptionId}`,
+        `[Cancel Subscription] Renovação cancelada no Stripe: ${subscription.stripeSubscriptionId}`,
       )
     }
 
-    // 4. Executa a mesma lógica de cancelamento local (status, arquivar empresas e colaboradores)
-    const subscriptionCanceledUseCase = new SubscriptionCanceledUseCase(
-      this.userSubscriptionsRepository,
-      this.companiesRepository,
-      this.collaboratorsRepository,
-    )
-
-    const result = await subscriptionCanceledUseCase.execute({ userId })
+    // 4. Atualiza o banco local apenas com a data de cancelamento
+    // O status permanece ACTIVE até o webhook confirmar a deleção no fim do ciclo
+    const userSubscription = await this.userSubscriptionsRepository.update({
+      id: subscription.id,
+      canceledAt: new Date(),
+    })
 
     console.log(
-      `[Cancel Subscription] Cancelamento local concluído. Empresas arquivadas: ${result.archivedCompanyIds.length}`,
+      `[Cancel Subscription] Marcado como cancelado no banco local. Acesso mantido até o fim do ciclo.`,
     )
 
-    return result
+    return {
+      userSubscription,
+      archivedCompanyIds: [],
+    }
   }
 }

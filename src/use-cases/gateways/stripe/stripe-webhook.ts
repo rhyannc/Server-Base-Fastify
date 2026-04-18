@@ -280,7 +280,10 @@ export class StripeWebhookUseCase {
                   )
                 ).card?.brand
               : undefined,
-              expiresAt: new Date(finalTimestamp * 1000),
+            expiresAt: new Date(finalTimestamp * 1000),
+            canceledAt: subscription.canceled_at 
+              ? new Date(subscription.canceled_at * 1000) 
+              : null,
           })
 
           console.log(`[Stripe Webhook- UPDATE DE PLANO] Assinatura sincronizada. O pagamento será registrado pelo evento invoice.payment_succeeded.`)
