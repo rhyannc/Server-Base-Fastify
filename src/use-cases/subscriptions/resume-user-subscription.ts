@@ -1,6 +1,7 @@
 import { UserSubscription } from '@prisma/client'
 
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
+import { SubscriptionEventsRepository } from '@/repositories/subscription-events-repository'
 import { stripe } from '@/providers/stripe-provider'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { SubscriptionNotActiveError } from '../errors/subscription-not-active-error'
@@ -16,6 +17,7 @@ interface ResumeUserSubscriptionUseCaseResponse {
 export class ResumeUserSubscriptionUseCase {
   constructor(
     private userSubscriptionsRepository: UserSubscriptionsRepository,
+    private subscriptionEventsRepository: SubscriptionEventsRepository,
   ) {}
 
   async execute({
@@ -53,6 +55,16 @@ export class ResumeUserSubscriptionUseCase {
     console.log(
       `[Resume Subscription] Registro de cancelamento limpo no banco local.`,
     )
+
+    // 5. Registra o evento de log
+    await this.subscriptionEventsRepository.create({
+      userId,
+      type: 'MANUAL_ACTION',
+      name: 'manual.resume',
+      status: 'SUCCESS',
+      message: 'Renovação automática reativada pelo usuário.',
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
+    })
 
     return {
       userSubscription,

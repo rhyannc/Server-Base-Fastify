@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { InvoicesRepository } from '@/repositories/invoices-repository'
+import { SubscriptionEventsRepository } from '@/repositories/subscription-events-repository'
 
 import { prisma } from '../../../lib/prisma'
 import { stripe } from '../../../providers/stripe-provider'
@@ -23,12 +24,17 @@ export class StripeWebhookUseCase {
     private companiesRepository: CompaniesRepository,
     private collaboratorsRepository: CollaboratorsRepository,
     private invoicesRepository: InvoicesRepository,
+    private subscriptionEventsRepository: SubscriptionEventsRepository,
   ) {}
 
   async execute({ event }: StripeWebhookUseCaseRequest): Promise<void> {
     console.log(`[Stripe Webhook- INITIALs] Evento recebido: ${event.type}`)
 
-    switch (event.type) {
+    const stripeSubscriptionId = (event.data.object as any).subscription || (event.data.object as any).id
+    let userId: string | undefined
+
+    try {
+      switch (event.type) {
 
      
 
@@ -154,6 +160,7 @@ export class StripeWebhookUseCase {
                   status: subscription.status === 'trialing' ? 'TRIALING' : 'ACTIVE',
                   cardLast4,
                   cardBrand,
+                  canceledAt: null,
                   expiresAt: new Date(finalTimestamp * 1000),
                 })
                 console.log(
@@ -201,6 +208,16 @@ export class StripeWebhookUseCase {
               console.log(
                 `[Stripe Webhook] chosePlan atualizado para true. Fluxo concluído!`,
               )
+
+              userId = user.id
+              await this.subscriptionEventsRepository.create({
+                userId,
+                type: 'WEBHOOK',
+                name: event.type,
+                status: 'SUCCESS',
+                stripeSubscriptionId: subscriptionId,
+                payload: event as any,
+              })
             } else {
               console.error(
                 `[Stripe Webhook] ERRO: Usuário não encontrado para userId=${userId}`,
@@ -286,6 +303,17 @@ export class StripeWebhookUseCase {
               : null,
           })
 
+          userId = existingSub.userId
+
+          await this.subscriptionEventsRepository.create({
+            userId,
+            type: 'WEBHOOK',
+            name: event.type,
+            status: 'SUCCESS',
+            stripeSubscriptionId: subscription.id,
+            payload: event as any,
+          })
+
           console.log(`[Stripe Webhook- UPDATE DE PLANO] Assinatura sincronizada. O pagamento será registrado pelo evento invoice.payment_succeeded.`)
         }
         break
@@ -309,6 +337,15 @@ export class StripeWebhookUseCase {
 
           await subscriptionCanceledUseCase.execute({
             userId: existingSub.userId,
+          })
+
+          await this.subscriptionEventsRepository.create({
+            userId: existingSub.userId,
+            type: 'WEBHOOK',
+            name: event.type,
+            status: 'SUCCESS',
+            stripeSubscriptionId: subscription.id,
+            payload: event as any,
           })
         }
         break
@@ -407,6 +444,16 @@ export class StripeWebhookUseCase {
               cardLast4: cardLast4 || existingSub.cardLast4,
               cardBrand: cardBrand || existingSub.cardBrand,
             })
+
+            await this.subscriptionEventsRepository.create({
+              userId: existingSub.userId,
+              type: 'WEBHOOK',
+              name: event.type,
+              status: 'SUCCESS',
+              stripeSubscriptionId: subscriptionId,
+              payload: event as any,
+            })
+
             console.log(`[Stripe Webhook 02-INVOICE] Invoice de ${stripeInvoice.billing_reason} registrada com sucesso. Valor: R$ ${stripeInvoice.amount_paid / 100}`)
           }
         }
@@ -414,7 +461,28 @@ export class StripeWebhookUseCase {
       }
 
       default:
-        console.log(`Unhandled event type ${event.type}`)
+        console.log(`Tipo de evento não tratado ${event.type}`)
+        await this.subscriptionEventsRepository.create({
+          type: 'WEBHOOK',
+          name: event.type,
+          status: 'IGNORED',
+          message: 'Evento ignorado (não implementado ou não relevante).',
+          stripeSubscriptionId: stripeSubscriptionId,
+          payload: event as any,
+        })
+    }
+    } catch (err) {
+      console.error(`[Stripe Webhook Error] ${err}`)
+      await this.subscriptionEventsRepository.create({
+        userId,
+        type: 'WEBHOOK',
+        name: event.type,
+        status: 'FAILURE',
+        message: err instanceof Error ? err.message : 'Erro desconhecido no processamento do webhook.',
+        stripeSubscriptionId: stripeSubscriptionId,
+        payload: event as any,
+      })
+      throw err
     }
   }
 }

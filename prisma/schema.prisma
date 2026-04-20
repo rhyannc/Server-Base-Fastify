@@ -65,8 +65,27 @@ model User {
   usages           Usage[]
   tokens           Token[]
   invoices         Invoice[]
+  subscriptionEvents SubscriptionEvent[]
 
   @@map("users")
+}
+
+model SubscriptionEvent {
+  id                   String   @id @default(uuid())
+  user                 User?    @relation(fields: [userId], references: [id])
+  userId               String?
+  
+  type                 String   // Ex: 'WEBHOOK', 'MANUAL_ACTION'
+  name                 String   // Ex: 'subscription.updated', 'manual.reactivation'
+  
+  status               String   // Ex: 'SUCCESS', 'FAILURE'
+  message              String?  @db.Text
+  payload              Json?    // Opcional: Dados brutos para rastreio
+  
+  stripeSubscriptionId String?
+  createdAt            DateTime @default(now())
+
+  @@map("subscription_events")
 }
 
 model Company {

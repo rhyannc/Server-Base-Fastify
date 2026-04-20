@@ -3,6 +3,7 @@ import { UserSubscription } from '@prisma/client'
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
+import { SubscriptionEventsRepository } from '@/repositories/subscription-events-repository'
 
 import { stripe } from '@/providers/stripe-provider'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
@@ -22,6 +23,7 @@ export class CancelUserSubscriptionUseCase {
     private userSubscriptionsRepository: UserSubscriptionsRepository,
     private companiesRepository: CompaniesRepository,
     private collaboratorsRepository: CollaboratorsRepository,
+    private subscriptionEventsRepository: SubscriptionEventsRepository,
   ) {}
 
   async execute({
@@ -60,6 +62,16 @@ export class CancelUserSubscriptionUseCase {
     console.log(
       `[Cancel Subscription] Marcado como cancelado no banco local. Acesso mantido até o fim do ciclo.`,
     )
+
+    // 5. Registra o evento de log
+    await this.subscriptionEventsRepository.create({
+      userId,
+      type: 'MANUAL_ACTION',
+      name: 'manual.cancel',
+      status: 'SUCCESS',
+      message: 'Renovação automática cancelada pelo usuário.',
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
+    })
 
     return {
       userSubscription,
