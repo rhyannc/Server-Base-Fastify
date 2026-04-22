@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { CompanyNoExistError } from '@/use-cases/errors/company-no-exist-error'
 import { GenericUnauthorizedError } from '@/use-cases/errors/generic-unauthorized-error'
+import { PlanLimitReachedError } from '@/use-cases/errors/plan-limit-reached-error'
 import { makeToggleCompanyStatusUseCase } from '@/use-cases/factories/make-toggle-company-status'
 
 export const toggleCompanyStatusParamsSchema = z.object({
@@ -17,6 +18,7 @@ export const toggleCompanyStatusResponseSchema = {
   400: z.object({ message: z.string() }).describe('Erro de validação.'),
   401: z.object({ message: z.string() }).describe('Não autorizado.'),
   404: z.object({ message: z.string() }).describe('Empresa não encontrada.'),
+  409: z.object({ message: z.string() }).describe('Limite do plano atingido.'),
 }
 
 export async function toggleCompanyStatus(
@@ -44,6 +46,9 @@ export async function toggleCompanyStatus(
     }
     if (error instanceof GenericUnauthorizedError) {
       return reply.status(401).send({ message: error.message })
+    }
+    if (error instanceof PlanLimitReachedError) {
+      return reply.status(409).send({ message: error.message })
     }
     if (error instanceof Error && error.message.includes('arquivadas')) {
       return reply.status(400).send({ message: error.message })

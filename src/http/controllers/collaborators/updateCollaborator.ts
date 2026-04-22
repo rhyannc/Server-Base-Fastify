@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
 import { GenericUnauthorizedError } from '@/use-cases/errors/generic-unauthorized-error'
+import { PlanLimitReachedError } from '@/use-cases/errors/plan-limit-reached-error'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import { makeUpdateCollaboratorUseCase } from '@/use-cases/factories/make-update-collaborator-use-case'
 
@@ -11,10 +12,8 @@ export const updateCollaboratorParamsSchema = z.object({
   collaboratorId: z.string().uuid(),
 })
 
-// schema de validação para o corpo da requisição.
 export const updateCollaboratorBodySchema = z.object({
   role: z.enum(['LEAD', 'COLLABORATOR']).optional(),
-  active: z.boolean().optional(),
   status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional(),
 })
 
@@ -28,7 +27,7 @@ export async function updateCollaborator(
   )
 
   // Extrai e valida os campos opcionais enviados no corpo da requisição
-  const { role, active, status } = updateCollaboratorBodySchema.parse(
+  const { role, status } = updateCollaboratorBodySchema.parse(
     request.body,
   )
 
@@ -41,7 +40,6 @@ export async function updateCollaborator(
       meId: request.user.sub,
       meSysRole: request.user.role as Role,
       role,
-      active,
       status,
     })
 
@@ -55,6 +53,10 @@ export async function updateCollaborator(
     // Retorna 404 Not Found se o colaborador ou a empresa a qual ele pertence não for encontrado
     if (err instanceof ResourceNotFoundError) {
       return reply.status(404).send({ message: err.message })
+    }
+
+    if (err instanceof PlanLimitReachedError) {
+      return reply.status(409).send({ message: err.message })
     }
 
     // Lança qualquer erro inesperado para ser tratado pelo handler global do Fastify

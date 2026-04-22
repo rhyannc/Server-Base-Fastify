@@ -128,7 +128,6 @@ model Collaborator {
 
   role RoleCollaborator @default(COLLABORATOR)
 
-  active Boolean @default(true)
   status Status  @default(ACTIVE) // active, frozen, archived
 
   createdAt DateTime @default(now())

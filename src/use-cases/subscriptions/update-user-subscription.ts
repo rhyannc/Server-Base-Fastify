@@ -9,8 +9,6 @@ import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-r
 import { stripe } from '@/providers/stripe-provider'
 import { PlanNotActiveError } from '../errors/plan-not-active-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
-import { UserSubscriptionAlreadyExistsError } from '../errors/user-subscription-already-exists-error'
-import { UserSubscriptionNotExistsPlanError } from '../errors/user-subscription-not-exists-plan-error'
 
 interface UpdateUserSubscriptionUseCaseRequest {
   userId: string
@@ -96,30 +94,31 @@ export class UpdateUserSubscriptionUseCase {
 
     if (plan) {
       // 1. Verificar limite de Empresas (maxCompanies)
+      // Usage só rastreia empresas ACTIVE, então só consideramos ACTIVE no downgrade
       if (plan.maxCompanies) {
         const companies = await this.companiesRepository.findManyByManagerId(
           userId,
         )
-        const activeOrFrozenCompanies = companies.filter(
-          (c) => c.status === 'ACTIVE' || c.status === 'FROZEN',
+        const activeCompanies = companies.filter(
+          (c) => c.status === 'ACTIVE',
         )
 
-        if (activeOrFrozenCompanies.length > plan.maxCompanies) {
+        if (activeCompanies.length > plan.maxCompanies) {
           // As empresas já vêm ordenadas por lastAccess DESC no repository
-          const companiesToArchive = activeOrFrozenCompanies.slice(plan.maxCompanies)
+          // Mantém as mais recentemente acessadas, arquiva o restante
+          const companiesToArchive = activeCompanies.slice(plan.maxCompanies)
           const companyIdsToArchive = companiesToArchive.map((c: Company) => c.id)
 
-          // Como as empresas a arquivar são poucas normalmente, podemos fazer um loop ou adicionar updateStatusByIds
           for (const companyId of companyIdsToArchive) {
             await this.companiesRepository.update({
               id: companyId,
               status: 'ARCHIVED',
             })
 
-            // Arquiva colaboradores dessas empresas
+            // Arquiva colaboradores ACTIVE dessas empresas
             await this.collaboratorsRepository.updateStatusByCompanyIds(
               [companyId],
-              ['ACTIVE', 'FROZEN'],
+              ['ACTIVE'],
               'ARCHIVED',
             )
           }
@@ -127,6 +126,7 @@ export class UpdateUserSubscriptionUseCase {
       }
 
       // 2. Verificar limite de Colaboradores (maxCollaborators)
+      // Usage só rastreia colaboradores ACTIVE, então só consideramos ACTIVE no downgrade
       if (plan.maxCollaborators) {
         const activeCollaboratorsCount =
           await this.collaboratorsRepository.countActiveByManagerId(userId)
@@ -135,22 +135,20 @@ export class UpdateUserSubscriptionUseCase {
           const collaborators =
             await this.collaboratorsRepository.findManyByManagerId(userId)
           
-          // Filtra apenas os ativos das empresas que ainda estão ativas (já que as outras foram arquivadas acima)
-          // Filtra apenas os ativos ou congelados das empresas que ainda estão ativas (já que as outras foram arquivadas acima)
-          const activeOrFrozenCollaborators = collaborators.filter(
-            (c) => c.status === 'ACTIVE' || c.status === 'FROZEN',
+          // Filtra apenas os ACTIVE (já que as empresas arquivadas acima já tiveram seus colaboradores arquivados)
+          const activeCollaborators = collaborators.filter(
+            (c) => c.status === 'ACTIVE',
           )
 
-          if (activeOrFrozenCollaborators.length > plan.maxCollaborators) {
-            // Collaborators vêm ordenados por createdAt ASC (mais antigos primeiro)
-            // Mas queremos manter os mais novos? O user não especificou.
-            // Geralmente mantém os mais antigos ou os mais novos. 
-            // "deve ser desativado ate ficar no limit do novo plano"
-            // Vamos manter os mais antigos (quem chegou primeiro fica)? Ou os mais novos?
-            // Vou seguir a lógica de empresas (manter os mais recentes acessados), mas como não tem lastAccess, vou manter os mais novos (createdAt DESC).
-            
-            const sortedCollaborators = activeOrFrozenCollaborators.sort(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          if (activeCollaborators.length > plan.maxCollaborators) {
+            // Ordena por lastLoginAt DESC (quem fez login mais recente fica, quem nunca fez login é arquivado primeiro)
+            const sortedCollaborators = activeCollaborators.sort(
+              (a, b) => {
+                if (a.user.lastLoginAt === b.user.lastLoginAt) return 0
+                if (a.user.lastLoginAt === null) return 1
+                if (b.user.lastLoginAt === null) return -1
+                return b.user.lastLoginAt.getTime() - a.user.lastLoginAt.getTime()
+              },
             )
 
             const collaboratorsToArchive = sortedCollaborators.slice(
@@ -168,13 +166,12 @@ export class UpdateUserSubscriptionUseCase {
       }
 
       // 3. Sincronizar Uso (Usage)
-      const currentPeriod = new Date()
-      currentPeriod.setDate(1)
-      currentPeriod.setHours(0, 0, 0, 0)
+      const now = new Date()
+      const currentPeriod = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
 
       // COMPANIES
       const finalCompanies = await this.companiesRepository.findManyByManagerId(userId)
-      const finalActiveCompaniesCount = finalCompanies.filter(c => c.status === 'ACTIVE' || c.status === 'FROZEN').length
+      const finalActiveCompaniesCount = finalCompanies.filter(c => c.status === 'ACTIVE').length
       
       const companiesUsage = await this.usagesRepository.findByUserIdAndMetric(userId, 'COMPANIES', currentPeriod)
       if (companiesUsage) {

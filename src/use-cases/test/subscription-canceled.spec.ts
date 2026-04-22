@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryCollaboratorsRepository } from '@/repositories/im-memory/in-memory-collaborators-repository'
 import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-companies-repository'
+import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 
 import { SubscriptionCanceledUseCase } from '../gateways/stripe/subscription-canceled'
@@ -9,6 +10,7 @@ import { SubscriptionCanceledUseCase } from '../gateways/stripe/subscription-can
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let companiesRepository: InMemoryCompaniesRepository
 let collaboratorsRepository: InMemoryCollaboratorsRepository
+let usagesRepository: InMemoryUsagesRepository
 let sut: SubscriptionCanceledUseCase
 
 describe('Subscription Canceled Use Case', () => {
@@ -16,10 +18,12 @@ describe('Subscription Canceled Use Case', () => {
     userSubscriptionsRepository = new InMemoryUserSubscriptionsRepository()
     companiesRepository = new InMemoryCompaniesRepository()
     collaboratorsRepository = new InMemoryCollaboratorsRepository()
+    usagesRepository = new InMemoryUsagesRepository()
     sut = new SubscriptionCanceledUseCase(
       userSubscriptionsRepository,
       companiesRepository,
       collaboratorsRepository,
+      usagesRepository,
     )
   })
 

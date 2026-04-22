@@ -5,6 +5,7 @@ import { CollaboratorsRepository } from '@/repositories/collaborators-repository
 import { CompaniesRepository } from '@/repositories/companies-repository'
 import { InvoicesRepository } from '@/repositories/invoices-repository'
 import { SubscriptionEventsRepository } from '@/repositories/subscription-events-repository'
+import { UsagesRepository } from '@/repositories/usages-repository'
 
 import { prisma } from '../../../lib/prisma'
 import { stripe } from '../../../providers/stripe-provider'
@@ -25,6 +26,7 @@ export class StripeWebhookUseCase {
     private collaboratorsRepository: CollaboratorsRepository,
     private invoicesRepository: InvoicesRepository,
     private subscriptionEventsRepository: SubscriptionEventsRepository,
+    private usagesRepository: UsagesRepository,
   ) {}
 
   async execute({ event }: StripeWebhookUseCaseRequest): Promise<void> {
@@ -333,12 +335,14 @@ export class StripeWebhookUseCase {
             this.userSubscriptionsRepository,
             this.companiesRepository,
             this.collaboratorsRepository,
+            this.usagesRepository,
           )
 
           await subscriptionCanceledUseCase.execute({
             userId: existingSub.userId,
           })
 
+          // Cria Log de evento de cancelamento  
           await this.subscriptionEventsRepository.create({
             userId: existingSub.userId,
             type: 'WEBHOOK',

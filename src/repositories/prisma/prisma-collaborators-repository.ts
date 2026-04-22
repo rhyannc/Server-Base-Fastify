@@ -125,7 +125,12 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
       where: {
         company: { managerId },
       },
-      orderBy: { createdAt: 'asc' }, // Mais antigos primeiro para arquivamento
+      include: {
+        user: {
+          select: { lastLoginAt: true },
+        },
+      },
+      orderBy: { user: { lastLoginAt: { sort: 'desc', nulls: 'last' } } },
     })
 
     return collaborators
@@ -135,9 +140,7 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
     const count = await prisma.collaborator.count({
       where: {
         company: { managerId },
-        status: {
-          in: ['ACTIVE', 'FROZEN'],
-        },
+        status: 'ACTIVE',
       },
     })
 

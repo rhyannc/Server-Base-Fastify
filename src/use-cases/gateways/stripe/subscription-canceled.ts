@@ -1,7 +1,8 @@
-import { UserSubscription } from '@prisma/client'
+import { UserSubscription, UsageMetric } from '@prisma/client'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
 import { CompaniesRepository } from '@/repositories/companies-repository'
+import { UsagesRepository } from '@/repositories/usages-repository'
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
 
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
@@ -20,6 +21,7 @@ export class SubscriptionCanceledUseCase {
     private userSubscriptionsRepository: UserSubscriptionsRepository,
     private companiesRepository: CompaniesRepository,
     private collaboratorsRepository: CollaboratorsRepository,
+    private usagesRepository: UsagesRepository,
   ) {}
 
   async execute({
@@ -53,6 +55,34 @@ export class SubscriptionCanceledUseCase {
       archivedCompanyIds,
       ['ACTIVE', 'FROZEN'],
       'ARCHIVED',
+    )
+
+    // 5. Zerar Usage (tudo foi arquivado, não há mais recursos ACTIVE)
+    const now = new Date()
+    const period = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+
+    // Zera o usage de empresas
+    const companiesUsage = await this.usagesRepository.findByUserIdAndMetric(
+      userId,
+      UsageMetric.COMPANIES,
+      period,
+    )
+    if (companiesUsage) {
+      await this.usagesRepository.setValue(companiesUsage.id, 0)
+    }
+
+    // Zera o usage de colaboradores
+    const collaboratorsUsage = await this.usagesRepository.findByUserIdAndMetric(
+      userId,
+      UsageMetric.COLLABORATORS,
+      period,
+    )
+    if (collaboratorsUsage) {
+      await this.usagesRepository.setValue(collaboratorsUsage.id, 0)
+    }
+
+    console.log(
+      `[Subscription Canceled] Usage zerado para userId ${userId}. COMPANIES=0, COLLABORATORS=0`,
     )
 
     return { userSubscription, archivedCompanyIds }

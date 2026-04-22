@@ -4,11 +4,15 @@ import { Collaborator, Prisma, Status } from '@prisma/client'
 
 import { CollaboratorsRepository } from '../collaborators-repository'
 import { InMemoryCompaniesRepository } from './in-memory-companies-repository'
+import { InMemoryUsersRepository } from './in-memory-users-repository'
 
 export class InMemoryCollaboratorsRepository implements CollaboratorsRepository {
   public items: Collaborator[] = []
 
-  constructor(private companiesRepository: InMemoryCompaniesRepository = new InMemoryCompaniesRepository()) {}
+  constructor(
+    private companiesRepository: InMemoryCompaniesRepository = new InMemoryCompaniesRepository(),
+    private usersRepository: InMemoryUsersRepository = new InMemoryUsersRepository(),
+  ) {}
 
   async findById(id: string) {
     const collaborator = this.items.find((item) => item.id === id)
@@ -110,7 +114,16 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
 
     return this.items
       .filter((item) => companyIds.includes(item.companyId))
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((item) => {
+        const user = this.usersRepository.items.find((u) => u.id === item.userId)
+        return { ...item, user: { lastLoginAt: user?.lastLoginAt ?? null } }
+      })
+      .sort((a, b) => {
+        if (a.user.lastLoginAt === b.user.lastLoginAt) return 0
+        if (a.user.lastLoginAt === null) return 1
+        if (b.user.lastLoginAt === null) return -1
+        return b.user.lastLoginAt.getTime() - a.user.lastLoginAt.getTime()
+      })
   }
 
   async countActiveByManagerId(managerId: string) {
@@ -120,7 +133,7 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
     const companyIds = managerCompanies.map((c) => c.id)
 
     return this.items.filter(
-      (item) => companyIds.includes(item.companyId) && (item.status === 'ACTIVE' || item.status === 'FROZEN'),
+      (item) => companyIds.includes(item.companyId) && item.status === 'ACTIVE',
     ).length
   }
 
