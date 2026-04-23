@@ -11,8 +11,16 @@ interface FetchCollaboratorsByCompanyUseCaseRequest {
   page: number
 }
 
+import { env } from '@/env'
+
 interface FetchCollaboratorsByCompanyUseCaseResponse {
   collaborators: Collaborator[]
+  meta: {
+    totalCount: number
+    pageIndex: number
+    perPage: number
+    totalPages: number
+  }
 }
 
 export class FetchCollaboratorsByCompanyUseCase {
@@ -35,7 +43,6 @@ export class FetchCollaboratorsByCompanyUseCase {
     if (!company) {
       throw new ResourceNotFoundError()
     }
-    console.log(company)
 
     // Validação de Permissão (ADMIN ou Manager da Empresa)
     if (meSysRole !== 'ADMIN' && company.managerId !== meId) {
@@ -48,11 +55,21 @@ export class FetchCollaboratorsByCompanyUseCase {
       }
     }
 
-    const collaborators = await this.collaboratorsRepository.findManyByCompany(
-      companyId,
-      page,
-    )
+    const [collaborators, totalCount] = await Promise.all([
+      this.collaboratorsRepository.findManyByCompany(companyId, page),
+      this.collaboratorsRepository.countByCompany(companyId),
+    ])
 
-    return { collaborators }
+    const totalPages = Math.ceil(totalCount / env.TAKE_PAGINATION)
+
+    return {
+      collaborators,
+      meta: {
+        totalCount,
+        pageIndex: page,
+        perPage: env.TAKE_PAGINATION,
+        totalPages,
+      },
+    }
   }
 }

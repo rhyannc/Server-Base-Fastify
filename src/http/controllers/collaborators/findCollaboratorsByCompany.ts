@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { z } from 'zod'
+import { z } from 'zod' 
 
 import { makeFetchCollaboratorsByCompanyUseCase } from '@/use-cases/factories/make-fetch-collaborators-by-company-use-case'
 
@@ -24,12 +24,13 @@ export async function findCollaboratorsByCompany(
   const fetchCollaboratorsByCompanyUseCase =
     makeFetchCollaboratorsByCompanyUseCase()
 
-  const { collaborators } = await fetchCollaboratorsByCompanyUseCase.execute({
-    companyId,
-    meId: request.user.sub,
-    meSysRole: request.user.role as Role,
-    page,
-  })
+  const { collaborators, meta } =
+    await fetchCollaboratorsByCompanyUseCase.execute({
+      companyId,
+      meId: request.user.sub,
+      meSysRole: request.user.role as Role,
+      page,
+    })
 
-  return reply.status(200).send({ collaborators })
+  return reply.status(200).send({ meta, collaborators })
 }

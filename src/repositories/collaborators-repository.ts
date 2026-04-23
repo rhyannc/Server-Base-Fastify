@@ -20,5 +20,6 @@ export interface CollaboratorsRepository {
   findManyByManagerId(managerId: string): Promise<(Collaborator & { user: { lastLoginAt: Date | null } })[]>
   countActiveByManagerId(managerId: string): Promise<number>
   findByCompanyId(companyId: string): Promise<Collaborator[]>
+  countByCompany(companyId: string): Promise<number>
 }
 

@@ -138,5 +138,9 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
   async findByCompanyId(companyId: string) {
     return this.items.filter((item) => item.companyId === companyId)
   }
+
+  async countByCompany(companyId: string) {
+    return this.items.filter((item) => item.companyId === companyId).length
+  }
 }
 
