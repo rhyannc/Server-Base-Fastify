@@ -5,6 +5,7 @@ import { CompaniesRepository } from '@/repositories/companies-repository'
 import { PlansRepository } from '@/repositories/plans-repository'
 import { UsagesRepository } from '@/repositories/usages-repository'
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 
 import { CompanyNoExistError } from '../errors/company-no-exist-error'
 import { OnlyAdminAuthorizedError } from '../errors/only-admin-authorized-error'
@@ -15,6 +16,8 @@ interface ToggleCompanyStatusUseCaseRequest {
   id: string
   meId: string
   meSysRole: Role
+  ip?: string
+  userAgent?: string
 }
 
 interface ToggleCompanyStatusUseCaseResponse {
@@ -28,12 +31,15 @@ export class ToggleCompanyStatusUseCase {
     private userSubscriptionsRepository: UserSubscriptionsRepository,
     private plansRepository: PlansRepository,
     private usagesRepository: UsagesRepository,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
 
   async execute({
     id,
     meId,
     meSysRole,
+    ip,
+    userAgent,
   }: ToggleCompanyStatusUseCaseRequest): Promise<ToggleCompanyStatusUseCaseResponse> {
     const companyExists = await this.companiesRepository.findById(id)
     if (!companyExists) {
@@ -106,6 +112,20 @@ export class ToggleCompanyStatusUseCase {
       console.log(
         `[Toggle Status] Empresa ${id} congelada. Usage decrementado: COMPANIES -1, COLLABORATORS -${collaboratorsCount}`,
       )
+
+      // Registra o status change no log de atividades
+      await this.activityLogsRepository.create({
+        userId: meId,
+        action: 'STATUS_CHANGE',
+        resource: 'COMPANY',
+        resourceId: id,
+        minidescription: `EMPRESA CONGELADA`,
+        description: `Empresa ${id} congelada (ACTIVE -> FROZEN) por ${meId}.`,
+        oldState: { status: 'ACTIVE' },
+        newState: { status: 'FROZEN' },
+        ip,
+        userAgent,
+      })
 
       return { company }
     }
@@ -207,6 +227,20 @@ export class ToggleCompanyStatusUseCase {
       console.log(
         `[Toggle Status] Empresa ${id} reativada. Usage incrementado: COMPANIES +1, COLLABORATORS +${collaboratorsCount}`,
       )
+
+      // Registra o status change no log de atividades
+      await this.activityLogsRepository.create({
+        userId: meId,
+        action: 'STATUS_CHANGE',
+        resource: 'COMPANY',
+        resourceId: id,
+        minidescription: `EMPRESA REATIVADA`,
+        description: `Empresa ${id} reativada (FROZEN -> ACTIVE) por ${meId}.`,
+        oldState: { status: 'FROZEN' },
+        newState: { status: 'ACTIVE' },
+        ip,
+        userAgent,
+      })
 
       return { company }
     }

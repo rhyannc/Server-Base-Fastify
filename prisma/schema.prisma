@@ -66,8 +66,30 @@ model User {
   tokens           Token[]
   invoices         Invoice[]
   subscriptionEvents SubscriptionEvent[]
+  activityLogs       ActivityLog[]
 
   @@map("users")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String?  // Quem fez (pode ser nulo para eventos de sistema/webhook)
+  user       User?    @relation(fields: [userId], references: [id])
+  
+  action     String   // 'CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'STATUS_CHANGE'
+  resource   String   // 'USER', 'COMPANY', 'COLLABORATOR', 'SUBSCRIPTION'
+  resourceId String?  // ID do recurso afetado
+  minidescription String? // Descrição curta da ação
+  description String?  @db.Text // Descrição amigável da ação
+  oldState    Json?    // Estado anterior (se aplicável)
+  newState    Json?    // Novo estado (se aplicável)
+  
+  ip          String?
+  userAgent   String?
+  
+  createdAt   DateTime @default(now())
+
+  @@map("activity_logs")
 }
 
 model SubscriptionEvent {

@@ -81,6 +81,8 @@ export async function createCompany(
       active: active ?? true,
       status: status ?? 'ACTIVE',
       managerId: managerId ?? request.user.sub,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'] as string,
     })
 
     return reply.status(201).send({ companyId: company.id }) // 👉 retorna o ID

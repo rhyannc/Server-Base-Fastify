@@ -15,11 +15,13 @@ import { CollaboratorAlreadyExistsError } from '../errors/collaborator-already-e
 import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
-
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 interface CreateCollaboratorUseCaseRequest {
   companyId: string
   email: string
   role?: RoleCollaborator
+  ip?: string
+  userAgent?: string
 }
 
 interface CreateCollaboratorUseCaseResponse {
@@ -33,6 +35,7 @@ export class CreateCollaboratorUseCase {
     private usersRepository: UsersRepository,
     private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
     private mailProvider: IMailProvider,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
 
   async execute({
@@ -41,6 +44,8 @@ export class CreateCollaboratorUseCase {
     meId,
     meSysRole,
     role,
+    ip,
+    userAgent,
   }: CreateCollaboratorUseCaseRequest & {
     meId: string
     meSysRole: Role
@@ -90,6 +95,17 @@ export class CreateCollaboratorUseCase {
       companyId,
       userId: user.id,
       role,
+    })
+
+    await this.activityLogsRepository.create({
+      userId: meId,
+      action: 'CREATE',
+      resource: 'COLLABORATOR',
+      resourceId: collaborator.id,
+      description: `Colaborador ${user.id} (${email}) adicionado à empresa ${companyId} por ${meId}.`,
+      newState: collaborator,
+      ip,
+      userAgent,
     })
 
     // Envia o e-mail de convite

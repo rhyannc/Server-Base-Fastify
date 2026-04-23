@@ -5,6 +5,7 @@ import { CompaniesRepository } from '@/repositories/companies-repository'
 import { PlansRepository } from '@/repositories/plans-repository'
 import { UsagesRepository } from '@/repositories/usages-repository'
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 
 import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
 import { PlanLimitReachedError } from '../errors/plan-limit-reached-error'
@@ -14,6 +15,8 @@ interface UpdateCollaboratorUseCaseRequest {
   collaboratorId: string
   role?: RoleCollaborator
   status?: Status
+  ip?: string
+  userAgent?: string
 }
 
 interface UpdateCollaboratorUseCaseResponse {
@@ -27,6 +30,7 @@ export class UpdateCollaboratorUseCase {
     private userSubscriptionsRepository: UserSubscriptionsRepository,
     private plansRepository: PlansRepository,
     private usagesRepository: UsagesRepository,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
 
   async execute({
@@ -35,6 +39,8 @@ export class UpdateCollaboratorUseCase {
     meSysRole,
     role,
     status,
+    ip,
+    userAgent,
   }: UpdateCollaboratorUseCaseRequest & {
     meId: string
     meSysRole: Role
@@ -148,6 +154,24 @@ export class UpdateCollaboratorUseCase {
       id: collaboratorId,
       role: role ?? collaborator.role,
       status: newStatus,
+    })
+
+    await this.activityLogsRepository.create({
+      userId: meId,
+      action: 'UPDATE',
+      resource: 'COLLABORATOR',
+      resourceId: collaboratorId,
+      description: `Colaborador ${collaboratorId} atualizado por ${meId}.`,
+      oldState: {
+        role: collaborator.role,
+        status: collaborator.status,
+      },
+      newState: {
+        role: updatedCollaborator.role,
+        status: updatedCollaborator.status,
+      },
+      ip,
+      userAgent,
     })
 
     return { collaborator: updatedCollaborator }

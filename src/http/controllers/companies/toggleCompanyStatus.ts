@@ -34,6 +34,8 @@ export async function toggleCompanyStatus(
       id: companyId,
       meId: request.user.sub,
       meSysRole: request.user.role as Role,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'] as string,
     })
 
     return reply.status(200).send({

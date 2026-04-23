@@ -7,6 +7,7 @@ import { CompanyAlreadyExistsError } from '../errors/company-already-exists-erro
 import { UserSubscriptionsRepository } from '@/repositories/user-subscriptions-repository'
 import { UserSubscriptionNotExistsPlanError } from '../errors/user-subscription-not-exists-plan-error'
 import { SubscriptionNotActiveError } from '../errors/subscription-not-active-error'
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 
 interface CreateCompanyUseCaseRequest {
   name: string
@@ -25,6 +26,8 @@ interface CreateCompanyUseCaseRequest {
   active?: boolean
   status?: Status
   managerId: string
+  ip?: string
+  userAgent?: string
 }
 
 interface CreateCompanyUseCaseResponse {
@@ -36,6 +39,7 @@ export class CreateCompanyUseCase {
     private companiesRepository: CompaniesRepository,
     private userSubscriptionsRepository: UserSubscriptionsRepository,
     private checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
   async execute({
     name,
@@ -54,6 +58,8 @@ export class CreateCompanyUseCase {
     active,
     status,
     managerId,
+    ip,
+    userAgent,
   }: CreateCompanyUseCaseRequest): Promise<CreateCompanyUseCaseResponse> {
     // Validar se CNPJ ja existe
     const companyWithsameCnpj = await this.companiesRepository.findByCnpj(cnpj)
@@ -100,6 +106,17 @@ export class CreateCompanyUseCase {
       active,
       status,
       managerId,
+    })
+
+    await this.activityLogsRepository.create({
+      userId: createdBy || managerId,
+      action: 'CREATE',
+      resource: 'COMPANY',
+      resourceId: company.id,
+      description: `Nova empresa criada: ${name} (ID: ${company.id}).`,
+      newState: company,
+      ip,
+      userAgent,
     })
 
     return { company } // Retorna a company criada

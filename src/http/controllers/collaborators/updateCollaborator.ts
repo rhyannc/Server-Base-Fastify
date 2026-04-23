@@ -41,6 +41,8 @@ export async function updateCollaborator(
       meSysRole: request.user.role as Role,
       role,
       status,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'] as string,
     })
 
     return reply.status(200).send({ collaborator })

@@ -30,6 +30,8 @@ export async function authenticate(
     const { user } = await authenticateUseCase.execute({
       email,
       password,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'],
     })
 
     // Cria Token

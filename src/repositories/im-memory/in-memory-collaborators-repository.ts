@@ -54,7 +54,6 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       companyId: data.companyId,
       userId: data.userId,
       role: data.role ?? 'COLLABORATOR',
-      active: data.active ?? true,
       status: data.status ?? Status.ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -72,7 +71,6 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
 
     if (collaboratorIndex >= 0) {
       if (data.role !== undefined) this.items[collaboratorIndex].role = data.role as any
-      if (data.active !== undefined) this.items[collaboratorIndex].active = data.active as boolean
       if (data.status !== undefined) this.items[collaboratorIndex].status = data.status as Status
       this.items[collaboratorIndex].updatedAt = new Date()
     }

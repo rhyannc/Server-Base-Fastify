@@ -1,3 +1,4 @@
+import { PrismaActivityLogsRepository } from '@/repositories/prisma/prisma-activity-logs-repository'
 import { PrismaCollaboratorsRepository } from '@/repositories/prisma/prisma-collaborators-repository'
 import { PrismaCompaniesRepository } from '@/repositories/prisma/prisma-companies-respository'
 import { PrismaPlansRepository } from '@/repositories/prisma/prisma-plans-repository'
@@ -12,6 +13,7 @@ export function makeUpdateCollaboratorUseCase() {
   const userSubscriptionsRepository = new PrismaUserSubscriptionsRepository()
   const plansRepository = new PrismaPlansRepository()
   const usagesRepository = new PrismaUsagesRepository()
+  const prismaActivityLogsRepository = new PrismaActivityLogsRepository()
 
   const useCase = new UpdateCollaboratorUseCase(
     collaboratorsRepository,
@@ -19,6 +21,7 @@ export function makeUpdateCollaboratorUseCase() {
     userSubscriptionsRepository,
     plansRepository,
     usagesRepository,
+    prismaActivityLogsRepository,
   )
 
   return useCase

@@ -4,11 +4,14 @@ import { CollaboratorsRepository } from '@/repositories/collaborators-repository
 import { CompaniesRepository } from '@/repositories/companies-repository'
 
 import { DecrementUsageUseCase } from '../usages/decrement-usage'
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 import { GenericUnauthorizedError } from '../errors/generic-unauthorized-error'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 interface RemoveCollaboratorUseCaseRequest {
   collaboratorId: string
+  ip?: string
+  userAgent?: string
 }
 
 export class RemoveCollaboratorUseCase {
@@ -16,12 +19,15 @@ export class RemoveCollaboratorUseCase {
     private collaboratorsRepository: CollaboratorsRepository,
     private companiesRepository: CompaniesRepository,
     private decrementUsageUseCase: DecrementUsageUseCase,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
 
   async execute({
     collaboratorId,
     meId,
     meSysRole,
+    ip,
+    userAgent,
   }: RemoveCollaboratorUseCaseRequest & {
     meId: string
     meSysRole: Role
@@ -61,6 +67,17 @@ export class RemoveCollaboratorUseCase {
     await this.decrementUsageUseCase.execute({
       userId: company.managerId,
       metric: UsageMetric.COLLABORATORS,
+    })
+
+    await this.activityLogsRepository.create({
+      userId: meId,
+      action: 'DELETE',
+      resource: 'COLLABORATOR',
+      resourceId: collaboratorId,
+      description: `Colaborador ${collaboratorId} removido por ${meId}.`,
+      oldState: collaborator,
+      ip,
+      userAgent,
     })
   }
 }

@@ -25,6 +25,8 @@ export async function removeCollaborator(
       collaboratorId,
       meId: request.user.sub,
       meSysRole: request.user.role as Role,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'] as string,
     })
 
     return reply.status(204).send()

@@ -40,6 +40,8 @@ export async function createCollaborator(
       meId: request.user.sub,
       meSysRole: request.user.role as Role,
       role,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'] as string,
     })
 
     return reply.status(201).send({ collaboratorId: collaborator.id })
