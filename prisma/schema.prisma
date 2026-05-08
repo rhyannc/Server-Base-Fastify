@@ -182,21 +182,22 @@ model Plan {
 }
 
 model UserSubscription {
-  id                   String             @id @default(uuid())
-  user                 User               @relation(fields: [userId], references: [id])
-  userId               String             @unique
-  plan                 Plan               @relation(fields: [planId], references: [id])
-  planId               String
-  status               SubscriptionStatus // active, trialing, past_due, canceled, expired
-  stripeSubscriptionId String?            @unique
-  stripePriceId        String?
-  cardLast4            String?
-  cardBrand            String?
-  startedAt            DateTime           @default(now()) // Data de início da assinatura
-  expiresAt            DateTime? // Data de expiração da assinatura
-  trialEndsAt          DateTime? // Data de expiração do período de teste
-  canceledAt           DateTime? // Data de cancelamento da assinatura
-  gracePeriodEndsAt    DateTime? // Data de expiração do período de carência
+  id                     String             @id @default(uuid())
+  user                   User               @relation(fields: [userId], references: [id])
+  userId                 String             @unique
+  plan                   Plan               @relation(fields: [planId], references: [id])
+  planId                 String
+  status                 SubscriptionStatus // active, trialing, past_due, canceled, expired
+  stripeSubscriptionId   String?            @unique
+  stripePriceId          String?
+  cardLast4              String?
+  cardBrand              String?
+  startedAt              DateTime           @default(now()) // Data de início da assinatura
+  expiresAt              DateTime? // Data de expiração da assinatura
+  trialEndsAt            DateTime? // Data de expiração do período de teste
+  canceledAt             DateTime? // Data de cancelamento da assinatura
+  gracePeriodEndsAt      DateTime? // Data de expiração do período de carência
+  reviewQuotaReactivated Boolean            @default(false) // Indica se o usuário precisa escolher ativos após reativar assinatura com limite menor
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

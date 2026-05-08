@@ -28,6 +28,11 @@ import {
   resumeSubscription,
   resumeSubscriptionResponseSchema,
 } from './resume-subscription'
+import {
+  reactivateAssets,
+  reactivateAssetsBodySchema,
+  reactivateAssetsResponseSchema,
+} from './reactivate-assets'
 import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
 
 export async function userSubscriptionsRoutes(app: FastifyInstance) {
@@ -116,4 +121,19 @@ export async function userSubscriptionsRoutes(app: FastifyInstance) {
     },
     resumeSubscription,
   )
+
+  app.post(
+    '/reactivate-assets',
+    {
+      schema: {
+        tags: ['User Subscription'],
+        summary: 'Reativa as empresas selecionadas após o retorno de um cancelamento caso o novo plano tenha limite menor',
+        security: [{ bearerAuth: [] }],
+        body: reactivateAssetsBodySchema,
+        response: reactivateAssetsResponseSchema,
+      },
+    },
+    reactivateAssets,
+  )
 }
+

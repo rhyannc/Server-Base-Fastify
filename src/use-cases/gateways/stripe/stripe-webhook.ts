@@ -1,4 +1,4 @@
-import { SubscriptionStatus } from '@prisma/client'
+import { SubscriptionStatus, UsageMetric } from '@prisma/client'
 import Stripe from 'stripe'
 
 import { CollaboratorsRepository } from '@/repositories/collaborators-repository'
@@ -6,6 +6,7 @@ import { CompaniesRepository } from '@/repositories/companies-repository'
 import { InvoicesRepository } from '@/repositories/invoices-repository'
 import { SubscriptionEventsRepository } from '@/repositories/subscription-events-repository'
 import { UsagesRepository } from '@/repositories/usages-repository'
+import { ActivityLogsRepository } from '@/repositories/activity-logs-repository'
 
 import { prisma } from '../../../lib/prisma'
 import { stripe } from '../../../providers/stripe-provider'
@@ -27,6 +28,7 @@ export class StripeWebhookUseCase {
     private invoicesRepository: InvoicesRepository,
     private subscriptionEventsRepository: SubscriptionEventsRepository,
     private usagesRepository: UsagesRepository,
+    private activityLogsRepository: ActivityLogsRepository,
   ) {}
 
   async execute({ event }: StripeWebhookUseCaseRequest): Promise<void> {
@@ -49,7 +51,7 @@ export class StripeWebhookUseCase {
         if (session.mode === 'subscription' && session.subscription) {
           const customerId = session.customer as string
           const subscriptionId = session.subscription as string
-          const userId = session.client_reference_id
+          userId = session.client_reference_id || undefined
 
           const result = await stripe.subscriptions.retrieve(subscriptionId) as any
 
@@ -154,6 +156,65 @@ export class StripeWebhookUseCase {
 
               // Cria ou atualiza a assinatura UserSubscription
               if (existingSubscription) {
+                let reviewQuotaReactivated = false
+
+                // Lógica de Reativação de Ativos (quando volta de um cancelamento)
+                if (existingSubscription.status === 'CANCELED' || existingSubscription.status === 'EXPIRED') {
+                  const archivedCompanies = await prisma.company.findMany({
+                    where: { managerId: user.id, status: 'ARCHIVED' },
+                    select: { id: true },
+                  })
+                  const archivedCompaniesCount = archivedCompanies.length
+
+                  // Se o novo plano suportar a quantidade de empresas arquivadas, ativa todas
+                  if (plan.maxCompanies === null || plan.maxCompanies >= archivedCompaniesCount) {
+                    await prisma.company.updateMany({
+                      where: { managerId: user.id, status: 'ARCHIVED' },
+                      data: { status: 'ACTIVE' },
+                    })
+
+                    // Registra o status change no log de atividades da reativação de empresas
+                   for (const archivedCompany of archivedCompanies) {
+                      await this.activityLogsRepository.create({
+                        userId: user.id,
+                        action: 'STATUS_CHANGE_REACTIVATE',
+                        resource: 'COMPANY',
+                        resourceId: archivedCompany.id,
+                        minidescription: `EMPRESA REATIVADA`,
+                        description: `Empresa ${archivedCompany.id} reativada (ARCHIVED -> ACTIVE) pelo Webhook do Stripe (Renovação).`,
+                        oldState: { status: 'ARCHIVED' },
+                        newState: { status: 'ACTIVE' },
+                        ip: 'STRIPE_WEBHOOK',
+                        userAgent: 'STRIPE_WEBHOOK',
+                      })
+                    }
+
+                    // Incrementa o uso de empresas
+                    if (archivedCompaniesCount > 0) {
+                      const now = new Date()
+                      const period = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+                      const companiesUsage = await this.usagesRepository.findByUserIdAndMetric(
+                        user.id,
+                        UsageMetric.COMPANIES,
+                        period,
+                      )
+                      if (companiesUsage) {
+                        await this.usagesRepository.increment(companiesUsage.id, archivedCompaniesCount)
+                      } else {
+                        await this.usagesRepository.create({
+                          userId: user.id,
+                          metric: UsageMetric.COMPANIES,
+                          period,
+                          value: archivedCompaniesCount,
+                        })
+                      }
+                    }
+                  } else if (archivedCompaniesCount > 0) {
+                    // Novo plano tem limite menor, usuário precisará escolher quais ativar
+                    reviewQuotaReactivated = true
+                  }
+                }
+
                 await this.userSubscriptionsRepository.update({
                   id: existingSubscription.id,
                   planId: plan.id,
@@ -164,6 +225,7 @@ export class StripeWebhookUseCase {
                   cardBrand,
                   canceledAt: null,
                   expiresAt: new Date(finalTimestamp * 1000),
+                  reviewQuotaReactivated,
                 })
                 console.log(
                   `[Stripe Webhook] Assinatura ATUALIZADA com sucesso.`,
@@ -211,6 +273,7 @@ export class StripeWebhookUseCase {
                 `[Stripe Webhook] chosePlan atualizado para true. Fluxo concluído!`,
               )
 
+              // Registra o status change no log de atividades
               userId = user.id
               await this.subscriptionEventsRepository.create({
                 userId,
@@ -268,14 +331,79 @@ export class StripeWebhookUseCase {
           const newStatus = statusMap[subscription.status] || 'PAST_DUE'
 
           let planId = existingSub.planId
+          let currentPlan = null
 
           // Se o preço mudou, busca o novo plano no banco
           if (stripePriceId !== existingSub.stripePriceId) {
-            const plan = await prisma.plan.findFirst({
+            currentPlan = await prisma.plan.findFirst({
               where: { stripePriceId },
             })
-            if (plan) {
-              planId = plan.id
+            if (currentPlan) {
+              planId = currentPlan.id
+            }
+          } else {
+            currentPlan = await prisma.plan.findUnique({
+              where: { id: planId },
+            })
+          }
+
+          let reviewQuotaReactivated = existingSub.reviewQuotaReactivated
+
+          // Lógica de Reativação de Ativos (quando volta de um cancelamento)
+          if ((existingSub.status === 'CANCELED' || existingSub.status === 'EXPIRED') && newStatus === 'ACTIVE') {
+            if (currentPlan) {
+              const archivedCompanies = await prisma.company.findMany({
+                where: { managerId: existingSub.userId, status: 'ARCHIVED' },
+                select: { id: true },
+              })
+              const archivedCompaniesCount = archivedCompanies.length
+
+              if (currentPlan.maxCompanies === null || currentPlan.maxCompanies >= archivedCompaniesCount) {
+                await prisma.company.updateMany({
+                  where: { managerId: existingSub.userId, status: 'ARCHIVED' },
+                  data: { status: 'ACTIVE' },
+                })
+                reviewQuotaReactivated = false
+
+                // Registra o status change no log de atividades da reativação de empresas
+              for (const archivedCompany of archivedCompanies) {
+                  await this.activityLogsRepository.create({
+                    userId: existingSub.userId,
+                    action: 'STATUS_CHANGE_REACTIVATE UP',
+                    resource: 'COMPANY',
+                    resourceId: archivedCompany.id,
+                    minidescription: `UP EMPRESA REATIVADA`,
+                    description: `Empresa ${archivedCompany.id} reativada (ARCHIVED -> ACTIVE) pelo Webhook do Stripe (Renovação).`,
+                    oldState: { status: 'ARCHIVED' },
+                    newState: { status: 'ACTIVE' },
+                    ip: 'STRIPE_WEBHOOK',
+                    userAgent: 'STRIPE_WEBHOOK',
+                  })
+                }
+
+                // Incrementa o uso de empresas
+                if (archivedCompaniesCount > 0) {
+                  const now = new Date()
+                  const period = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+                  const companiesUsage = await this.usagesRepository.findByUserIdAndMetric(
+                    existingSub.userId,
+                    UsageMetric.COMPANIES,
+                    period,
+                  )
+                  if (companiesUsage) {
+                    await this.usagesRepository.increment(companiesUsage.id, archivedCompaniesCount)
+                  } else {
+                    await this.usagesRepository.create({
+                      userId: existingSub.userId,
+                      metric: UsageMetric.COMPANIES,
+                      period,
+                      value: archivedCompaniesCount,
+                    })
+                  }
+                }
+              } else if (archivedCompaniesCount > 0) {
+                reviewQuotaReactivated = true
+              }
             }
           }
 
@@ -285,6 +413,7 @@ export class StripeWebhookUseCase {
             status: newStatus,
             planId,
             stripePriceId,
+            reviewQuotaReactivated,
             cardLast4: subscription.default_payment_method
               ? (
                   await stripe.paymentMethods.retrieve(
@@ -338,16 +467,35 @@ export class StripeWebhookUseCase {
             this.usagesRepository,
           )
 
-          await subscriptionCanceledUseCase.execute({
+          // Registra o log de atividades do arquivamento das empresas
+          const { archivedCompanyIds } = await subscriptionCanceledUseCase.execute({
             userId: existingSub.userId,
           })
+
+          
+          // Registra o log de atividades do arquivamento das empresas
+          for (const companyId of archivedCompanyIds) {
+            await this.activityLogsRepository.create({
+              userId: existingSub.userId,
+              action: 'STATUS_CHANGE_CANCEL',
+              resource: 'COMPANY',
+              resourceId: companyId,
+              minidescription: `EMPRESA ARQUIVADA`,
+              description: `Empresa ${companyId} arquivada (-> ARCHIVED) devido ao cancelamento da assinatura.`,
+              oldState: { status: 'ACTIVE' },
+              newState: { status: 'ARCHIVED' },
+              ip: 'STRIPE_WEBHOOK',
+              userAgent: 'STRIPE_WEBHOOK',
+            })
+          }
+          
 
           // Cria Log de evento de cancelamento  
           await this.subscriptionEventsRepository.create({
             userId: existingSub.userId,
             type: 'WEBHOOK',
             name: event.type,
-            status: 'SUCCESS',
+            status: 'SUCCESS_CANCELLED',
             stripeSubscriptionId: subscription.id,
             payload: event as any,
           })
