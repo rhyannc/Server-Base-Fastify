@@ -68,11 +68,10 @@ describe('Update User Subscription Use Case', () => {
     const { userSubscription } = await sut.execute({
       userId: user.id,
       planId: newPlan.id,
-      status: 'ACTIVE',
     })
 
     expect(userSubscription.planId).toEqual(newPlan.id)
-    expect(userSubscription.status).toEqual('ACTIVE')
+    expect(userSubscription.status).toEqual('TRIALING')
   })
 
   it('não deve ser possível atualizar se não houver assinatura', async () => {
@@ -85,7 +84,6 @@ describe('Update User Subscription Use Case', () => {
     await expect(() =>
       sut.execute({
         userId: user.id,
-        status: 'ACTIVE',
       }),
     ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })

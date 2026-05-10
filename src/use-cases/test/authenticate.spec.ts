@@ -3,16 +3,19 @@ import { hash } from 'bcryptjs'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
+import { InMemoryActivityLogsRepository } from '@/repositories/im-memory/in-memory-activity-logs-repository'
 
 import { AuthenticateUseCase } from '../authenticate'
 import { InvalidCredentialsError } from '../errors/invalid-credentials-error'
 
 let usersRepository: InMemoryUsersRepository
+let activityLogsRepository: InMemoryActivityLogsRepository
 let sut: AuthenticateUseCase
 describe('Authenticate Use Case', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository()
-    sut = new AuthenticateUseCase(usersRepository)
+    activityLogsRepository = new InMemoryActivityLogsRepository()
+    sut = new AuthenticateUseCase(usersRepository, activityLogsRepository)
   })
   it('Deve se Autenticar', async () => {
     await usersRepository.create({

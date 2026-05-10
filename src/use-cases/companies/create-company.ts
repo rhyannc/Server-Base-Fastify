@@ -23,7 +23,6 @@ interface CreateCompanyUseCaseRequest {
   complement?: string | null
   cep?: string | null
   createdBy?: string | null
-  active?: boolean
   status?: Status
   managerId: string
   ip?: string
@@ -55,7 +54,6 @@ export class CreateCompanyUseCase {
     complement,
     cep,
     createdBy,
-    active,
     status,
     managerId,
     ip,
@@ -103,7 +101,6 @@ export class CreateCompanyUseCase {
       complement,
       cep,
       createdBy,
-      active,
       status,
       managerId,
     })

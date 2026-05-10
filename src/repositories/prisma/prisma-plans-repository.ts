@@ -15,6 +15,15 @@ export class PrismaPlansRepository implements PlansRepository {
     return plans
   }
 
+  async findByStripePriceId(stripePriceId: string) {
+    const plan = await prisma.plan.findFirst({
+      where: {
+        stripePriceId,
+      },
+    })
+    return plan
+  }
+
   async findMany(page: number, onlyActive = true) {
     const plans = await prisma.plan.findMany({
       take: env.TAKE_PAGINATION,// limita a quantidade de resultados por página

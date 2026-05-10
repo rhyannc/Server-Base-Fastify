@@ -6,6 +6,7 @@ import { InMemoryCompaniesRepository } from '@/repositories/im-memory/in-memory-
 import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plans-repository'
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
+import { InMemoryActivityLogsRepository } from '@/repositories/im-memory/in-memory-activity-logs-repository'
 
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
 import { CreateCompanyUseCase } from '../companies/create-company'
@@ -15,6 +16,7 @@ let companiesRepository: InMemoryCompaniesRepository
 let usagesRepository: InMemoryUsagesRepository
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let plansRepository: InMemoryPlansRepository
+let activityLogsRepository: InMemoryActivityLogsRepository
 let checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase
 let sut: CreateCompanyUseCase
 
@@ -25,6 +27,7 @@ describe('Create Company Use Case', () => {
     usagesRepository = new InMemoryUsagesRepository()
     userSubscriptionsRepository = new InMemoryUserSubscriptionsRepository()
     plansRepository = new InMemoryPlansRepository()
+    activityLogsRepository = new InMemoryActivityLogsRepository()
     
     checkAndIncrementUsageUseCase = new CheckAndIncrementUsageUseCase(
       usagesRepository,
@@ -34,7 +37,9 @@ describe('Create Company Use Case', () => {
 
     sut = new CreateCompanyUseCase(
       companiesRepository,
+      userSubscriptionsRepository,
       checkAndIncrementUsageUseCase,
+      activityLogsRepository,
     )
 
     const plan = await plansRepository.create({

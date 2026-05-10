@@ -1,5 +1,6 @@
 import { stripe } from '../../../providers/stripe-provider'
 import { PrismaUsersRepository } from '../../../repositories/prisma/prisma-users-respository'
+import { PlansRepository } from '../../../repositories/plans-repository'
 import { ResourceNotFoundError } from '../../errors/resource-not-found-error'
 
 interface CreateCheckoutSessionUseCaseRequest {
@@ -14,7 +15,10 @@ interface CreateCheckoutSessionUseCaseResponse {
 }
 
 export class CreateCheckoutSessionUseCase {
-  constructor(private usersRepository: PrismaUsersRepository) {}
+  constructor(
+    private usersRepository: PrismaUsersRepository,
+    private plansRepository: PlansRepository,
+  ) {}
 
   async execute({
     userId,
@@ -52,6 +56,17 @@ export class CreateCheckoutSessionUseCase {
       await this.usersRepository.update(user)
     }
 
+    // Busca o plano no banco usando o priceId (stripePriceId)
+    const plan = await this.plansRepository.findByStripePriceId(priceId)
+    
+    // Converte trialDays para número ou usa 7 como fallback
+    let trialPeriodDays = 7
+    if (plan && plan.trialDays) {
+      const parsedDays = parseInt(plan.trialDays, 10)
+      if (!isNaN(parsedDays)) {
+        trialPeriodDays = parsedDays
+      }
+    }
     
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -64,12 +79,12 @@ export class CreateCheckoutSessionUseCase {
       ],
       mode: 'subscription',
      
-      // Aqui está a mágica:
-      ...(user.trialUsed === false && {
-                                        subscription_data: {
-                                                              trial_period_days: 7,
-                                                            },
-          }),
+      // Aqui está a mágica: Verifica se o usuario já usou o trial e se o plano realmente oferece trial
+      ...(user.trialUsed === false && plan?.isTrial === true && {
+        subscription_data: {
+          trial_period_days: trialPeriodDays,
+        },
+      }),
 
       success_url: successUrl,
       cancel_url: cancelUrl,

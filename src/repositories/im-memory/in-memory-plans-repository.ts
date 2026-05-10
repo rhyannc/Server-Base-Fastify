@@ -17,6 +17,16 @@ export class InMemoryPlansRepository implements PlansRepository {
     return plan
   }
 
+  async findByStripePriceId(stripePriceId: string) {
+    const plan = this.items.find((item) => item.stripePriceId === stripePriceId)
+
+    if (!plan) {
+      return null
+    }
+
+    return plan
+  }
+
   async findMany(page: number, onlyActive = true) {
     let items = this.items
     if (onlyActive) {

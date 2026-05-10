@@ -78,7 +78,7 @@ export class StripeWebhookUseCase {
 
  
               console.log(
-                `[Stripe Webhook 67] stripePriceId da assinatura Stripe: ${stripePriceId}`,
+                `[Stripe Webhook] stripePriceId da assinatura Stripe: ${stripePriceId}`,
               )
 
               // Busca o plano no banco pelo stripePriceId
@@ -227,6 +227,21 @@ export class StripeWebhookUseCase {
                   expiresAt: new Date(finalTimestamp * 1000),
                   reviewQuotaReactivated,
                 })
+
+                // Registra o log de atividades do UPDATE DE ASSINATURA          
+                await this.activityLogsRepository.create({
+                 userId: user.id,
+                 action: 'UPDATED_SUBSCRIPTION',
+                 resource: 'SUBSCRIPTION',
+                 resourceId: subscription.id,
+                 minidescription: `ATUALIAZAÇÃO DA ASSINATURA`,
+                 description: `Assinatura ${subscription.id} atualizada.`,
+                 oldState: { status: '' },
+                 newState: { status: subscription.status === 'trialing' ? 'TRIALING' : 'ACTIVE' },
+                 ip: 'STRIPE_WEBHOOK',
+                 userAgent: 'STRIPE_WEBHOOK',
+                })
+
                 console.log(
                   `[Stripe Webhook] Assinatura ATUALIZADA com sucesso.`,
                 )
@@ -241,6 +256,22 @@ export class StripeWebhookUseCase {
                   cardBrand,
                   expiresAt: new Date(finalTimestamp * 1000),
                 })
+
+
+                // Registra o log de atividades do CRIAÇÃO DA ASSINATURA          
+                await this.activityLogsRepository.create({
+                 userId: user.id,
+                 action: 'CREATED_SUBSCRIPTION',
+                 resource: 'SUBSCRIPTION',
+                 resourceId: subscription.id,
+                 minidescription: `CRIAÇÃO DA ASSINATURA`,
+                 description: `Assinatura ${subscription.id} criada.`,
+                 oldState: { status: '' },
+                 newState: { status: subscription.status === 'trialing' ? 'TRIALING' : 'ACTIVE' },
+                 ip: 'STRIPE_WEBHOOK',
+                 userAgent: 'STRIPE_WEBHOOK',
+                })
+
                 console.log(`[Stripe Webhook] Assinatura CRIADA com sucesso.`)
 
               }
@@ -304,6 +335,7 @@ export class StripeWebhookUseCase {
 
 
       // Customer Subscription Updated - Atualiza a assinatura
+      /**  */
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const stripePriceId = subscription.items.data[0].price.id
@@ -436,11 +468,25 @@ export class StripeWebhookUseCase {
 
           userId = existingSub.userId
 
+          // Registra o log de atividades da ATUALIZAÇÃO DA ASSINATURA          
+          await this.activityLogsRepository.create({
+              userId: existingSub.userId,
+              action: 'UPGRADE_SUBSCRIPTION',
+              resource: 'SUBSCRIPTION',
+              resourceId: subscription.id,
+              minidescription: `ATUALIZAÇÃO DA ASSINATURA`,
+              description: `Assinatura ${subscription.id} atualizada (${existingSub.status} -> ${newStatus}) devido a Atualização da assinatura.`,
+              oldState: { status: existingSub.status },
+              newState: { status: newStatus },
+              ip: 'STRIPE_WEBHOOK',
+              userAgent: 'STRIPE_WEBHOOK',
+            })
+
           await this.subscriptionEventsRepository.create({
             userId,
             type: 'WEBHOOK',
             name: event.type,
-            status: 'SUCCESS',
+            status: 'SUCCESS_UPDATE',
             stripeSubscriptionId: subscription.id,
             payload: event as any,
           })
@@ -451,6 +497,7 @@ export class StripeWebhookUseCase {
       }
 
       // Customer Subscription Deleted - Cancela a assinatura
+      /** */
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         const existingSub =
@@ -488,6 +535,21 @@ export class StripeWebhookUseCase {
               userAgent: 'STRIPE_WEBHOOK',
             })
           }
+
+          // Registra o log de atividades do CANCELAMENTO DA ASSINATURA          
+            await this.activityLogsRepository.create({
+              userId: existingSub.userId,
+              action: 'CANCELLED_SUBSCRIPTION',
+              resource: 'SUBSCRIPTION',
+              resourceId: subscription.id,
+              minidescription: `CANCELAMENTO DA ASSINATURA`,
+              description: `Assinatura ${subscription.id} cancelada (-> CANCELLED) devido ao cancelamento da assinatura.`,
+              oldState: { status: 'ACTIVE' },
+              newState: { status: 'CANCELED' },
+              ip: 'STRIPE_WEBHOOK',
+              userAgent: 'STRIPE_WEBHOOK',
+            })
+          
           
 
           // Cria Log de evento de cancelamento  
@@ -504,6 +566,7 @@ export class StripeWebhookUseCase {
       }
 
       // Invoice Payment Succeeded - Registra a fatura no banco (seja renovação ou pro-rata)
+      /** */
       case 'invoice.payment_succeeded': {
         const stripeInvoice = event.data.object as any
 
@@ -614,26 +677,26 @@ export class StripeWebhookUseCase {
 
       default:
         console.log(`Tipo de evento não tratado ${event.type}`)
-        await this.subscriptionEventsRepository.create({
+       /* await this.subscriptionEventsRepository.create({
           type: 'WEBHOOK',
           name: event.type,
           status: 'IGNORED',
           message: 'Evento ignorado (não implementado ou não relevante).',
           stripeSubscriptionId: stripeSubscriptionId,
           payload: event as any,
-        })
+        })*/
     }
     } catch (err) {
-      console.error(`[Stripe Webhook Error] ${err}`)
-      await this.subscriptionEventsRepository.create({
-        userId,
-        type: 'WEBHOOK',
-        name: event.type,
-        status: 'FAILURE',
-        message: err instanceof Error ? err.message : 'Erro desconhecido no processamento do webhook.',
-        stripeSubscriptionId: stripeSubscriptionId,
-        payload: event as any,
-      })
+        console.error(`[Stripe Webhook Error] ${err}`)
+        /*await this.subscriptionEventsRepository.create({
+          userId,
+          type: 'WEBHOOK',
+          name: event.type,
+          status: 'FAILURE',
+          message: err instanceof Error ? err.message : 'Erro desconhecido no processamento do webhook.',
+          stripeSubscriptionId: stripeSubscriptionId,
+          payload: event as any,
+      })*/
       throw err
     }
   }

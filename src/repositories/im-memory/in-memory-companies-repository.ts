@@ -58,7 +58,6 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
       if (data.number !== undefined) this.items[companyIndex].number = data.number as string | null
       if (data.complement !== undefined) this.items[companyIndex].complement = data.complement as string | null
       if (data.cep !== undefined) this.items[companyIndex].cep = data.cep as string | null
-      if (data.active !== undefined) this.items[companyIndex].active = data.active as boolean
       if (data.status !== undefined) this.items[companyIndex].status = data.status as Status
       if (data.managerId !== undefined) this.items[companyIndex].managerId = data.managerId as string
       if (data.lastAccess !== undefined) this.items[companyIndex].lastAccess = data.lastAccess as Date | null
@@ -81,7 +80,6 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
       number: data.number ?? null,
       complement: data.complement ?? null,
       cep: data.cep ?? null,
-      active: true,
       status: data.status ?? Status.ACTIVE,
       createdBy: 'user-0',
       createdAt: new Date(),

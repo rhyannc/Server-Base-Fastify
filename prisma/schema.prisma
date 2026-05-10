@@ -125,7 +125,6 @@ model Company {
   number      String?
   complement  String?
   cep         String?
-  active      Boolean   @default(true)
   status      Status    @default(ACTIVE) // active, frozen, archived
   lastAccess  DateTime? // Último login
   createdBy   String?

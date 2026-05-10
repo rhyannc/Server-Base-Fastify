@@ -6,6 +6,7 @@ import { InMemoryPlansRepository } from '@/repositories/im-memory/in-memory-plan
 import { InMemoryUsagesRepository } from '@/repositories/im-memory/in-memory-usages-repository'
 import { InMemoryUserSubscriptionsRepository } from '@/repositories/im-memory/in-memory-user-subscriptions-repository'
 import { InMemoryUsersRepository } from '@/repositories/im-memory/in-memory-users-repository'
+import { InMemoryActivityLogsRepository } from '@/repositories/im-memory/in-memory-activity-logs-repository'
 import { FakeMailProvider } from '@/providers/mail/implementations/FakeMailProvider'
 
 import { CheckAndIncrementUsageUseCase } from '../usages/check-and-increment-usage'
@@ -19,6 +20,7 @@ let usersRepository: InMemoryUsersRepository
 let usagesRepository: InMemoryUsagesRepository
 let userSubscriptionsRepository: InMemoryUserSubscriptionsRepository
 let plansRepository: InMemoryPlansRepository
+let activityLogsRepository: InMemoryActivityLogsRepository
 let checkAndIncrementUsageUseCase: CheckAndIncrementUsageUseCase
 let mailProvider: FakeMailProvider
 let sut: CreateCollaboratorUseCase
@@ -40,6 +42,7 @@ describe('Create Collaborator Use Case', () => {
     )
 
     mailProvider = new FakeMailProvider()
+    activityLogsRepository = new InMemoryActivityLogsRepository()
 
     sut = new CreateCollaboratorUseCase(
       collaboratorsRepository,
@@ -47,6 +50,7 @@ describe('Create Collaborator Use Case', () => {
       usersRepository,
       checkAndIncrementUsageUseCase,
       mailProvider,
+      activityLogsRepository,
     )
 
     const plan = await plansRepository.create({
@@ -88,7 +92,7 @@ describe('Create Collaborator Use Case', () => {
 
     const { collaborator } = await sut.execute({
       companyId: company.id,
-      userId: user.id,
+      email: user.email,
       meId: managerIdForTests,
       meSysRole: 'ADMIN',
     })
@@ -112,7 +116,7 @@ describe('Create Collaborator Use Case', () => {
 
     await sut.execute({
       companyId: company.id,
-      userId: user.id,
+      email: user.email,
       meId: managerIdForTests,
       meSysRole: 'ADMIN',
     })
@@ -120,7 +124,7 @@ describe('Create Collaborator Use Case', () => {
     await expect(() =>
       sut.execute({
         companyId: company.id,
-        userId: user.id,
+        email: user.email,
         meId: managerIdForTests,
         meSysRole: 'ADMIN',
       }),
@@ -137,7 +141,7 @@ describe('Create Collaborator Use Case', () => {
     await expect(() =>
       sut.execute({
         companyId: 'non-existing-company-id',
-        userId: user.id,
+        email: user.email,
         meId: managerIdForTests,
         meSysRole: 'ADMIN',
       }),
@@ -154,7 +158,7 @@ describe('Create Collaborator Use Case', () => {
     await expect(() =>
       sut.execute({
         companyId: company.id,
-        userId: 'non-existing-user-id',
+        email: 'non-existing-user-email@example.com',
         meId: managerIdForTests,
         meSysRole: 'ADMIN',
       }),

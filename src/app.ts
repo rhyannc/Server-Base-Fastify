@@ -10,7 +10,7 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from 'fastify-type-provider-zod'
-import { z } from 'zod'
+import { ZodError } from 'zod'
 
 import { env } from './env'
 import { collaboratorsRoutes } from './http/controllers/collaborators/routes'
@@ -45,6 +45,7 @@ app.register(fastifyRateLimit, {
      timeWindow: '1 minute',*/
 })
 
+// Registro do JWT
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
   cookie: {
@@ -75,7 +76,7 @@ app.register(fastifySwagger, {
 // Interface Visual do Swagger
 app.register(fastifySwaggerUi, {
   routePrefix: '/docs',
-  uiConfig: { docExpansion: 'list' },
+  uiConfig: { docExpansion: 'list' }, //lista: fecha os itens, list: abre os itens
 })
 
 // Registra as rotas da aplicação
@@ -98,55 +99,38 @@ app.get(
 
 
 // TRATAMENTO DE ERROS DE FORMA GLOBAL
-/*
 app.setErrorHandler((error, _req, reply) => {
-  // 1) Erros de validação disparados pelo Fastify (quando schema.body/params/… falha)
+  // 1) Erros de validação disparados pelo Fastify/ZodTypeProvider nas rotas
   if ((error as any)?.code === 'FST_ERR_VALIDATION') {
     const cause = (error as any).cause
     if (cause instanceof ZodError) {
       return reply.status(400).send({
         message: 'Validation error.',
-        issues: cause.flatten(), // ou cause.format()
+        issues: cause.format(),
       })
     }
-    // fallback: caso não seja ZodError por algum motivo
+    // fallback: caso não seja ZodError
     return reply.status(400).send({
-      message: 'Validation error!',
+      message: 'Validation error.',
       issues: (error as any).message,
     })
   }
 
-  // 2) Erros Zod disparados manualmente no handler (parse/safeParse)
+  // 2) Erros Zod disparados manualmente no controller (quando se usa .parse direto no body)
   if (error instanceof ZodError) {
     return reply.status(400).send({
       message: 'Validation error.',
-      // issues: error.flatten(),
+      issues: error.format(),
     })
   }
 
-  // Demais erros
-  if (env.NODE_ENV !== 'production') {
-    console.error(error)
-  }
-  return reply.status(500).send({ message: 'Internal Server Error.' })
-})
-
-/**
-VALIDA ERRO GLOBAL
-app.setErrorHandler((error, _, reply) => {
-  if (error instanceof ZodError) {
-    return reply
-      .status(400)
-      .send({ message: 'Validation error.', issues: error.format() })
-  }
-
+  // 3) Demais erros (Erros 500 ou não mapeados)
   if (env.NODE_ENV !== 'production') {
     console.error(error)
   } else {
-    // TODO: Here we should log to a external tool like DataDog/NewRelic/Sentry
+    // TODO: Aqui a gente deveria fazer log para uma ferramenta externa (ex: Datadog / NewRelic / Sentry)
   }
 
-  return reply.status(500).send({ message: 'Internal server error.' })
-})
-
-*/
+  return reply.status(500).send({ message: 'Internal Server Error.' })
+}
+)
