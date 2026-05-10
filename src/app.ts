@@ -98,6 +98,7 @@ app.get(
 )
 
 
+
 // TRATAMENTO DE ERROS DE FORMA GLOBAL
 app.setErrorHandler((error, _req, reply) => {
   // 1) Erros de validação disparados pelo Fastify/ZodTypeProvider nas rotas

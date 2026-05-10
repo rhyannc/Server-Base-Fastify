@@ -21,7 +21,6 @@ export const createCompanyBodySchema = z.object({
   complement: z.string().optional(),
   cep: z.string().regex(/^\d+$/, 'Deve conter apenas números').optional(),
   createdBy: z.string().optional().describe('Criado por)'),
-  active: z.boolean().optional().default(true),
   status: z.enum(['ACTIVE', 'FROZEN', 'ARCHIVED']).optional().default('ACTIVE'),
   managerId: z
     .string()
@@ -55,7 +54,6 @@ export async function createCompany(
     complement,
     cep,
     createdBy,
-    active,
     status,
     managerId,
   } = createCompanyBodySchema.parse(request.body)
@@ -78,7 +76,6 @@ export async function createCompany(
       complement,
       cep,
       createdBy: createdBy ?? request.user.sub,
-      active: active ?? true,
       status: status ?? 'ACTIVE',
       managerId: managerId ?? request.user.sub,
       ip: request.ip,

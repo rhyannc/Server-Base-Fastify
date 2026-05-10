@@ -24,7 +24,6 @@ export const companyIdBodyResponse = {
         number: z.string().nullable(),
         complement: z.string().nullable(),
         cep: z.string().nullable(),
-        active: z.boolean(),
         createdBy: z.string().nullable(),
         createdAt: z.date(),
         updatedBy: z.string().nullable(),

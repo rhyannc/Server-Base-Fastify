@@ -1,5 +1,7 @@
 import { FastifyInstance } from 'fastify'
 
+import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
+import { verifyCompanyActive } from '@/http/middlewares/verify-company-active'
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 
 import {
@@ -30,9 +32,6 @@ import {
   updateCollaboratorBodySchema,
   updateCollaboratorParamsSchema,
 } from './updateCollaborator'
-import { verifyActiveUser } from '@/http/middlewares/verify-active-user'
-import { verifyCompanyActive } from '@/http/middlewares/verify-company-active'
-
 
 export async function collaboratorsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
@@ -43,7 +42,8 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Cadastra um novo colaborador em uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
+        summary:
+          'Cadastra um novo colaborador em uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         body: createCollaboratorBodySchema,
         response: createCollaboratorBodyResponse,
@@ -58,7 +58,8 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Lista todos os colaboradores de uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
+        summary:
+          'Lista todos os colaboradores de uma empresa | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: findCollaboratorsByCompanyParamsSchema,
         querystring: findCollaboratorsByCompanyQuerySchema,
@@ -88,7 +89,8 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Lista todas as empresas nas quais o usuário autenticado é colaborador',
+        summary:
+          'Lista todas as empresas nas quais o usuário autenticado é colaborador',
         security: [{ bearerAuth: [] }],
         querystring: findCompaniesByUserQuerySchema,
       },
@@ -101,7 +103,8 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Atualiza dados de um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
+        summary:
+          'Atualiza dados de um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: updateCollaboratorParamsSchema,
         body: updateCollaboratorBodySchema,
@@ -115,7 +118,8 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Collaborator'],
-        summary: 'Remove um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
+        summary:
+          'Remove um colaborador | somente usuário *ADMIN* - LEAD - MANAGER',
         security: [{ bearerAuth: [] }],
         params: removeCollaboratorParamsSchema,
       },

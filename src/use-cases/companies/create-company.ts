@@ -66,7 +66,7 @@ export class CreateCompanyUseCase {
       throw new CompanyAlreadyExistsError()
     }
 
-    // Verifica se Plano esta ativo ou Trial
+    // Verifica se Plano do usuario esta ativo ou Trial
     const subscription = await this.userSubscriptionsRepository.findByUserId(managerId)
 
     if (!subscription) {
