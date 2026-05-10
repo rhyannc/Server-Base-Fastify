@@ -21,5 +21,7 @@ export interface CollaboratorsRepository {
   countActiveByManagerId(managerId: string): Promise<number>
   findByCompanyId(companyId: string): Promise<Collaborator[]>
   countByCompany(companyId: string): Promise<number>
+  searchManyByCompany(companyId: string, query: string, page: number): Promise<Collaborator[]>
+  countSearchByCompany(companyId: string, query: string): Promise<number>
 }
 

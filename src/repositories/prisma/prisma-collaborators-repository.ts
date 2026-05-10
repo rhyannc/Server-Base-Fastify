@@ -162,5 +162,48 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
 
     return count
   }
+
+  async searchManyByCompany(companyId: string, query: string, page: number) {
+    const collaborators = await prisma.collaborator.findMany({
+      where: {
+        companyId,
+        user: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { email: { contains: query, mode: 'insensitive' } },
+          ],
+        },
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+      },
+      take: env.TAKE_PAGINATION,
+      skip: (page - 1) * env.TAKE_PAGINATION,
+    })
+
+    return collaborators
+  }
+
+  async countSearchByCompany(companyId: string, query: string) {
+    const count = await prisma.collaborator.count({
+      where: {
+        companyId,
+        user: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { email: { contains: query, mode: 'insensitive' } },
+          ],
+        },
+      },
+    })
+
+    return count
+  }
 }
 

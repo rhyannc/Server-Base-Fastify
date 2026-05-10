@@ -13,6 +13,11 @@ import {
   findCollaboratorsByCompanyQuerySchema,
 } from './findCollaboratorsByCompany'
 import {
+  searchCollaboratorsByCompany,
+  searchCollaboratorsByCompanyParamsSchema,
+  searchCollaboratorsByCompanyQuerySchema,
+} from './searchCollaboratorsByCompany'
+import {
   findCompaniesByUser,
   findCompaniesByUserQuerySchema,
 } from './findCompaniesByUser'
@@ -61,6 +66,21 @@ export async function collaboratorsRoutes(app: FastifyInstance) {
       preHandler: [verifyCompanyActive], // Bloqueia se a empresa estiver FROZEN ou ARCHIVED
     },
     findCollaboratorsByCompany,
+  )
+
+  app.get(
+    '/company/:companyId/search/:query',
+    {
+      schema: {
+        tags: ['Collaborator'],
+        summary: 'Pesquisa colaboradores de uma empresa por nome ou email | somente usuário *ADMIN* - LEAD - MANAGER',
+        security: [{ bearerAuth: [] }],
+        params: searchCollaboratorsByCompanyParamsSchema,
+        querystring: searchCollaboratorsByCompanyQuerySchema,
+      },
+      preHandler: [verifyCompanyActive],
+    },
+    searchCollaboratorsByCompany,
   )
 
   app.get(

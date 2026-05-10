@@ -142,5 +142,37 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
   async countByCompany(companyId: string) {
     return this.items.filter((item) => item.companyId === companyId).length
   }
+
+  async searchManyByCompany(companyId: string, query: string, page: number) {
+    const collaborators = this.items.filter((item) => {
+      if (item.companyId !== companyId) return false
+
+      const user = this.usersRepository.items.find((u) => u.id === item.userId)
+      if (!user) return false
+
+      const matchesName = user.name.toLowerCase().includes(query.toLowerCase())
+      const matchesEmail = user.email.toLowerCase().includes(query.toLowerCase())
+
+      return matchesName || matchesEmail
+    })
+
+    return collaborators.slice((page - 1) * 20, page * 20)
+  }
+
+  async countSearchByCompany(companyId: string, query: string) {
+    const count = this.items.filter((item) => {
+      if (item.companyId !== companyId) return false
+
+      const user = this.usersRepository.items.find((u) => u.id === item.userId)
+      if (!user) return false
+
+      const matchesName = user.name.toLowerCase().includes(query.toLowerCase())
+      const matchesEmail = user.email.toLowerCase().includes(query.toLowerCase())
+
+      return matchesName || matchesEmail
+    }).length
+
+    return count
+  }
 }
 
