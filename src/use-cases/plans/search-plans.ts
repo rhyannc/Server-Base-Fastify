@@ -1,6 +1,7 @@
 import { Plan } from '@prisma/client'
 
 import { PlansRepository } from '@/repositories/plans-repository'
+import { env } from '@/env'
 
 interface SearchPlansUseCaseRequest {
   query: string
@@ -9,6 +10,12 @@ interface SearchPlansUseCaseRequest {
 
 interface SearchPlansUseCaseResponse {
   plans: Plan[]
+  meta: {
+    totalCount: number
+    pageIndex: number
+    perPage: number
+    totalPages: number
+  }
 }
 
 export class SearchPlansUseCase {
@@ -18,7 +25,17 @@ export class SearchPlansUseCase {
     query,
     page,
   }: SearchPlansUseCaseRequest): Promise<SearchPlansUseCaseResponse> {
-    const plans = await this.plansRepository.searchMany(query, page)
-    return { plans }
+    const [plans, totalCount] = await this.plansRepository.searchMany(query, page)
+    const totalPages = Math.ceil(totalCount / env.TAKE_PAGINATION)
+
+    return {
+      plans,
+      meta: {
+        totalCount,
+        pageIndex: page,
+        perPage: env.TAKE_PAGINATION,
+        totalPages,
+      },
+    }
   }
 }

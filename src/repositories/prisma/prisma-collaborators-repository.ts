@@ -47,32 +47,38 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
     return collaborators
   }
 
-  async findManyByUser(userId: string, page: number) {
-    const collaborators = await prisma.collaborator.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        company: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            cnpj: true,
-            email: true,
-            phone: true,
-            address: true,
-            city: true,
-            active: true,
-            status: true,
-            
+  async findManyByUser(userId: string, page: number): Promise<[any[], number]> {
+    const transaction = await prisma.$transaction([
+      prisma.collaborator.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          company: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              cnpj: true,
+              email: true,
+              phone: true,
+              address: true,
+              city: true,
+              status: true,
+            },
           },
         },
-      },
-      take: env.TAKE_PAGINATION,
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
-    return collaborators
+        take: env.TAKE_PAGINATION,
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.collaborator.count({
+        where: {
+          userId,
+        },
+      }),
+    ])
+
+    return transaction
   }
 
   async create(data: Prisma.CollaboratorUncheckedCreateInput) {
@@ -206,4 +212,3 @@ export class PrismaCollaboratorsRepository implements CollaboratorsRepository {
     return count
   }
 }
-

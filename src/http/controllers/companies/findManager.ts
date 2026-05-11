@@ -17,7 +17,7 @@ export async function findManager(
   // Inversion Dependency Factoreis Pattern
   const FetchCompaniesUserId = makeFindUserIdCompaniesUseCase()
 
-  const { company } = await FetchCompaniesUserId.execute({
+  const { company, meta } = await FetchCompaniesUserId.execute({
     userId,
     page,
   })
@@ -30,6 +30,7 @@ export async function findManager(
   }
 
   return reply.status(200).send({
+    meta,
     company,
   })
 }

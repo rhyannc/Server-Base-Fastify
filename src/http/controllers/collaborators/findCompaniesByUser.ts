@@ -16,10 +16,10 @@ export async function findCompaniesByUser(
 
   const fetchUserCompaniesUseCase = makeFetchUserCompaniesUseCase()
 
-  const { collaborators } = await fetchUserCompaniesUseCase.execute({
+  const { collaborators, meta } = await fetchUserCompaniesUseCase.execute({
     userId,
     page,
   })
 
-  return reply.status(200).send({ collaborators })
+  return reply.status(200).send({ meta, collaborators })
 }

@@ -27,18 +27,19 @@ export class InMemoryPlansRepository implements PlansRepository {
     return plan
   }
 
-  async findMany(page: number, onlyActive = true) {
+  async findMany(page: number, onlyActive = true): Promise<[Plan[], number]> {
     let items = this.items
     if (onlyActive) {
       items = items.filter((item) => item.isActive)
     }
-    return items.slice((page - 1) * 20, page * 20)
+    const paginated = items.slice((page - 1) * 20, page * 20)
+    return [paginated, items.length]
   }
 
-  async searchMany(query: string, page: number) {
-    return this.items
-      .filter((item) => item.name.includes(query))
-      .slice((page - 1) * 20, page * 20)
+  async searchMany(query: string, page: number): Promise<[Plan[], number]> {
+    const filtered = this.items.filter((item) => item.name.includes(query))
+    const paginated = filtered.slice((page - 1) * 20, page * 20)
+    return [paginated, filtered.length]
   }
 
   async create(data: Prisma.PlanCreateInput) {

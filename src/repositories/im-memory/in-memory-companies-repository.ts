@@ -27,20 +27,21 @@ export class InMemoryCompaniesRepository implements CompaniesRepository {
     return company
   }
 
-  async findManyByUserManager(userId: string, page: number) {
-    return this.items
-      .filter((item) => item.managerId === userId)
-      .slice((page - 1) * 20, page * 20)
+  async findManyByUserManager(userId: string, page: number): Promise<[Company[], number]> {
+    const filtered = this.items.filter((item) => item.managerId === userId)
+    const paginated = filtered.slice((page - 1) * 20, page * 20)
+    return [paginated, filtered.length]
   }
 
-  async searchMany(query: string, page: number) {
-    return this.items
-      .filter((item) => item.name.includes(query) || (item.cnpj && item.cnpj.includes(query)))
-      .slice((page - 1) * 20, page * 20)
+  async searchMany(query: string, page: number): Promise<[Company[], number]> {
+    const filtered = this.items.filter((item) => item.name.includes(query) || (item.cnpj && item.cnpj.includes(query)))
+    const paginated = filtered.slice((page - 1) * 20, page * 20)
+    return [paginated, filtered.length]
   }
 
-  async findMany(page: number) {
-    return this.items.slice((page - 1) * 20, page * 20)
+  async findMany(page: number): Promise<[Company[], number]> {
+    const paginated = this.items.slice((page - 1) * 20, page * 20)
+    return [paginated, this.items.length]
   }
 
   async update(data: Prisma.CompanyUncheckedUpdateInput) {

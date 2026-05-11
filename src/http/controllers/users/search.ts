@@ -4,7 +4,10 @@ import { z } from 'zod'
 import { makeSearchUserUseCase } from '@/use-cases/factories/make-search-user-use-case'
 
 export const searchUsersQuerySchema = z.object({
-  q: z.string().min(1, 'q não pode ser vazio').describe('Pesquisa por Nome ou Email'),
+  q: z
+    .string()
+    .min(1, 'q não pode ser vazio')
+    .describe('Pesquisa por Nome ou Email'),
   page: z.coerce.number().min(1).default(1),
 })
 
@@ -13,7 +16,7 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
 
   const searchUserUseCase = makeSearchUserUseCase()
 
-  const { users } = await searchUserUseCase.execute({
+  const { users, meta } = await searchUserUseCase.execute({
     query: q,
     page,
   })
@@ -30,5 +33,5 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
     return userData
   })
 
-  return reply.status(200).send({ users: usersWithoutPassword })
+  return reply.status(200).send({ meta, users: usersWithoutPassword })
 }

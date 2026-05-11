@@ -24,30 +24,38 @@ export class PrismaPlansRepository implements PlansRepository {
     return plan
   }
 
-  async findMany(page: number, onlyActive = true) {
-    const plans = await prisma.plan.findMany({
-      take: env.TAKE_PAGINATION,// limita a quantidade de resultados por página
-      skip: (page - 1) * env.TAKE_PAGINATION, // pula os resultados anteriores
-      where:  onlyActive ? { isActive: true } : {},  
-      orderBy: {
-        name: 'asc',
-      },
-    })
-    return plans
+  async findMany(page: number, onlyActive = true): Promise<[any[], number]> {
+    const where = onlyActive ? { isActive: true } : {}
+    const transaction = await prisma.$transaction([
+      prisma.plan.findMany({
+        take: env.TAKE_PAGINATION,
+        skip: (page - 1) * env.TAKE_PAGINATION,
+        where,
+        orderBy: {
+          name: 'asc',
+        },
+      }),
+      prisma.plan.count({ where }),
+    ])
+    return transaction
   }
 
-  async searchMany(query: string, page: number) {
-    const plans = await prisma.plan.findMany({
-      where: {
-        name: {
-          contains: query,
-          mode: 'insensitive',
-        },
+  async searchMany(query: string, page: number): Promise<[any[], number]> {
+    const where = {
+      name: {
+        contains: query,
+        mode: 'insensitive' as Prisma.QueryMode,
       },
-      take: env.TAKE_PAGINATION,
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
-    return plans
+    }
+    const transaction = await prisma.$transaction([
+      prisma.plan.findMany({
+        where,
+        take: env.TAKE_PAGINATION,
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.plan.count({ where }),
+    ])
+    return transaction
   }
 
   async create(data: Prisma.PlanCreateInput) {

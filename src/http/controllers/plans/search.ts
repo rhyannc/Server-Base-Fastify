@@ -13,7 +13,7 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
 
   const searchPlansUseCase = makeSearchPlansUseCase()
 
-  const { plans } = await searchPlansUseCase.execute({
+  const { plans, meta } = await searchPlansUseCase.execute({
     query: q,
     page,
   })
@@ -26,6 +26,7 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
   }
 
   return reply.status(200).send({
+    meta,
     plans,
   })
 }

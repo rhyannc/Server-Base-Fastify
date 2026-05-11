@@ -13,7 +13,7 @@ export async function findPlans(request: FastifyRequest, reply: FastifyReply) {
   // Inversion Dependency Factoreis Pattern
   const findPlansUseCase = makeFindPlansUseCase()
 
-  const { plans } = await findPlansUseCase.execute({
+  const { plans, meta } = await findPlansUseCase.execute({
     page,
   })
 
@@ -24,6 +24,6 @@ export async function findPlans(request: FastifyRequest, reply: FastifyReply) {
     })
   }
 
-  return reply.status(200).send({ plans: {...plans, createdAt: undefined } })
+  return reply.status(200).send({ meta, plans: {...plans, createdAt: undefined } })
 
 }

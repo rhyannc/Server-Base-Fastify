@@ -7,13 +7,16 @@ export const findCompaniesQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
 })
 
-export async function findCompanies(request: FastifyRequest, reply: FastifyReply) {
+export async function findCompanies(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const { page } = findCompaniesQuerySchema.parse(request.query)
 
   // Inversion Dependency Factoreis Pattern
   const findCompanyUseCase = makeFindCompaniesUseCase()
 
-  const {companies } = await findCompanyUseCase.execute({
+  const { companies, meta } = await findCompanyUseCase.execute({
     page,
   })
 
@@ -24,5 +27,5 @@ export async function findCompanies(request: FastifyRequest, reply: FastifyReply
     })
   }
 
-  return reply.status(200).send({ companies })
+  return reply.status(200).send({ meta, companies })
 }

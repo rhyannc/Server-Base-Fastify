@@ -32,38 +32,46 @@ export class PrismaUsersRepository implements UsersRepository {
     return user
   }
 
-  async findMany(page: number) {
-    const users = await prisma.user.findMany({
-      take: env.TAKE_PAGINATION,
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
+  async findMany(page: number): Promise<[User[], number]> {
+    const transaction = await prisma.$transaction([
+      prisma.user.findMany({
+        take: env.TAKE_PAGINATION,
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.user.count(),
+    ])
 
-    return users
+    return transaction
   }
 
-  async searchMany(query: string, page: number) {
-    const users = await prisma.user.findMany({
-      where: {
-        OR: [
-          {
-            name: {
-              contains: query,
-              mode: 'insensitive',
-            },
+  async searchMany(query: string, page: number): Promise<[User[], number]> {
+    const where = {
+      OR: [
+        {
+          name: {
+            contains: query,
+            mode: 'insensitive' as Prisma.QueryMode,
           },
-          {
-            email: {
-              contains: query,
-              mode: 'insensitive',
-            },
+        },
+        {
+          email: {
+            contains: query,
+            mode: 'insensitive' as Prisma.QueryMode,
           },
-        ],
-      },
-      take: env.TAKE_PAGINATION,
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
+        },
+      ],
+    }
 
-    return users
+    const transaction = await prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        take: env.TAKE_PAGINATION,
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.user.count({ where }),
+    ])
+
+    return transaction
   }
 
   async update(data: User) {

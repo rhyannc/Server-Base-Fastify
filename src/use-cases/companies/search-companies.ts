@@ -1,5 +1,6 @@
 import { Company } from '@prisma/client'
 
+import { env } from '@/env'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 
 // Interface local para estender a Company
@@ -16,6 +17,12 @@ interface SearchCompaniesUseCaseRequest {
 
 interface SearchCompaniesUseCaseResponse {
   company: Company[]
+  meta: {
+    totalCount: number
+    pageIndex: number
+    perPage: number
+    totalPages: number
+  }
 }
 
 export class SearchCompaniesUseCase {
@@ -25,13 +32,22 @@ export class SearchCompaniesUseCase {
     query,
     page,
   }: SearchCompaniesUseCaseRequest): Promise<SearchCompaniesUseCaseResponse> {
-    const company = (await this.companiesRepository.searchMany(
+    const [companiesList, totalCount] = await this.companiesRepository.searchMany(
       query,
       page,
-    )) as CompanyWithManager[]
+    )
+
+    const company = companiesList as CompanyWithManager[]
+    const totalPages = Math.ceil(totalCount / env.TAKE_PAGINATION)
 
     return {
       company,
+      meta: {
+        totalCount,
+        pageIndex: page,
+        perPage: env.TAKE_PAGINATION,
+        totalPages,
+      },
     }
   }
 }

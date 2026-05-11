@@ -42,10 +42,10 @@ export class InMemoryCollaboratorsRepository implements CollaboratorsRepository 
       .slice((page - 1) * 20, page * 20)
   }
 
-  async findManyByUser(userId: string, page: number) {
-    return this.items
-      .filter((item) => item.userId === userId)
-      .slice((page - 1) * 20, page * 20)
+  async findManyByUser(userId: string, page: number): Promise<[Collaborator[], number]> {
+    const collaborators = this.items.filter((item) => item.userId === userId)
+    const paginated = collaborators.slice((page - 1) * 20, page * 20)
+    return [paginated, collaborators.length]
   }
 
   async create(data: Prisma.CollaboratorUncheckedCreateInput) {

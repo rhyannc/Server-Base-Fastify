@@ -24,61 +24,79 @@ export class PrismaCompaniesRepository implements CompaniesRepository {
     return company
   }
 
-  async findMany(page: number) {
-    const companies = await prisma.company.findMany({
-      include: {
-        manager: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      take: env.TAKE_PAGINATION, // Total de resutados por pagina
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
-    return companies
-  }
-
-  async findManyByUserManager(userId: string, page: number) {
-    const companies = await prisma.company.findMany({
-      where: {
-        managerId: userId,
-      },
-      take: env.TAKE_PAGINATION, // Total de resutados por pagina
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
-    return companies
-  }
-
-  async searchMany(query: string, page: number) {
-    const companies = await prisma.company.findMany({
-      where: {
-        OR: [
-          {
-            name: {
-              contains: query,
-              mode: 'insensitive', // VAI PESQUISAR INDEPENDENTE SE ESTA MAIUSCULO OU MINUSCULO
+  async findMany(page: number): Promise<[any[], number]> {
+    const transaction = await prisma.$transaction([
+      prisma.company.findMany({
+        include: {
+          manager: {
+            select: {
+              name: true,
             },
           },
-          {
-            cnpj: {
-              contains: query,
-            },
-          },
-        ],
-      },
-      include: {
-        manager: {
-          select: {
-            name: true,
+        },
+        take: env.TAKE_PAGINATION, // Total de resutados por pagina
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.company.count(),
+    ])
+
+    return transaction
+  }
+
+  async findManyByUserManager(userId: string, page: number): Promise<[any[], number]> {
+    const transaction = await prisma.$transaction([
+      prisma.company.findMany({
+        where: {
+          managerId: userId,
+        },
+        take: env.TAKE_PAGINATION, // Total de resutados por pagina
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.company.count({
+        where: {
+          managerId: userId,
+        },
+      }),
+    ])
+
+    return transaction
+  }
+
+  async searchMany(query: string, page: number): Promise<[any[], number]> {
+    const where = {
+      OR: [
+        {
+          name: {
+            contains: query,
+            mode: 'insensitive' as Prisma.QueryMode, // VAI PESQUISAR INDEPENDENTE SE ESTA MAIUSCULO OU MINUSCULO
           },
         },
-      },
+        {
+          cnpj: {
+            contains: query,
+          },
+        },
+      ],
+    }
 
-      take: env.TAKE_PAGINATION, // Total de resutados por pagina
-      skip: (page - 1) * env.TAKE_PAGINATION,
-    })
-    return companies
+    const transaction = await prisma.$transaction([
+      prisma.company.findMany({
+        where,
+        include: {
+          manager: {
+            select: {
+              name: true,
+            },
+          },
+        },
+
+        take: env.TAKE_PAGINATION, // Total de resutados por pagina
+        skip: (page - 1) * env.TAKE_PAGINATION,
+      }),
+      prisma.company.count({ where }),
+    ])
+
+    return transaction
   }
 
   async create(data: Prisma.CompanyUncheckedCreateInput) {

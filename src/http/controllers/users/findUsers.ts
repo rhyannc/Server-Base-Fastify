@@ -12,7 +12,7 @@ export async function findUsers(request: FastifyRequest, reply: FastifyReply) {
 
   const fetchUsersUseCase = makeFetchUsersUseCase()
 
-  const { users } = await fetchUsersUseCase.execute({
+  const { users, meta } = await fetchUsersUseCase.execute({
     page,
   })
 
@@ -28,5 +28,5 @@ export async function findUsers(request: FastifyRequest, reply: FastifyReply) {
     return userData
   })
 
-  return reply.status(200).send({ users: usersWithoutPassword })
+  return reply.status(200).send({ meta, users: usersWithoutPassword })
 }

@@ -1,5 +1,6 @@
 import { Company } from '@prisma/client'
 
+import { env } from '@/env'
 import { CompaniesRepository } from '@/repositories/companies-repository'
 
 interface FetchCompanyUseCaseRequest {
@@ -9,6 +10,12 @@ interface FetchCompanyUseCaseRequest {
 
 interface FetchCompanyUseCaseResponse {
   company: Company[]
+  meta: {
+    totalCount: number
+    pageIndex: number
+    perPage: number
+    totalPages: number
+  }
 }
 
 export class FetchCompaniesUserId {
@@ -18,11 +25,21 @@ export class FetchCompaniesUserId {
     userId,
     page,
   }: FetchCompanyUseCaseRequest): Promise<FetchCompanyUseCaseResponse> {
-    const company = await this.companiesRepository.findManyByUserManager(
+    const [company, totalCount] = await this.companiesRepository.findManyByUserManager(
       userId,
       page,
     )
 
-    return { company }
+    const totalPages = Math.ceil(totalCount / env.TAKE_PAGINATION)
+
+    return {
+      company,
+      meta: {
+        totalCount,
+        pageIndex: page,
+        perPage: env.TAKE_PAGINATION,
+        totalPages,
+      },
+    }
   }
 }

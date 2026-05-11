@@ -16,7 +16,7 @@ export async function meCollaborator(
 
   const fetchUserCompaniesUseCase = makeFetchUserCompaniesUseCase()
 
-  const { collaborators } = await fetchUserCompaniesUseCase.execute({
+  const { collaborators, meta } = await fetchUserCompaniesUseCase.execute({
     userId,
     page,
   })
@@ -28,5 +28,5 @@ export async function meCollaborator(
     })
   }
 
-  return reply.status(200).send({ collaborators })
+  return reply.status(200).send({ meta, collaborators })
 }

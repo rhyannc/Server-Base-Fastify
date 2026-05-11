@@ -26,16 +26,17 @@ export class InMemoryUsersRepository implements UsersRepository {
     return user
   }
 
-  async findMany(page: number) {
-    return this.items.slice((page - 1) * 20, page * 20)
+  async findMany(page: number): Promise<[User[], number]> {
+    const paginated = this.items.slice((page - 1) * 20, page * 20)
+    return [paginated, this.items.length]
   }
 
-  async searchMany(query: string, page: number) {
-    return this.items
-      .filter(
-        (item) => item.name.includes(query) || item.email.includes(query),
-      )
-      .slice((page - 1) * 20, page * 20)
+  async searchMany(query: string, page: number): Promise<[User[], number]> {
+    const filtered = this.items.filter(
+      (item) => item.name.includes(query) || item.email.includes(query),
+    )
+    const paginated = filtered.slice((page - 1) * 20, page * 20)
+    return [paginated, filtered.length]
   }
 
   async update(data: Prisma.UserUncheckedUpdateInput) {

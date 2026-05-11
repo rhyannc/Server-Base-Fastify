@@ -7,7 +7,7 @@ export interface CollaboratorsRepository {
     userId: string,
   ): Promise<Collaborator | null>
   findManyByCompany(companyId: string, page: number): Promise<Collaborator[]>
-  findManyByUser(userId: string, page: number): Promise<Collaborator[]>
+  findManyByUser(userId: string, page: number): Promise<[Collaborator[], number]>
   create(data: Prisma.CollaboratorUncheckedCreateInput): Promise<Collaborator>
   update(data: Prisma.CollaboratorUncheckedUpdateInput): Promise<Collaborator>
   delete(id: string): Promise<void>

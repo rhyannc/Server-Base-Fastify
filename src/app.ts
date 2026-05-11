@@ -4,6 +4,7 @@ import fastifyRateLimit from '@fastify/rate-limit'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
 import fastify from 'fastify'
+import fastifyRawBody from 'fastify-raw-body'
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -19,16 +20,14 @@ import { plansRoutes } from './http/controllers/plans/routes'
 import { usagesRoutes } from './http/controllers/usages/routes'
 import { userSubscriptionsRoutes } from './http/controllers/user-subscriptions/routes'
 import { usersRoutes } from './http/controllers/users/routes'
-import { appRoutes } from './http/routes'
 import { webhooksRoutes } from './http/controllers/webhooks/routes'
+import { appRoutes } from './http/routes'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 // zod <-> fastify
 app.setValidatorCompiler(validatorCompiler)
-app.setSerializerCompiler(serializerCompiler)
-
-import fastifyRawBody from 'fastify-raw-body' // Plugin para ler o body da requisição
+app.setSerializerCompiler(serializerCompiler) // Plugin para ler o body da requisição
 
 app.register(fastifyCookie)
 app.register(fastifyRawBody, {
@@ -42,7 +41,7 @@ app.register(fastifyRawBody, {
 app.register(fastifyRateLimit, {
   global: false, // se false; cada rota define seu próprio limite
   /* max: 100,
-     timeWindow: '1 minute',*/
+     timeWindow: '1 minute', */
 })
 
 // Registro do JWT
@@ -66,7 +65,7 @@ app.register(fastifySwagger, {
           scheme: 'bearer',
           bearerFormat: 'JWT',
         },
-      }, 
+      },
     },
   },
 
@@ -76,7 +75,7 @@ app.register(fastifySwagger, {
 // Interface Visual do Swagger
 app.register(fastifySwaggerUi, {
   routePrefix: '/docs',
-  uiConfig: { docExpansion: 'list' }, //lista: fecha os itens, list: abre os itens
+  uiConfig: { docExpansion: 'list' }, // lista: fecha os itens, list: abre os itens
 })
 
 // Registra as rotas da aplicação
@@ -90,14 +89,9 @@ app.register(usagesRoutes, { prefix: '/usages' })
 app.register(webhooksRoutes, { prefix: '/webhooks' })
 
 // Rota para testar se a API está funcionando
-app.get(
-  '/',
-  async (request, reply) => {
-    return reply.status(200).send('It Works!')
-  },
-)
-
-
+app.get('/', async (request, reply) => {
+  return reply.status(200).send('It Works!')
+})
 
 // TRATAMENTO DE ERROS DE FORMA GLOBAL
 app.setErrorHandler((error, _req, reply) => {
@@ -133,5 +127,4 @@ app.setErrorHandler((error, _req, reply) => {
   }
 
   return reply.status(500).send({ message: 'Internal Server Error.' })
-}
-)
+})

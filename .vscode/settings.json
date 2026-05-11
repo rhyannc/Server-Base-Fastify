@@ -2,7 +2,9 @@
 
 {
   "editor.formatOnSave": false,
+  "files.eol": "\n",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    
   }
 }
